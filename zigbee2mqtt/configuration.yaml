@@ -1,0 +1,180 @@
+version: 4
+homeassistant:
+  enabled: true
+advanced:
+  network_key:
+    - 59
+    - 187
+    - 26
+    - 213
+    - 153
+    - 231
+    - 202
+    - 187
+    - 244
+    - 60
+    - 197
+    - 107
+    - 197
+    - 131
+    - 180
+    - 84
+  pan_id: 56928
+  ext_pan_id:
+    - 116
+    - 228
+    - 181
+    - 67
+    - 43
+    - 213
+    - 60
+    - 158
+mqtt:
+  server: mqtt://core-mosquitto:1883
+  user: mqtt_user
+  password: Jegkanikkelideost1
+serial:
+  port: >-
+    /dev/serial/by-id/usb-ITEAD_SONOFF_Zigbee_3.0_USB_Dongle_Plus_V2_20240218153241-if00
+  adapter: ember
+frontend:
+  enabled: true
+  port: 8099
+devices:
+  '0x00178801062cae78':
+    friendly_name: kontor1
+  '0x00178801061f9830':
+    friendly_name: spisebord1
+  '0x0017880106a22f02':
+    friendly_name: spisebord2
+  '0x001788010849d830':
+    friendly_name: lillebad1
+  '0x001788010e617e0b':
+    friendly_name: lillebad2
+  '0x00178801085019ce':
+    friendly_name: lillebad3
+  '0x001788010e619647':
+    friendly_name: lillebad4
+  '0x0017880109dbf75b':
+    friendly_name: lillebad5
+  '0x001788010e4fc541':
+    friendly_name: SensorLillebad
+  '0x0017880106b9510e':
+    friendly_name: gangen1
+  '0x0017880106b96957':
+    friendly_name: gangen2
+  '0x00178801068d4351':
+    friendly_name: gangen3
+  '0x0017880106b9598c':
+    friendly_name: gangen4
+  '0x001788010e5e0616':
+    friendly_name: gangen5
+  '0x0017880106f6cf37':
+    friendly_name: SensorGangen
+  '0x001788010e608621':
+    friendly_name: garage1
+  '0x001788010e5d0bdd':
+    friendly_name: garage2
+  '0x001788010e608783':
+    friendly_name: garage3
+  '0x001788010e5d03e8':
+    friendly_name: garage4
+  '0x001788010e4fc5ac':
+    friendly_name: SensorGarage
+  '0x001788010e61914a':
+    friendly_name: bryggers1
+  '0x001788010e6184ea':
+    friendly_name: bryggers2
+  '0x001788010e4facad':
+    friendly_name: SensorBryggers
+  '0x001788010e217524':
+    friendly_name: viktualie1
+  '0x001788010e21722a':
+    friendly_name: viktualie2
+  '0x001788010e504bfb':
+    friendly_name: SensorViktualie
+  '0x001788010e61978a':
+    friendly_name: storbad1
+  '0x001788010e619640':
+    friendly_name: storbad2
+  '0x00178801084585d0':
+    friendly_name: storbad3
+  '0x00178801083ed53d':
+    friendly_name: storbad4
+  '0x00178801083ed03a':
+    friendly_name: storbad5
+  '0x001788010e61913b':
+    friendly_name: storbad6
+  '0x00178801083eda94':
+    friendly_name: storbad7
+  '0x0017880106f6c778':
+    friendly_name: SensorStorbad
+  '0x001788010dbda59d':
+    friendly_name: lillestue1
+  '0x001788010dbda447':
+    friendly_name: lillestue2
+  '0x001788010e6165ee':
+    friendly_name: stue1
+  '0x001788010e61612a':
+    friendly_name: stue2
+  '0x001788010e5dd684':
+    friendly_name: stue3
+  '0x001788010e616696':
+    friendly_name: stue4
+  '0x001788010e5ddb4b':
+    friendly_name: stue5
+  '0x001788010e5dd6a2':
+    friendly_name: stue6
+  '0x001788010e567bf9':
+    friendly_name: kontaktstue
+  '0x001788010e567b67':
+    friendly_name: kontaktkokken
+  '0x001788010d4ac542':
+    friendly_name: kokken1
+  '0x0017880109dbe5cc':
+    friendly_name: kokken2
+  '0x001788010e6160bb':
+    friendly_name: kokken3
+  '0x001788010d9a6602':
+    friendly_name: kokken4
+  '0x001788010e619360':
+    friendly_name: kokken5
+  '0x0017880109e3f695':
+    friendly_name: kokken6
+  '0x0017880108497a94':
+    friendly_name: kokken7
+  '0x0017880109e3f715':
+    friendly_name: kokken8
+  '0x001788010e616180':
+    friendly_name: kokken9
+  '0x001788010e5dd675':
+    friendly_name: kokken10
+  '0x0017880106eb7f4f':
+    friendly_name: kontaktKontor
+  '0x00158d000af064a3':
+    friendly_name: aqarastorbad
+groups:
+  '1':
+    friendly_name: garage
+  '2':
+    friendly_name: bryggers
+  '3':
+    friendly_name: gangen
+  '4':
+    friendly_name: lillebad
+  '5':
+    friendly_name: kokken
+  '6':
+    friendly_name: spisebord
+  '7':
+    friendly_name: storbad
+  '8':
+    friendly_name: stue
+  '9':
+    friendly_name: altlys
+  '10':
+    friendly_name: kontor
+  '11':
+    friendly_name: viktualie
+  '12':
+    friendly_name: lillestue

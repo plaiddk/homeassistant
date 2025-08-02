@@ -1,0 +1,8 @@
+- platform: statistics
+  name: "Sidste måneds elforbrug"
+  entity_id: sensor.eloverblik_energy_total
+  state_characteristic: sum # newest − oldest
+  sampling_size: 744 # ≥ 31 days × 24 h
+  max_age:
+    days: 30 # rolling window of 30 days
+  precision: 2

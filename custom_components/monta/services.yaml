@@ -1,0 +1,25 @@
+start_charging:
+  name: Start charging
+  description: >-
+    Start charging. Select either charger device or
+    specify the charge_point_id directly
+  fields:
+    charge_point_id:
+      description: "The charger point id"
+      required: true
+      selector:
+        device:
+          integration: monta
+
+stop_charging:
+  name: Stop charging
+  description: >-
+    Stop the active charging. Select either charger device
+    or specify the charge_point_id directly
+  fields:
+    charge_point_id:
+      description: "The charger point id"
+      required: true
+      selector:
+        device:
+          integration: monta

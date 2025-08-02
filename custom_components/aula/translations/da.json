@@ -1,0 +1,61 @@
+{
+  "services": {
+    "api_call": {
+      "name": "API Kald",
+      "description": "Lav et custom API kald til Aula",
+      "fields": {
+        "uri": {
+          "name": "uri",
+          "description": "URI"
+        },
+        "post_data": {
+          "name": "post_data",
+          "description": "Post data i JSON format. Hvis ikke angivet, laver vi et GET request"
+        }
+      }
+    }
+  },
+  "config": {
+    "error": {
+      "1": "Unknown error",
+      "2": "Unknown error"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Unilogin brugernavn",
+          "password": "Unilogin password",
+          "schoolschedule": "Skoleskemaer som kalender entiteter",
+          "ugeplan": "Ugeplaner som sensor attributter",
+          "mu_opgaver": "Opgaver fra Min Uddannelse som sensor attribut"
+        },
+        "description": "Indtast dine Unilogin oplysninger",
+        "title": "Login"
+      }
+    }
+  },
+  "options": {
+    "error": {
+      "1": "Unknown error"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "username": "Unilogin brugernavn",
+          "password": "Unilogin password"
+        },
+        "description": "Indtast dine Unilogin oplysninger",
+        "title": "Login"
+      },
+      "options": {
+        "data": {
+          "schoolschedule": "Skoleskemaer som kalender entiteter",
+          "ugeplan": "Ugeplaner som sensor attributter",
+          "mu_opgaver": "Opgaver fra Min Uddannelse som sensor attribut"
+        },
+        "description": "",
+        "title": "Login"
+      }
+    }
+  }
+}

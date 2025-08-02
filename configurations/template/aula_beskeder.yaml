@@ -1,0 +1,27 @@
+- trigger:
+    - platform: event
+      event_type: beskeder_updated
+  sensor:
+    - name: "Ulæste beskeder aula"
+      unique_id: aula_beskeder
+      state: >-
+        {% set raw_data = trigger.event.data.huskeliste %}
+        {% if raw_data %}
+          JSON received
+        {% else %}
+          Ingen beskeder fundet.
+        {% endif %}
+      attributes:
+        huskeliste: >-
+          {% set raw_data = trigger.event.data.huskeliste %}
+          {% if raw_data %}
+            {% set huskeliste = raw_data | regex_replace(find="\s*```json\s*", replace='') 
+                                         | regex_replace(find="\s*```\s*", replace='') 
+                                         | from_json %}
+            {% for item in huskeliste %}
+              - **{{ item.person }}**  
+                - {{ item.date }}: {{ item.message }}
+            {% endfor %}
+          {% else %}
+            Ingen beskeder fundet.
+          {% endif %}

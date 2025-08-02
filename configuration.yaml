@@ -1,0 +1,136 @@
+# Loads default set of integrations. Do not remove.
+default_config:
+  #bluetooth:
+######################################
+# Home Assistant setup
+homeassistant:
+  #customize: !include customize.yaml
+  packages: !include_dir_merge_named configurations/packages/
+  #allowlist_external_dirs:
+  #- /config/www/rest
+  #- /config
+
+######################################
+# Frontend setup
+frontend:
+  themes: !include_dir_merge_named themes
+
+######################################
+# Default includes
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+######################################
+# Integrations without configuration
+wake_on_lan:
+
+######################################
+
+# Configurations
+binary_sensor: !include_dir_merge_list configurations/binary_sensor
+#conversation: !include configurations/conversation.yaml
+#fuelprices_dk: !include configurations/fuelprices.yaml
+#group: !include_dir_merge_named configurations/groups
+#intent_script: !include_dir_merge_named configurations/intent_script
+#media_player: !include_dir_merge_list configurations/media_player
+#powercalc: !include configurations/powercalc.yaml
+#pyscript: !include configurations/pyscript.yaml
+python_script:
+#recorder: !include configurations/recorder.yaml
+#rest: !include_dir_merge_list configurations/rest
+#rest_command: !include configurations/rest_command.yaml
+sensor: !include_dir_merge_list configurations/sensor
+#shell_command: !include configurations/shell_commands.yaml
+#switch: !include_dir_merge_list configurations/switch
+template: !include_dir_merge_list configurations/template
+#tts: !include configurations/tts.yaml
+#zha: !include configurations/zha.yaml
+
+spotcast:
+  sp_dc: !secret sp_dc
+  sp_key: !secret sp_key
+  country: DK
+
+input_text:
+  huskeliste_herman:
+    name: Huskeliste Herman
+    max: 256
+  huskeliste_kamma:
+    name: Huskeliste Kamma
+    max: 256
+  beskedliste_alle:
+    name: beskederaula
+    max: 256
+
+input_boolean:
+  smart_wash:
+    name: Smart Wash
+    initial: off # Default state is off when Home Assistant starts
+    icon: mdi:dishwasher
+  smart_wash_vaskemaskine:
+    name: Smart Wash2
+    initial: off # Default state is off when Home Assistant starts
+    icon: mdi:washing-machine
+  wash_today:
+    name: Wash Today
+    initial: off # Default state is off when Home Assistant starts
+    icon: mdi:dishwasher
+  wash_today_vaskemaskine:
+    name: Wash Today Vaskemaskine
+    initial: off
+    icon: mdi:washing-machine
+
+input_number:
+  climate_temperature:
+    name: Climate Temperature
+    min: 15.5
+    max: 30
+    step: 0.5
+    mode: slider
+    initial: 22.5
+
+input_select:
+  washer_temperature:
+    name: Washer Temperature
+    options:
+      - "30"
+      - "40"
+      - "60"
+    initial: "40" # Default selected value
+    icon: mdi:thermometer
+  theme_selector:
+    name: Theme Selector
+    options:
+      - Fluent Blue
+      - Fluent Green
+      - Fluent Orange
+      - Fluent Purple
+      - Fluent Red
+      - Fluent Slate
+      - Metro Blue
+      - Metro Green
+      - Metro Orange
+      - Metro Purple
+      - Metro Red
+      - Metro Slate
+    initial: Fluent Blue
+
+#───────────────────────────────────────────────────────────────────────────────
+# Pollen prognose og seneste pollental
+#───────────────────────────────────────────────────────────────────────────────
+pollen_dk:
+  regions: # Possible values: øst, vest
+    - vest
+  pollen_types: # Possible values: alternaria, birk, bynke, cladosporium, el, elm, græs, hassel
+    - alternaria
+    - birk
+    - bynke
+    - cladosporium
+    - el
+    - elm
+    - græs
+    - hassel
+#───────────────────────────────────────────────────────────────────────────────
+# Eloverblik
+#───────────────────────────────────────────────────────────────────────────────

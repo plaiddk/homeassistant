@@ -1,0 +1,4 @@
+{% from 'cheapest_energy_hours.jinja' import cheapest_energy_hours %}
+{% set energi_priser='sensor.energi_data_service' %}
+{% set output = cheapest_energy_hours(sensor=energi_priser, time_key='hour', value_key='price', hours=4, look_ahead=true, include_today=true, include_tomorrow=true, mode='start') %}
+{{ output }}

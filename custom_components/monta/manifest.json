@@ -1,0 +1,16 @@
+{
+  "domain": "monta",
+  "name": "Monta",
+  "codeowners": [
+    "@nickknissen"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/nickknissen/hass-monta",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/nickknissen/hass-monta/issues",
+  "loggers": [
+    "custom_components.monta"
+  ],
+  "version": "1.6.3"
+}

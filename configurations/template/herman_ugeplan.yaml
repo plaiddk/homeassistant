@@ -1,0 +1,20 @@
+- trigger:
+    - platform: event
+      event_type: herman_huskeliste_updated
+  sensor:
+    - name: "Herman Huskeliste"
+      unique_id: herman_huskeliste
+      state: "Updated"
+      attributes:
+        huskeliste: >-
+          {% set raw_data = trigger.event.data.huskeliste %}
+          {% if raw_data %}
+            {% set huskeliste = raw_data | regex_replace(find="\s*```json\s*", replace='') 
+                                         | regex_replace(find="\s*```\s*", replace='') 
+                                         | from_json %}
+            {% for item in huskeliste %}
+              - **{{ item.date }}**: {{ item.message }}
+            {% endfor %}
+          {% else %}
+            Ingen beskeder fundet.
+          {% endif %}

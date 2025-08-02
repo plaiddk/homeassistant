@@ -1,0 +1,9 @@
+- platform: generic_hygrostat
+  name: Toilet Hygrostat
+  sensor: sensor.aqarastorbad_humidity
+  delta_trigger: 6
+  target_offset: 3
+  max_on_time: 7200
+  sample_interval: 60
+  min_humidity: 75
+  unique_id: bathroom_hygrostat

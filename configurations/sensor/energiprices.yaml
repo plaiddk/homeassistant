@@ -1,0 +1,18 @@
+- platform: template
+  sensors:
+    today_mean_price:
+      friendly_name: "today mean price"
+      unit_of_measurement: "DKK/kWh"
+      value_template: >
+        {{ state_attr('sensor.energi_data_service', 'today_mean') }}
+
+    tomorrow_min_price:
+      friendly_name: "Tomorrow Min Price"
+      unit_of_measurement: "DKK/kWh"
+      value_template: >
+        {{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}
+
+    finish_in_relative:
+      friendly_name: "Finish In Relative"
+      unit_of_measurement: "seconds"
+      value_template: "{{ states('sensor.finish_in_relative') | int }}"
