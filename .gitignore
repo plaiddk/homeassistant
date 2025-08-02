@@ -16,3 +16,4 @@ www/*.mp4
 www/*.jpghome-assistant_v2.db
 home-assistant_v2.db-shm
 home-assistant_v2.db-wal
+.storage/
