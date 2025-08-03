@@ -760,6 +760,10 @@ Metro Red:
   card-mod-theme: "Metro Red"
   card-mod-root-yaml: |
     .: |
+      .toolbar > sl-tab-group {
+        pointer-events: none;
+        opacity: 0;
+      }
       /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
       @media (min-width: 768px) {
         :not(.edit-mode) > #view {
@@ -797,6 +801,10 @@ Fluent Red:
   card-mod-theme: "Fluent Red"
   card-mod-root-yaml: |
     .: |
+      .toolbar > sl-tab-group {
+        pointer-events: none;
+        opacity: 0;
+      }
       /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
       @media (min-width: 768px) {
         :not(.edit-mode) > #view {
@@ -846,6 +854,10 @@ Metro Blue:
   card-mod-theme: "Metro Blue"
   card-mod-root-yaml: |
     .: |
+      .toolbar > sl-tab-group {
+        pointer-events: none;
+        opacity: 0;
+      }
       /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
       @media (min-width: 768px) {
         :not(.edit-mode) > #view {
@@ -883,6 +895,10 @@ Fluent Blue:
   card-mod-theme: "Fluent Blue"
   card-mod-root-yaml: |
     .: |
+      .toolbar > sl-tab-group {
+        pointer-events: none;
+        opacity: 0;
+      }
       /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
       @media (min-width: 768px) {
         :not(.edit-mode) > #view {
@@ -931,6 +947,10 @@ Metro Green:
   card-mod-theme: "Metro Green"
   card-mod-root-yaml: |
     .: |
+      .toolbar > sl-tab-group {
+        pointer-events: none;
+        opacity: 0;
+      }
       /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
       @media (min-width: 768px) {
         :not(.edit-mode) > #view {
@@ -968,6 +988,10 @@ Fluent Green:
   card-mod-theme: "Fluent Green"
   card-mod-root-yaml: |
     .: |
+      .toolbar > sl-tab-group {
+        pointer-events: none;
+        opacity: 0;
+      }
       /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
       @media (min-width: 768px) {
         :not(.edit-mode) > #view {
@@ -1016,6 +1040,10 @@ Metro Orange:
   card-mod-theme: "Metro Orange"
   card-mod-root-yaml: |
     .: |
+      .toolbar > sl-tab-group {
+        pointer-events: none;
+        opacity: 0;
+      }
       /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
       @media (min-width: 768px) {
         :not(.edit-mode) > #view {
@@ -1053,6 +1081,10 @@ Fluent Orange:
   card-mod-theme: "Fluent Orange"
   card-mod-root-yaml: |
     .: |
+      .toolbar > sl-tab-group {
+        pointer-events: none;
+        opacity: 0;
+      }
       /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
       @media (min-width: 768px) {
         :not(.edit-mode) > #view {
@@ -1101,6 +1133,10 @@ Metro Purple:
   card-mod-theme: "Metro Purple"
   card-mod-root-yaml: |
     .: |
+      .toolbar > sl-tab-group {
+        pointer-events: none;
+        opacity: 0;
+      }
       /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
       @media (min-width: 768px) {
         :not(.edit-mode) > #view {
@@ -1138,6 +1174,10 @@ Fluent Purple:
   card-mod-theme: "Fluent Purple"
   card-mod-root-yaml: |
     .: |
+      .toolbar > sl-tab-group {
+        pointer-events: none;
+        opacity: 0;
+      }
       /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
       @media (min-width: 768px) {
         :not(.edit-mode) > #view {
@@ -1188,6 +1228,10 @@ Metro Slate:
   card-mod-theme: "Metro Slate"
   card-mod-root-yaml: |
     .: |
+      .toolbar > sl-tab-group {
+        pointer-events: none;
+        opacity: 0;
+      }
       /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
       @media (min-width: 768px) {
         :not(.edit-mode) > #view {
@@ -1225,6 +1269,10 @@ Fluent Slate:
   card-mod-theme: "Fluent Slate"
   card-mod-root-yaml: |
     .: |
+      .toolbar > sl-tab-group {
+        pointer-events: none;
+        opacity: 0;
+      }
       /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
       @media (min-width: 768px) {
         :not(.edit-mode) > #view {
