@@ -396,8 +396,8 @@
     "0x001788010e504bfb": {
         "battery": 100,
         "occupancy": false,
-        "illuminance": 18,
-        "temperature": 19.48,
+        "illuminance": 1,
+        "temperature": 19.73,
         "occupancy_timeout": 0,
         "linkquality": 128,
         "update": {
@@ -422,7 +422,7 @@
         "battery": 69.5,
         "occupancy_timeout": 0,
         "occupancy": false,
-        "temperature": 20.04,
+        "temperature": 19.47,
         "illuminance": 5,
         "linkquality": 128,
         "update": {
@@ -763,9 +763,9 @@
         "linkquality": 104
     },
     "0x00158d000af064a3": {
-        "temperature": 21.83,
-        "humidity": 68.22,
-        "pressure": 992.5,
+        "temperature": 21.77,
+        "humidity": 67.93,
+        "pressure": 991.9,
         "voltage": 3025,
         "battery": 100,
         "power_outage_count": 17,
