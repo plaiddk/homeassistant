@@ -57,10 +57,10 @@ actions:
     data:
       agent_id: "{{ agent_id }}"
       text: >
-        Givet ugeplanen nedenfor: Udtræk én post pr. skoledag i den pågældende uge (mandag–fredag). Inkludér ALLE dage, også hvis der ikke skal huskes noget (så er "message" tom).
+        Givet ugeplanen nedenfor: Udtræk én post pr. skoledag i den pågældende uge (mandag–fredag). Inkludér ALLE dage, også selvom det ikke nødvendigvis hører under det med særlig fokus. Så bare lav et kort notat om det.
             
         Formål:
-        Som forælder vil jeg se, hvad der skal huskes pr. dag med SÆRLIG fokus på lektier (afleveringer/opgaver), bøger/bibliotek, idræt/svømning og ture.
+        Som forælder vil jeg se, hvad der skal huskes pr. dag med SÆRLIG fokus på lektier (afleveringer/opgaver,læse), bøger/bibliotek, idræt/svømning og ture.
 
         Detektion (eksempler, ikke udtømmende):
         - Lektier: "lektier", "lektie", "aflevering", "opgave/opg.", "læselektier", "læs s.", "skriv", "stav", "øve".
@@ -68,13 +68,14 @@ actions:
         - Bøger/bibliotek: "bog", "bøger", "læsebog", "bibliotek", "aflever bog".
         - Idræt/svømning: "idræt"/"idraet", "gymnastik", "bevægelse", "svømning", "svømmehal", "badetøj", "håndklæde", "svømmebriller".
         - Tur/udflugt: "tur", "udflugt", "ekskursion", "museum", "ude-dag", "skovtur".
+        - Test: "nationale test", "nationale", "test"
         - Andet udstyr: "iPad/computer opladet", "høretelefoner", "penalhus", "madpakke særligt", "cykel", "hjelm", "byttepenge", "underskrift".
 
         Regler:
         1) Opret ét objekt per skoledag (man–fre) i ugen, sorteret stigende efter dato (YYYY-MM-DD). Brug datoer fra ugeplanen; hvis en dag ikke nævner særlige ting, sæt "message" til "" (tom streng).
         2) Sæt lektier først i "message" med formatet: "Lektier (fag): kort beskrivelse". Hvis flere fag, adskil med "; ".
         3) Saml øvrige ting i samme "message", adskilt med "; " (fx "Idræt: idrætstøj og indendørssko; Svømning: badetøj og håndklæde; Bibliotek: aflever/medbring bøger; Tur: turtaske, drikkedunk").
-        4) Maks 1000 tegn i "message". Vær ultrakonkis; fjern fyldord og gentagelser.
+        4) Maks 5000 tegn i "message". Vær ultrakonkis; fjern fyldord og gentagelser.
         5) Ingen linjeskift i "message". Brug dansk. Ingen dato-hallucinationer.
         6) Hvis ugeplanen angiver lektier "til torsdag", placér dem på den nævnte forfaldsdag (torsdag), ikke på annonceringsdagen.
 
