@@ -1,5 +1,5 @@
 - trigger:
-    - platform: event
+    - trigger: event
       event_type: beskeder_updated
   sensor:
     - name: "Ulæste beskeder aula"

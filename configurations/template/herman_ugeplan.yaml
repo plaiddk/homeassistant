@@ -1,5 +1,5 @@
 - trigger:
-    - platform: event
+    - trigger: event
       event_type: herman_huskeliste_updated
   sensor:
     - name: "Herman Huskeliste"

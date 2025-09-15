@@ -1,6 +1,6 @@
 # KAMMA (bygger altid fra eventets parse’de liste)
 - trigger:
-    - platform: event
+    - trigger: event
       event_type: kamma_huskeliste_updated
   sensor:
     - name: "Kamma huskeliste (lang)"
@@ -24,7 +24,7 @@
 
 # HERMAN
 - trigger:
-    - platform: event
+    - trigger: event
       event_type: herman_huskeliste_updated
   sensor:
     - name: "Herman huskeliste (lang)"
