@@ -110,16 +110,17 @@ actions:
         sequence:
           - event: "{{ evt_name }}"
             event_data:
-              huskeliste_json: "{{ huskeliste_raw }}"
-              items_count: "{{ huskeliste | count }}"
+              # Send den parse’de liste som 'huskeliste_json'
+              huskeliste_json: "{{ huskeliste }}"
+    default: []
 
   - action: input_text.set_value
-    target:
-      entity_id: "{{ out_entity }}"
     data:
+      entity_id: !input output_helper
       value: >-
         {%- set lines = [] -%}
-        {%- for item in huskeliste if item.date and item.message -%}
-          {%- set _ = lines.append('- **' ~ item.date ~ '**: ' ~ item.message) -%}
+        {%- for item in huskeliste
+              if (item.date | default('')) and (item.message | default('') | trim) -%}
+          {%- set _ = lines.append('- **' ~ item.date ~ '**: ' ~ (item.message | trim)) -%}
         {%- endfor -%}
-        {{ (lines | join('\n'))[ : 250 ] }}
+        {{ (lines | join('\n'))[:250] }}

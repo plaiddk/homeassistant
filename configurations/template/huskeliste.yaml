@@ -1,18 +1,46 @@
-- sensor:
+# KAMMA (bygger altid fra eventets parse’de liste)
+- trigger:
+    - platform: event
+      event_type: kamma_huskeliste_updated
+  sensor:
     - name: "Kamma huskeliste (lang)"
       unique_id: kamma_huskeliste_full
       icon: mdi:bag-personal-outline
-      state: >-
-        {{ 'Opdateret' if (state_attr('sensor.kamma_huskeliste','huskeliste') | default('')) else 'Ingen data' }}
+      state: "Opdateret"
       attributes:
         full_text: >-
-          {{ state_attr('sensor.kamma_huskeliste','huskeliste') | default('') }}
+          {% set raw = trigger.event.data.huskeliste_json | default([]) %}
+          {# raw kan være en liste (allerede parse’t) eller en JSON-streng #}
+          {% if raw is string %}
+            {% set items = (raw | trim | regex_match('^\\s*\\[')) and (raw | from_json) or [] %}
+          {% else %}
+            {% set items = raw %}
+          {% endif %}
+          {% set out = namespace(lines=[]) %}
+          {% for item in items if item.message | default('') | trim %}
+            {% set _ = out.lines.append('- **' ~ item.date ~ '**: ' ~ (item.message | trim)) %}
+          {% endfor %}
+          {{ out.lines | join('\n') }}
 
+# HERMAN
+- trigger:
+    - platform: event
+      event_type: herman_huskeliste_updated
+  sensor:
     - name: "Herman huskeliste (lang)"
       unique_id: herman_huskeliste_full
       icon: mdi:bag-personal-outline
-      state: >-
-        {{ 'Opdateret' if (state_attr('sensor.herman_huskeliste','huskeliste') | default('')) else 'Ingen data' }}
+      state: "Opdateret"
       attributes:
         full_text: >-
-          {{ state_attr('sensor.herman_huskeliste','huskeliste') | default('') }}
+          {% set raw = trigger.event.data.huskeliste_json | default([]) %}
+          {% if raw is string %}
+            {% set items = (raw | trim | regex_match('^\\s*\\[')) and (raw | from_json) or [] %}
+          {% else %}
+            {% set items = raw %}
+          {% endif %}
+          {% set out = namespace(lines=[]) %}
+          {% for item in items if item.message | default('') | trim %}
+            {% set _ = out.lines.append('- **' ~ item.date ~ '**: ' ~ (item.message | trim)) %}
+          {% endfor %}
+          {{ out.lines | join('\n') }}
