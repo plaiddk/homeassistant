@@ -47,7 +47,7 @@
         "state": "ON",
         "brightness": 254,
         "color_mode": "color_temp",
-        "color_temp": 408
+        "color_temp": 366
     },
     "8": {
         "state": "OFF",
@@ -59,7 +59,7 @@
         "state": "ON",
         "brightness": 254,
         "color_mode": "color_temp",
-        "color_temp": 170,
+        "color_temp": 366,
         "color": {
             "x": 0.3244,
             "y": 0.3339
@@ -501,7 +501,7 @@
         "state": "ON",
         "brightness": 254,
         "color_mode": "color_temp",
-        "color_temp": 408
+        "color_temp": 366
     },
     "0x001788010dbda59d": {
         "update": {
@@ -763,9 +763,9 @@
         "linkquality": 104
     },
     "0x00158d000af064a3": {
-        "temperature": 22.01,
-        "humidity": 78.4,
-        "pressure": 992.4,
+        "temperature": 21.87,
+        "humidity": 73.55,
+        "pressure": 992.5,
         "voltage": 3025,
         "battery": 100,
         "power_outage_count": 17,

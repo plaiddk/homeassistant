@@ -57,22 +57,36 @@ actions:
     data:
       agent_id: "{{ agent_id }}"
       text: >
-        Givet følgende ugeplan for mit barns skole, list de dage hvor jeg som
-        forælder skal huske mit barn på at have noget med på dagen. F.eks.
-        idrætstøj, turtaske, lektier, bøger, bibliotek, tøj, osv. Det er ret vigtigt jeg ser når der er lektier for.
+        Givet ugeplanen nedenfor: Udtræk én post pr. skoledag i den pågældende uge (mandag–fredag). Inkludér ALLE dage, også hvis der ikke skal huskes noget (så er "message" tom).
+            
+        Formål:
+        Som forælder vil jeg se, hvad der skal huskes pr. dag med SÆRLIG fokus på lektier (afleveringer/opgaver), bøger/bibliotek, idræt/svømning og ture.
 
-        Outputformatet skal være et JSON array med ét objekt for hver dag.
-        Objektet skal være på max 1000 tegn i "message".
+        Detektion (eksempler, ikke udtømmende):
+        - Lektier: "lektier", "lektie", "aflevering", "opgave/opg.", "læselektier", "læs s.", "skriv", "stav", "øve".
+        - Fag: "dansk", "matematik", "engelsk", "natur/teknologi", "historie", "tysk" m.fl. (angiv faget i parentes ved lektier, hvis muligt).
+        - Bøger/bibliotek: "bog", "bøger", "læsebog", "bibliotek", "aflever bog".
+        - Idræt/svømning: "idræt"/"idraet", "gymnastik", "bevægelse", "svømning", "svømmehal", "badetøj", "håndklæde", "svømmebriller".
+        - Tur/udflugt: "tur", "udflugt", "ekskursion", "museum", "ude-dag", "skovtur".
+        - Andet udstyr: "iPad/computer opladet", "høretelefoner", "penalhus", "madpakke særligt", "cykel", "hjelm", "byttepenge", "underskrift".
 
-        Format:
+        Regler:
+        1) Opret ét objekt per skoledag (man–fre) i ugen, sorteret stigende efter dato (YYYY-MM-DD). Brug datoer fra ugeplanen; hvis en dag ikke nævner særlige ting, sæt "message" til "" (tom streng).
+        2) Sæt lektier først i "message" med formatet: "Lektier (fag): kort beskrivelse". Hvis flere fag, adskil med "; ".
+        3) Saml øvrige ting i samme "message", adskilt med "; " (fx "Idræt: idrætstøj og indendørssko; Svømning: badetøj og håndklæde; Bibliotek: aflever/medbring bøger; Tur: turtaske, drikkedunk").
+        4) Maks 1000 tegn i "message". Vær ultrakonkis; fjern fyldord og gentagelser.
+        5) Ingen linjeskift i "message". Brug dansk. Ingen dato-hallucinationer.
+        6) Hvis ugeplanen angiver lektier "til torsdag", placér dem på den nævnte forfaldsdag (torsdag), ikke på annonceringsdagen.
+
+        Outputformat (KUN gyldig JSON – ingen forklaring, ingen kodefence):
         [
-          { "date": "YYYY-MM-DD", "message": "det, der skal huskes" }
+          { "date": "YYYY-MM-DD", "message": "..." },
+          { "date": "YYYY-MM-DD", "message": "..." }
         ]
-
-        Returner KUN JSON (ingen forklaring, ingen kodefence).
 
         Ugeplan:
         {{ state_attr(ugeplan_entity, 'ugeplan') }}
+
     response_variable: summary_response
 
   - variables:
