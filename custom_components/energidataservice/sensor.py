@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from collections import namedtuple
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import homeassistant.helpers.config_validation as cv
 from homeassistant.components import sensor
@@ -26,6 +26,28 @@ from homeassistant.util import slugify as util_slugify
 from jinja2 import pass_context
 
 from .const import (
+    ATTR_ATTRIBUTION,
+    ATTR_CURRENCY,
+    ATTR_CURRENT_PRICE,
+    ATTR_FORECAST,
+    ATTR_NET_OPERATOR,
+    ATTR_NEXT_DATA_UPDATE,
+    ATTR_RAW_TODAY,
+    ATTR_RAW_TOMORROW,
+    ATTR_REGION,
+    ATTR_REGION_CODE,
+    ATTR_TARIFFS,
+    ATTR_TODAY,
+    ATTR_TODAY_MAX,
+    ATTR_TODAY_MEAN,
+    ATTR_TODAY_MIN,
+    ATTR_TOMORROW,
+    ATTR_TOMORROW_MAX,
+    ATTR_TOMORROW_MEAN,
+    ATTR_TOMORROW_MIN,
+    ATTR_TOMORROW_VALID,
+    ATTR_UNIT,
+    ATTR_USE_CENT,
     CENT_MULTIPLIER,
     CONF_AREA,
     CONF_COUNTRY,
@@ -272,7 +294,7 @@ class EnergidataserviceCO2Sensor(SensorEntity):
         if self._api.co2:
             possible_dataset = []
             for dataset in self._api.co2:
-                if dataset.hour <= current_state_time:
+                if dataset.time <= current_state_time:
                     possible_dataset = dataset
                 else:
                     self._attr_native_value = possible_dataset.value
@@ -280,7 +302,7 @@ class EnergidataserviceCO2Sensor(SensorEntity):
                         "Current CO2 value updated to %f for %s using dataset time %s",
                         self._attr_native_value,
                         self.region.region,
-                        possible_dataset.hour,
+                        possible_dataset.time,
                     )
                     break
 
@@ -288,7 +310,7 @@ class EnergidataserviceCO2Sensor(SensorEntity):
 
             value_dict = {}
             for i in self._api.co2:
-                value_dict.update({i.hour.strftime("%H:%M"): i.value})
+                value_dict.update({i.time.strftime("%H:%M"): i.value})
 
             self._attr_extra_state_attributes.update({"emissions": value_dict})
 
@@ -306,6 +328,17 @@ class EnergidataserviceCO2Sensor(SensorEntity):
 
 class EnergidataserviceSensor(SensorEntity):
     """Representation of Energi Data Service data."""
+
+    _unrecorded_attributes = frozenset(
+        {
+            ATTR_TODAY,
+            ATTR_TOMORROW,
+            ATTR_RAW_TODAY,
+            ATTR_RAW_TOMORROW,
+            ATTR_FORECAST,
+            ATTR_TARIFFS,
+        }
+    )
 
     def __init__(
         self,
@@ -543,7 +576,20 @@ class EnergidataserviceSensor(SensorEntity):
         )
         if self._api.today:
             for dataset in self._api.today:
-                if dataset.hour == current_state_time:
+                if not dataset.time.hour == dt_utils.now().hour:
+                    continue
+
+                if (
+                    dataset.time.hour == dt_utils.now().hour
+                    and len(self._api.today) == 24
+                ) or (
+                    dataset.time.minute <= dt_utils.now().minute
+                    and (
+                        (dataset.time + timedelta(minutes=15)).minute
+                        > dt_utils.now().minute
+                        or (dataset.time + timedelta(minutes=15)).minute == 0
+                    )
+                ):
                     self._attr_native_value = dataset.price
                     _LOGGER.debug(
                         "Current price updated to %f for %s",
@@ -553,34 +599,34 @@ class EnergidataserviceSensor(SensorEntity):
                     break
 
             self._attr_extra_state_attributes = {
-                "current_price": self.state,
-                "unit": self.unit,
-                "currency": self._currency,
-                "region": self._area,
-                "region_code": self.region.region,
-                "tomorrow_valid": self.tomorrow_valid,
-                "next_data_update": self._api.next_data_refresh,
-                "today": self.today,
-                "tomorrow": self.tomorrow or None,
-                "raw_today": self._today_raw or None,
-                "raw_tomorrow": self._tomorrow_raw or None,
-                "today_min": self._today_min,
-                "today_max": self._today_max,
-                "today_mean": self._today_mean,
-                "tomorrow_min": self._tomorrow_min or None,
-                "tomorrow_max": self._tomorrow_max or None,
-                "tomorrow_mean": self._tomorrow_mean or None,
-                "use_cent": self._cent,
-                "attribution": f"Data sourced from {self._api.source}",
+                ATTR_CURRENT_PRICE: self.state,
+                ATTR_UNIT: self.unit,
+                ATTR_CURRENCY: self._currency,
+                ATTR_REGION: self._area,
+                ATTR_REGION_CODE: self.region.region,
+                ATTR_TOMORROW_VALID: self.tomorrow_valid,
+                ATTR_NEXT_DATA_UPDATE: self._api.next_data_refresh,
+                ATTR_TODAY: self.today,
+                ATTR_TOMORROW: self.tomorrow or None,
+                ATTR_RAW_TODAY: self._today_raw or None,
+                ATTR_RAW_TOMORROW: self._tomorrow_raw or None,
+                ATTR_TODAY_MIN: self._today_min,
+                ATTR_TODAY_MAX: self._today_max,
+                ATTR_TODAY_MEAN: self._today_mean,
+                ATTR_TOMORROW_MIN: self._tomorrow_min or None,
+                ATTR_TOMORROW_MAX: self._tomorrow_max or None,
+                ATTR_TOMORROW_MEAN: self._tomorrow_mean or None,
+                ATTR_USE_CENT: self._cent,
+                ATTR_ATTRIBUTION: f"Data sourced from {self._api.source}",
             }
 
             if not isinstance(self.predictions, type(None)):
                 self._attr_extra_state_attributes.update(
                     {
-                        "forecast": self._add_raw(
+                        ATTR_FORECAST: self._add_raw(
                             self.predictions, self._attr_suggested_display_precision
                         ),
-                        "attribution": f"Data sourced from {self._api.source} "
+                        ATTR_ATTRIBUTION: f"Data sourced from {self._api.source} "
                         "and forecast from Carnot",
                     }
                 )
@@ -588,10 +634,10 @@ class EnergidataserviceSensor(SensorEntity):
             if not isinstance(self._api.tariff_data, type(None)):
                 self._attr_extra_state_attributes.update(
                     {
-                        "net_operator": self._config.options.get(
+                        ATTR_NET_OPERATOR: self._config.options.get(
                             CONF_TARIFF_CHARGE_OWNER
                         ),
-                        "tariffs": show_with_vat(
+                        ATTR_TARIFFS: show_with_vat(
                             self._api.tariff_data,
                             self._vat,
                             self._attr_suggested_display_precision,
@@ -685,7 +731,7 @@ class EnergidataserviceSensor(SensorEntity):
         lst = []
         for i in data:
             ret = {
-                "hour": i.hour,
+                "hour": i.time,
                 "price": round(i.price, decimals),
             }
             lst.append(ret)
@@ -809,7 +855,7 @@ class EnergidataserviceSensor(SensorEntity):
             chargeowner_tariff=owner_tariff,
         )
 
-        if not isinstance(template_value, int | float):
+        if not isinstance(template_value, int | float | type(None)):
             try:
                 template_value = float(template_value)
             except (TypeError, ValueError):
@@ -819,6 +865,9 @@ class EnergidataserviceSensor(SensorEntity):
                     type(template_value),
                 )
                 raise
+
+        if isinstance(template_value, type(None)):
+            template_value = 0
 
         try:
             price += template_value + tariff_value
@@ -854,14 +903,14 @@ class EnergidataserviceSensor(SensorEntity):
             pass
 
         _start = datetime.now().timestamp()
-        Interval = namedtuple("Interval", "price hour")
+        Interval = namedtuple("Interval", "price time")
         for i in data:
             price = self._calculate(
                 i.price,
-                fake_dt=dt_utils.as_local(i.hour),
+                fake_dt=dt_utils.as_local(i.time),
                 default_currency=default_currency,
             )
-            formatted_pricelist.append(Interval(price, i.hour))
+            formatted_pricelist.append(Interval(price, i.time))
 
         _stop = datetime.now().timestamp()
         _ttf = round(_stop - _start, 2)
@@ -894,7 +943,7 @@ class EnergidataserviceSensor(SensorEntity):
             if data:
                 res = min(data, key=lambda k: k.price)
                 ret = {
-                    "hour": res.hour,
+                    "hour": res.time,
                     "price": round(res.price, decimals),
                 }
 
@@ -904,7 +953,7 @@ class EnergidataserviceSensor(SensorEntity):
         elif datatype in ["MAX", "Max", "max"]:
             if data:
                 res = max(data, key=lambda k: k.price)
-                ret = {"hour": res.hour, "price": round(res.price, decimals)}
+                ret = {"hour": res.time, "price": round(res.price, decimals)}
 
                 return ret
             else:

@@ -148,7 +148,7 @@
         forældre skal huske mit barn på at have noget med på dagen. F.eks. idrætstøj,
         turtaske, lektier, bøger, bibliotek, tøj, osv. \n\nOutputformatet skal være
         et JSON array med ét objekt for hver dag. Det må gerne være detajleret dog
-        max 500 karakter langt. Formatet for objektet er:\n{\n  \"date\": \"YYYY-MM-DD\",\n
+        max 254 karakter langt. Formatet for objektet er:\n{\n  \"date\": \"YYYY-MM-DD\",\n
         \ \"message\": \"dét, der skal huskes\"\n}\n\nreturner KUN json og intet andet.\n\nUgeplan:\n{{
         state_attr(\"sensor.finderuphoj_skole_kamma\", \"ugeplan\") }}\n"
       agent_id: conversation.chatgpt

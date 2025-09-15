@@ -3,7 +3,17 @@ default_config:
   #bluetooth:
 ######################################
 # Home Assistant setup
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 127.0.0.1
+    - 192.168.1.0/24
+    - 100.64.0.0/10 # <- WireGuard network
+
 homeassistant:
+  internal_url: http://192.168.1.159:8123
+  external_url: https://hacs.kaffeogkage.cc
+
   #customize: !include customize.yaml
   packages: !include_dir_merge_named configurations/packages/
   #allowlist_external_dirs:
@@ -55,13 +65,13 @@ spotcast:
 input_text:
   huskeliste_herman:
     name: Huskeliste Herman
-    max: 256
+    max: 255
   huskeliste_kamma:
     name: Huskeliste Kamma
-    max: 256
+    max: 255
   beskedliste_alle:
     name: beskederaula
-    max: 256
+    max: 255
 
 input_boolean:
   smart_wash:

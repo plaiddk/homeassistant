@@ -1,4 +1,5 @@
 """Data validator for Zaptec API data."""
+
 from __future__ import annotations
 
 import logging
@@ -13,7 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class TypeWrapper:
-    """Workaround class for v1 pydantic"""
+    """Workaround class for v1 pydantic."""
 
 
 class Installation(BaseModel):
@@ -44,16 +45,8 @@ class ChargerStates(TypeWrapper, BaseModel):
     _data: list[ChargerState]
 
 
-class ChargerSetting(BaseModel):
-    model_config = ConfigDict(extra="allow")
-    SettingsId: int
-    Value: str = ""
-
-
-# pydantic v2
-# ChargerSettings = TypeAdapter[dict[str, ChargerSetting]]
-class ChargerSettings(TypeWrapper, BaseModel):
-    _data: dict[str, ChargerSetting]
+class ChargerUpdate(TypeWrapper, BaseModel):
+    _data: dict[str, str]
 
 
 class Chargers(BaseModel):
@@ -65,12 +58,6 @@ class Circuit(BaseModel):
     model_config = ConfigDict(extra="allow")
     Id: str
     Name: str
-
-
-class CircuitHierarchy(BaseModel):
-    model_config = ConfigDict(extra="allow")
-    Id: str
-    Name: str
     Chargers: list[Charger]
 
 
@@ -78,7 +65,7 @@ class Hierarchy(BaseModel):
     model_config = ConfigDict(extra="allow")
     Id: str
     Name: str
-    Circuits: list[CircuitHierarchy]
+    Circuits: list[Circuit]
 
 
 class ChargerFirmware(BaseModel):
@@ -122,13 +109,12 @@ URLS = {
     r"installation/[0-9a-f\-]+/hierarchy": Hierarchy,
     r"installation/[0-9a-f\-]+/update": None,
     r"installation/[0-9a-f\-]+/messagingConnectionDetails": InstallationConnectionDetails,
-    r"circuits/[0-9a-f\-]+": Circuit,
     r"chargers/[0-9a-f\-]+": Charger,
     r"chargers/[0-9a-f\-]+/state": ChargerStates,
-    r"chargers/[0-9a-f\-]+/settings": ChargerSettings,
     r"chargers/[0-9a-f\-]+/authorizecharge": None,
     r"chargers/[0-9a-f\-]+/SendCommand/[0-9]+": None,
     r"chargers/[0-9a-f\-]+/localSettings": ChargerLocalSettings,
+    r"chargers/[0-9a-f\-]+/update": ChargerUpdate,
     r"chargerFirmware/installation/[0-9a-f\-]+": ChargerFirmwares,
 }
 

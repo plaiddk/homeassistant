@@ -1,8 +1,9 @@
 """Zaptec component binary sensors."""
+
 from __future__ import annotations
 
-import logging
 from dataclasses import dataclass
+import logging
 
 from homeassistant import const
 from homeassistant.components.binary_sensor import (
@@ -10,39 +11,42 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorEntityDescription,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import ZaptecBaseEntity, ZaptecUpdateCoordinator
-from .const import DOMAIN
+from . import ZaptecBaseEntity, ZaptecConfigEntry
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class ZaptecBinarySensor(ZaptecBaseEntity, BinarySensorEntity):
+    """Base class for Zaptec binary sensors."""
+
+    # What to log on entity update
+    _log_attribute = "_attr_is_on"
+
     @callback
     def _update_from_zaptec(self) -> None:
-        try:
-            self._attr_is_on = self._get_zaptec_value()
-            self._attr_available = True
-            self._log_value(self._attr_is_on)
-        except (KeyError, AttributeError):
-            self._attr_available = False
-            self._log_unavailable()
+        """Update the entity from Zaptec data."""
+        # Called from ZaptecBaseEntity._handle_coordinator_update()
+        self._attr_is_on = self._get_zaptec_value()
+        self._attr_available = True
 
 
 class ZaptecBinarySensorWithAttrs(ZaptecBinarySensor):
-    def _post_init(self):
+    """Zaptec binary sensor with additional attributes."""
+
+    def _post_init(self) -> None:
         self._attr_extra_state_attributes = self.zaptec_obj.asdict()
         self._attr_unique_id = self.zaptec_obj.id
 
 
-@dataclass
+@dataclass(frozen=True, kw_only=True)
 class ZapBinarySensorEntityDescription(BinarySensorEntityDescription):
-    cls: type | None = None
+    """Class describing Zaptec binary sensor entities."""
+
+    cls: type[BinarySensorEntity]
 
 
 INSTALLATION_ENTITIES: list[EntityDescription] = [
@@ -63,18 +67,7 @@ INSTALLATION_ENTITIES: list[EntityDescription] = [
         translation_key="authorization_required",
         entity_category=const.EntityCategory.DIAGNOSTIC,
         icon="mdi:lock",
-    ),
-]
-
-CIRCUIT_ENTITIES: list[EntityDescription] = [
-    ZapBinarySensorEntityDescription(
-        key="active",
-        name="Circuit",  # Special case, no translation
-        device_class=BinarySensorDeviceClass.CONNECTIVITY,  # False=disconnected, True=connected
-        entity_category=const.EntityCategory.DIAGNOSTIC,
-        icon="mdi:cloud",
-        has_entity_name=False,
-        cls=ZaptecBinarySensorWithAttrs,
+        cls=ZaptecBinarySensor,
     ),
 ]
 
@@ -97,25 +90,23 @@ CHARGER_ENTITIES: list[EntityDescription] = [
         cls=ZaptecBinarySensor,
     ),
     ZapBinarySensorEntityDescription(
-        key="is_authorization_required",
+        key="authentication_required",
         translation_key="authorization_required",
         entity_category=const.EntityCategory.DIAGNOSTIC,
         icon="mdi:lock",
+        cls=ZaptecBinarySensor,
     ),
 ]
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: ZaptecConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
-    _LOGGER.debug("Setup binary sensors")
-
-    coordinator: ZaptecUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
-
-    entities = ZaptecBinarySensor.create_from_zaptec(
-        coordinator,
+    """Set up the Zaptec binary sensors."""
+    entities = entry.runtime_data.create_entities_from_zaptec(
         INSTALLATION_ENTITIES,
-        CIRCUIT_ENTITIES,
         CHARGER_ENTITIES,
     )
     async_add_entities(entities, True)

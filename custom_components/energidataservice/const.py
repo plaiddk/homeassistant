@@ -13,6 +13,29 @@ https://github.com/mtrab/energidataservice/issues
 -------------------------------------------------------------------
 """
 
+ATTR_CURRENT_PRICE = "current_price"
+ATTR_UNIT = "unit"
+ATTR_CURRENCY = "currency"
+ATTR_REGION = "region"
+ATTR_REGION_CODE = "region_code"
+ATTR_TOMORROW_VALID = "tomorrow_valid"
+ATTR_NEXT_DATA_UPDATE = "next_data_update"
+ATTR_TODAY = "today"
+ATTR_TOMORROW = "tomorrow"
+ATTR_RAW_TODAY = "raw_today"
+ATTR_RAW_TOMORROW = "raw_tomorrow"
+ATTR_TODAY_MIN = "today_min"
+ATTR_TODAY_MAX = "today_max"
+ATTR_TODAY_MEAN = "today_mean"
+ATTR_TOMORROW_MIN = "tomorrow_min"
+ATTR_TOMORROW_MAX = "tomorrow_max"
+ATTR_TOMORROW_MEAN = "tomorrow_mean"
+ATTR_USE_CENT = "use_cent"
+ATTR_ATTRIBUTION = "attribution"
+ATTR_FORECAST = "forecast"
+ATTR_NET_OPERATOR = "net_operator"
+ATTR_TARIFFS = "tariffs"
+
 CONF_AREA = "area"
 CONF_COUNTRY = "country"
 CONF_CURRENCY_IN_CENT = "in_cent"
@@ -34,8 +57,8 @@ DEFAULT_NAME = "Energidataservice"
 DEFAULT_TEMPLATE = "{{0.0|float}}"
 DOMAIN = "energidataservice"
 
-INTERVAL = namedtuple("Interval", "price hour")
-CO2INTERVAL = namedtuple("CO2Interval", "value hour")
+INTERVAL = namedtuple("Interval", "price time")
+CO2INTERVAL = namedtuple("CO2Interval", "value time")
 
 UNIQUE_ID = "unique_id"
 UPDATE_EDS = "eds_update_{}"

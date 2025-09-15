@@ -1,8 +1,9 @@
 """Zaptec component number entities."""
+
 from __future__ import annotations
 
+from dataclasses import dataclass, replace
 import logging
-from dataclasses import dataclass
 
 from homeassistant import const
 from homeassistant.components.number import (
@@ -10,81 +11,102 @@ from homeassistant.components.number import (
     NumberEntity,
     NumberEntityDescription,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import ZaptecBaseEntity, ZaptecUpdateCoordinator
-from .api import Installation, Charger
-from .const import DOMAIN
+from . import ZaptecBaseEntity, ZaptecConfigEntry
+from .api import Charger, Installation
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class ZaptecNumber(ZaptecBaseEntity, NumberEntity):
+    """Base class for Zaptec number entities."""
+
+    # What to log on entity update
+    _log_attribute = "_attr_native_value"
+
     @callback
     def _update_from_zaptec(self) -> None:
-        try:
-            self._attr_native_value = self._get_zaptec_value()
-            self._attr_available = True
-            self._log_value(self._attr_native_value)
-        except (KeyError, AttributeError):
-            self._attr_available = False
-            self._log_unavailable()
+        """Update the entity from Zaptec data."""
+        # Called from ZaptecBaseEntity._handle_coordinator_update()
+        self._attr_native_value = self._get_zaptec_value()
+        self._attr_available = True
 
-
-class ZaptecAvailableCurrentNumber(ZaptecNumber):
-    zaptec_obj: Installation
-    entity_description: ZapNumberEntityDescription
-
-    def _post_init(self):
-        # Get the max current rating from the reported max current
-        self.entity_description.native_max_value = self.zaptec_obj.get(
-            "max_current", 32
-        )
-
-    async def async_set_native_value(self, value: float) -> None:
-        """Update to Zaptec."""
-        _LOGGER.debug(
-            "Set %s to <%s> %s in %s",
-            self.entity_id,
-            type(value).__qualname__,
-            value,
-            self.zaptec_obj.qual_id,
-        )
-
-        try:
-            await self.zaptec_obj.set_limit_current(availableCurrent=value)
-        except Exception as exc:
-            raise HomeAssistantError(f"Set current limit to {value} failed") from exc
-
-        await self.coordinator.async_request_refresh()
-
-
-class ZaptecSettingNumber(ZaptecNumber):
-    zaptec_obj: Charger
-    entity_description: ZapNumberEntityDescription
-
-    def _post_init(self):
-        # Get the max current rating from the reported max current
-        self.entity_description.native_max_value = self.zaptec_obj.get(
-            "charge_current_installation_max_limit", 32
-        )
-
-    async def async_set_native_value(self, value: float) -> None:
-        """Update to Zaptec."""
+    def _log_number(self, value: float) -> None:
+        """Log the number value change."""
         _LOGGER.debug(
             "Setting %s.%s to <%s> %s   (in %s)",
             self.__class__.__qualname__,
             self.key,
             type(value).__qualname__,
             value,
-            self.zaptec_obj.id,
+            self.zaptec_obj.qual_id,
         )
 
+
+class ZaptecAvailableCurrentNumber(ZaptecNumber):
+    """Zaptec available current number entity."""
+
+    zaptec_obj: Installation
+    entity_description: ZapNumberEntityDescription
+
+    def _post_init(self):
+        # Get the max current rating from the reported max current
+        self.entity_description = replace(
+            self.entity_description,
+            native_max_value=self.zaptec_obj.get("MaxCurrent", 32),
+        )
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Update to Zaptec."""
+        self._log_number(value)
+        try:
+            await self.zaptec_obj.set_limit_current(availableCurrent=value)
+        except Exception as exc:
+            raise HomeAssistantError(f"Set current limit to {value} failed") from exc
+
+        await self.trigger_poll()
+
+
+class ZaptecThreeToOnePhaseSwitchCurrent(ZaptecNumber):
+    """Zaptec three to one phase switch current number entity."""
+
+    zaptec_obj: Installation
+    entity_description: ZapNumberEntityDescription
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Update to Zaptec."""
+        self._log_number(value)
+        try:
+            await self.zaptec_obj.set_three_to_one_phase_switch_current(value)
+        except Exception as exc:
+            raise HomeAssistantError(
+                f"Setting three to one phase switch current to {value} failed"
+            ) from exc
+
+        await self.trigger_poll()
+
+
+class ZaptecSettingNumber(ZaptecNumber):
+    """Zaptec setting number entity."""
+
+    zaptec_obj: Charger
+    entity_description: ZapNumberEntityDescription
+
+    def _post_init(self):
+        # Get the max current rating from the reported max current
+        self.entity_description = replace(
+            self.entity_description,
+            native_max_value=self.zaptec_obj.get("ChargeCurrentInstallationMaxLimit", 32),
+        )
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Update to Zaptec."""
+        self._log_number(value)
         try:
             await self.zaptec_obj.set_settings({self.entity_description.setting: value})
         except Exception as exc:
@@ -92,44 +114,39 @@ class ZaptecSettingNumber(ZaptecNumber):
                 f"Setting {self.entity_description.setting} to {value} failed"
             ) from exc
 
-        await self.coordinator.async_request_refresh()
+        await self.trigger_poll()
 
 
 class ZaptecHmiBrightness(ZaptecNumber):
+    """Zaptec HMI brightness number entity."""
+
     zaptec_obj: Charger
     entity_description: ZapNumberEntityDescription
+    _log_attribute = "_attr_native_value"
 
     @callback
     def _update_from_zaptec(self) -> None:
-        try:
-            self._attr_native_value = float(self._get_zaptec_value()) * 100
-            self._attr_available = True
-            self._log_value(self._attr_native_value)
-        except (KeyError, AttributeError):
-            self._attr_available = False
-            self._log_unavailable()
+        """Update the entity from Zaptec data."""
+        # Called from ZaptecBaseEntity._handle_coordinator_update()
+        self._attr_native_value = float(self._get_zaptec_value()) * 100
+        self._attr_available = True
 
     async def async_set_native_value(self, value: float) -> None:
         """Update to Zaptec."""
-        _LOGGER.debug(
-            "Set %s to <%s> %s in %s",
-            self.entity_id,
-            type(value).__qualname__,
-            value,
-            self.zaptec_obj.qual_id,
-        )
-
+        self._log_number(value)
         try:
             await self.zaptec_obj.set_hmi_brightness(value / 100)
         except Exception as exc:
             raise HomeAssistantError(f"Set HmiBrightness to {value} failed") from exc
 
-        await self.coordinator.async_request_refresh()
+        await self.trigger_poll()
 
 
-@dataclass
+@dataclass(frozen=True, kw_only=True)
 class ZapNumberEntityDescription(NumberEntityDescription):
-    cls: type | None = None
+    """Class describing Zaptec number entities."""
+
+    cls: type[NumberEntity]
     setting: str | None = None
 
 
@@ -144,9 +161,17 @@ INSTALLATION_ENTITIES: list[EntityDescription] = [
         native_unit_of_measurement=const.UnitOfElectricCurrent.AMPERE,
         cls=ZaptecAvailableCurrentNumber,
     ),
+    ZapNumberEntityDescription(
+        key="three_to_one_phase_switch_current",
+        translation_key="three_to_one_phase_switch_current",
+        device_class=NumberDeviceClass.CURRENT,
+        native_min_value=0,
+        native_max_value=32,
+        icon="mdi:waves",
+        native_unit_of_measurement=const.UnitOfElectricCurrent.AMPERE,
+        cls=ZaptecThreeToOnePhaseSwitchCurrent,
+    ),
 ]
-
-CIRCUIT_ENTITIES: list[EntityDescription] = []
 
 CHARGER_ENTITIES: list[EntityDescription] = [
     ZapNumberEntityDescription(
@@ -159,7 +184,7 @@ CHARGER_ENTITIES: list[EntityDescription] = [
         icon="mdi:current-ac",
         native_unit_of_measurement=const.UnitOfElectricCurrent.AMPERE,
         cls=ZaptecSettingNumber,
-        setting="CurrentInMinimum",
+        setting="minChargeCurrent",
     ),
     ZapNumberEntityDescription(
         key="charger_max_current",
@@ -171,12 +196,12 @@ CHARGER_ENTITIES: list[EntityDescription] = [
         icon="mdi:current-ac",
         native_unit_of_measurement=const.UnitOfElectricCurrent.AMPERE,
         cls=ZaptecSettingNumber,
-        setting="CurrentInMaximum",
+        setting="maxChargeCurrent",
     ),
     ZapNumberEntityDescription(
         key="hmi_brightness",
         translation_key="hmi_brightness",
-        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_category=EntityCategory.CONFIG,
         icon="mdi:brightness-6",
         native_unit_of_measurement=const.PERCENTAGE,
         cls=ZaptecHmiBrightness,
@@ -185,16 +210,13 @@ CHARGER_ENTITIES: list[EntityDescription] = [
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: ZaptecConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
-    _LOGGER.debug("Setup numbers")
-
-    coordinator: ZaptecUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
-
-    entities = ZaptecNumber.create_from_zaptec(
-        coordinator,
+    """Set up the Zaptec numbers."""
+    entities = entry.runtime_data.create_entities_from_zaptec(
         INSTALLATION_ENTITIES,
-        CIRCUIT_ENTITIES,
         CHARGER_ENTITIES,
     )
     async_add_entities(entities, True)

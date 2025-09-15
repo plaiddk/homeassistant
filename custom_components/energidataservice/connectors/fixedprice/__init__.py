@@ -35,7 +35,7 @@ def prepare_data(value, date, tz) -> list:  # pylint: disable=invalid-name
         # tmpdate = datetime.fromisoformat(f"{date}T{hour}:00:00+{offset}")
         tmpdate = dt_util.parse_datetime(f"{date}T{hour}:00:00+{offset}")
         tmp = INTERVAL(value, tmpdate)
-        if date in tmp.hour.strftime("%Y-%m-%d"):
+        if date in tmp.time.strftime("%Y-%m-%d"):
             reslist.append(tmp)
 
         i += 1
@@ -59,6 +59,7 @@ class Connector:
         self.regionhandler = regionhandler
         self.value = self.config.options.get(CONF_FIXED_PRICE_VALUE)
         self.status = 200
+        self.result = {"Static": "OK"}
 
     async def async_get_spotprices(self) -> None:
         """Return the fixed price set in the configuration flow."""

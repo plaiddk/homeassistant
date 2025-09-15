@@ -1,8 +1,9 @@
 """Zaptec component update."""
+
 from __future__ import annotations
 
-import logging
 from dataclasses import dataclass
+import logging
 
 from homeassistant import const
 from homeassistant.components.update import (
@@ -10,38 +11,36 @@ from homeassistant.components.update import (
     UpdateEntity,
     UpdateEntityDescription,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import ZaptecBaseEntity, ZaptecUpdateCoordinator
+from . import ZaptecBaseEntity, ZaptecConfigEntry
 from .api import Charger
-from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class ZaptecUpdate(ZaptecBaseEntity, UpdateEntity):
+    """Base class for Zaptec update entities."""
+
+    # What to log on entity update
+    _log_attribute = "_attr_installed_version"
+    # This entity use several attributes from Zaptec
+    _log_zaptec_key = ["firmware_current_version", "firmware_available_version"]
     zaptec_obj: Charger
 
     @callback
     def _update_from_zaptec(self) -> None:
-        try:
-            self._attr_installed_version = self._get_zaptec_value(
-                key="current_firmware_version"
-            )
-            self._attr_latest_version = self._get_zaptec_value(
-                key="available_firmware_version"
-            )
-            self._attr_available = True
-            self._log_value(self._attr_installed_version)
-        except (KeyError, AttributeError):
-            self._attr_available = False
-            self._log_unavailable()
+        """Update the entity from Zaptec data."""
+        # Called from ZaptecBaseEntity._handle_coordinator_update()
+        self._attr_installed_version = self._get_zaptec_value(key="firmware_current_version")
+        self._attr_latest_version = self._get_zaptec_value(key="firmware_available_version")
+        self._attr_available = True
 
-    async def async_install(self, version, backup):
+    async def async_install(self, version, backup, **kwargs):
+        """Install the update."""
         _LOGGER.debug(
             "Updating firmware %s of %s",
             self.entity_id,
@@ -49,44 +48,41 @@ class ZaptecUpdate(ZaptecBaseEntity, UpdateEntity):
         )
 
         try:
-            await self.zaptec_obj.upgrade_firmware()
+            await self.zaptec_obj.command("upgrade_firmware")
         except Exception as exc:
             raise HomeAssistantError("Sending update firmware command failed") from exc
 
-        await self.coordinator.async_request_refresh()
+        await self.trigger_poll()
 
 
-@dataclass
+@dataclass(frozen=True, kw_only=True)
 class ZapUpdateEntityDescription(UpdateEntityDescription):
-    cls: type | None = None
+    """Class describing Zaptec update entities."""
+
+    cls: type[UpdateEntity]
 
 
 INSTALLATION_ENTITIES: list[EntityDescription] = []
-
-CIRCUIT_ENTITIES: list[EntityDescription] = []
 
 CHARGER_ENTITIES: list[EntityDescription] = [
     ZapUpdateEntityDescription(
         key="firmware_update",
         translation_key="firmware_update",
         device_class=UpdateDeviceClass.FIRMWARE,
-        entity_category=const.EntityCategory.DIAGNOSTIC,
-        # icon="mdi:lock",  # FIXME: Find how icons work for firmware
+        entity_category=const.EntityCategory.CONFIG,
+        cls=ZaptecUpdate,
     ),
 ]
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: ZaptecConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
-    _LOGGER.debug("Setup binary sensors")
-
-    coordinator: ZaptecUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
-
-    entities = ZaptecUpdate.create_from_zaptec(
-        coordinator,
+    """Set up the Zaptec update entities."""
+    entities = entry.runtime_data.create_entities_from_zaptec(
         INSTALLATION_ENTITIES,
-        CIRCUIT_ENTITIES,
         CHARGER_ENTITIES,
     )
     async_add_entities(entities, True)

@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from logging import getLogger
 
 import homeassistant.util.dt as dt_util
+from async_retrying_ng import RetryError, retry
 
 from ...const import CO2INTERVAL, INTERVAL
 from .regions import CO2REGIONS, REGIONS
@@ -28,12 +29,12 @@ def prepare_data(indata, date, tz) -> list:  # pylint: disable=invalid-name
     reslist = []
     for dataset in indata:
         tmpdate = (
-            datetime.fromisoformat(dataset["HourUTC"])
+            datetime.fromisoformat(dataset["TimeUTC"])
             .replace(tzinfo=dt_util.UTC)
             .astimezone(local_tz)
         )
-        tmp = INTERVAL(dataset["SpotPriceEUR"], tmpdate)
-        if date in tmp.hour.strftime("%Y-%m-%d"):
+        tmp = INTERVAL(dataset["DayAheadPriceEUR"], tmpdate)
+        if date in tmp.time.strftime("%Y-%m-%d"):
             reslist.append(tmp)
 
     return reslist
@@ -50,7 +51,7 @@ def prepare_co2_data(indata, date, tz) -> list:  # pylint: disable=invalid-name
             .astimezone(local_tz)
         )
         tmp = CO2INTERVAL(dataset["CO2Emission"], tmpdate)
-        if date in tmp.hour.strftime("%Y-%m-%d"):
+        if date in tmp.time.strftime("%Y-%m-%d"):
             reslist.append(tmp)
 
     return reslist
@@ -66,7 +67,7 @@ class Connector:
         self.config = config
         self.regionhandler = regionhandler
         self.client = client
-        self._result = {}
+        self.result = {}
         self._co2_result = {}
         self._tz = tz
         self.status = 418
@@ -74,7 +75,7 @@ class Connector:
     async def async_get_spotprices(self) -> None:
         """Fetch latest spotprices, excl. VAT and tariff."""
         headers = self._header()
-        url = self._prepare_url(BASE_URL + "elspotprices")
+        url = self._prepare_url(BASE_URL + "DayAheadPrices")
         _LOGGER.debug(
             "Request body for %s via Energi Data Service API URL: %s",
             self.regionhandler.region,
@@ -85,19 +86,23 @@ class Connector:
 
         if resp.status == 400:
             _LOGGER.error("API returned error 400, Bad Request!")
-            self._result = {}
+            self.result = {}
+        elif resp.status == 403:
+            self.result = {}
         elif resp.status == 411:
             _LOGGER.error("API returned error 411, Invalid Request!")
-            self._result = {}
+            self.result = {}
+        elif resp.status == 429:
+            self.result = {}
         elif resp.status == 200:
             res = await resp.json()
-            self._result = res["records"]
+            self.result = res["records"]
 
-            _LOGGER.debug(
-                "Response for %s:\n%s",
-                self.regionhandler.region,
-                json.dumps(self._result, indent=2, default=str),
-            )
+            # _LOGGER.debug(
+            #     "Response for %s:\n%s",
+            #     self.regionhandler.region,
+            #     json.dumps(self.result, indent=2, default=str),
+            # )
         elif resp.status >= 500 and resp.status <= 503:
             _LOGGER.error("API unavailable. E%s", str(resp.status))
         else:
@@ -115,28 +120,33 @@ class Connector:
                 url,
             )
             resp = await self.client.get(url, headers=headers)
+            self.status = resp.status
 
             if resp.status == 400:
                 _LOGGER.error("API returned error 400, Bad Request!")
-                self._result = {}
+                self.result = {}
+            elif resp.status == 403:
+                self.result = {}
             elif resp.status == 411:
                 _LOGGER.error("API returned error 411, Invalid Request!")
-                self._result = {}
+                self.result = {}
+            elif resp.status == 429:
+                self.result = {}
             elif resp.status == 200:
                 res = await resp.json()
                 self._co2_result = res["records"]
 
-                _LOGGER.debug(
-                    "Response for %s CO2:\n%s",
-                    self.regionhandler.region,
-                    json.dumps(self._co2_result, indent=2, default=str),
-                )
+                # _LOGGER.debug(
+                #     "Response for %s CO2:\n%s",
+                #     self.regionhandler.region,
+                #     json.dumps(self._co2_result, indent=2, default=str),
+                # )
             elif resp.status >= 500 and resp.status <= 503:
                 _LOGGER.error("API unavailable. E%s", str(resp.status))
-                self._result = {}
+                self.result = {}
             else:
                 _LOGGER.error("API returned error %s", str(resp.status))
-                self._result = {}
+                self.result = {}
         else:
             _LOGGER.debug("CO2 values not found for this region")
 
@@ -153,12 +163,13 @@ class Connector:
             end_date = (datetime.utcnow() + timedelta(days=2)).strftime("%Y-%m-%d")
             start = f"start={str(start_date)}"
             end = f"end={str(end_date)}"
-            limit = "limit=150"
+            # limit = "limit=150"
+            limit = ""
             objfilter = (
                 f"filter=%7B%22PriceArea%22:%22{str(self.regionhandler.region)}%22%7D"
             )
-            sort = "sort=HourUTC%20asc"
-            columns = "columns=HourUTC,SpotPriceEUR"
+            sort = "sort=TimeUTC%20asc"
+            columns = "columns=TimeUTC,DayAheadPriceEUR"
 
             return f"{url}?{start}&{end}&{objfilter}&{sort}&{columns}&{limit}"
         else:
@@ -174,13 +185,13 @@ class Connector:
     def today(self) -> list:
         """Return raw dataset for today."""
         date = datetime.now().strftime("%Y-%m-%d")
-        return prepare_data(self._result, date, self._tz)
+        return prepare_data(self.result, date, self._tz)
 
     @property
     def tomorrow(self) -> list:
         """Return raw dataset for today."""
         date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
-        return prepare_data(self._result, date, self._tz)
+        return prepare_data(self.result, date, self._tz)
 
     @property
     def co2data(self) -> list:
