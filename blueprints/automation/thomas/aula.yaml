@@ -72,7 +72,7 @@ actions:
         - Andet udstyr: "iPad/computer opladet", "høretelefoner", "penalhus", "madpakke særligt", "cykel", "hjelm", "byttepenge", "underskrift".
 
         Regler:
-        1) Opret ét objekt per skoledag (man–fre) i ugen, sorteret stigende efter dato (YYYY-MM-DD). Brug datoer fra ugeplanen; hvis en dag ikke nævner særlige ting, sæt "message" til "" (tom streng).
+        1) Opret ét objekt per skoledag (man–fre) i ugen, sorteret stigende efter dato (YYYY-MM-DD). Brug datoer fra ugeplanen.
         2) Sæt lektier først i "message" med formatet: "Lektier (fag): kort beskrivelse". Hvis flere fag, adskil med "; ".
         3) Saml øvrige ting i samme "message", adskilt med "; " (fx "Idræt: idrætstøj og indendørssko; Svømning: badetøj og håndklæde; Bibliotek: aflever/medbring bøger; Tur: turtaske, drikkedunk").
         4) Maks 5000 tegn i "message". Vær ultrakonkis; fjern fyldord og gentagelser.
