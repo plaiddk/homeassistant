@@ -1,50 +1,45 @@
 blueprint:
-  name: Huskeliste fra ugeplan (LLM) – v3
+  name: Huskeliste fra ugeplan (LLM) – v4 (tekst, ingen JSON)
   description: >
-    Trækker "husk"-punkter ud fra sensorens 'ugeplan'-attribut via LLM og skriver
-    en kort opsummering til et input_text helper-felt. Robust JSON-parsing og
-    beskæring til input_text længde.
+    Udtrækker vigtige "husk"-punkter fra sensorens 'ugeplan'-attribut via LLM
+    og udsender en færdig punktopstilling som ren tekst. Skriver en kort
+    (trimmet) opsummering til input_text. Den fulde tekst lægges i
+    event-data og kan gemmes i en template-sensor-attribut (ingen 255-char limit).
   domain: automation
   input:
     ugeplan_sensor:
       name: Ugeplan sensor
-      description: Sensoren med attributten 'ugeplan' (fx sensor.finderuphoj_skole_kamma)
       selector:
         entity:
           filter:
             - domain: sensor
     output_helper:
       name: Output helper (input_text)
-      description: Hvor den menneskelige opsummering skal skrives
       selector:
         entity:
           filter:
             - domain: input_text
     conversation_agent:
       name: Conversation Agent
-      description: Agent der bruges af conversation.process (fx conversation.chatgpt)
       default: conversation.chatgpt
       selector:
         text: {}
     event_name:
       name: Event-navn (valgfrit)
-      description: Hvis angivet, affyres et event med dette navn efter parsing
+      description: Fx kamma_huskeliste_updated / herman_huskeliste_updated
       default: ""
       selector:
         text: {}
 
 mode: single
 
-# NEW-style trigger syntax
 triggers:
   - trigger: state
     entity_id: !input ugeplan_sensor
     attribute: ugeplan
 
-# (optional) conditions block can be empty
 conditions: []
 
-# NEW-style actions syntax
 actions:
   - variables:
       ugeplan_entity: !input ugeplan_sensor
@@ -57,7 +52,7 @@ actions:
     data:
       agent_id: "{{ agent_id }}"
       text: >
-        Givet ugeplanen nedenfor: Udtræk én post pr. skoledag i den pågældende uge (mandag–fredag). Inkludér ALLE dage, også selvom det ikke nødvendigvis hører under det med særlig fokus. Så bare lav et kort notat om det.
+        Givet ugeplanen nedenfor: Udtræk én linje pr. skoledag i den pågældende uge (mandag–fredag). Inkludér ALLE dage, også selvom det ikke nødvendigvis hører under det med særlig fokus. Så bare lav et kort notat om det.
             
         Formål:
         Som forælder vil jeg se, hvad der skal huskes pr. dag med SÆRLIG fokus på lektier (afleveringer/opgaver,læse), bøger/bibliotek, idræt/svømning og ture.
@@ -79,11 +74,10 @@ actions:
         5) Ingen linjeskift i "message". Brug dansk. Ingen dato-hallucinationer.
         6) Hvis ugeplanen angiver lektier "til torsdag", placér dem på den nævnte forfaldsdag (torsdag), ikke på annonceringsdagen.
 
-        Outputformat (KUN gyldig JSON – ingen forklaring, ingen kodefence):
-        [
-          { "date": "YYYY-MM-DD", "message": "..." },
-          { "date": "YYYY-MM-DD", "message": "..." }
-        ]
+        Det skal være i dette format:
+        - **YYYY-MM-DD**: Beskeden ud fra de regler som er opstillet og detektion
+        Ingen overskrift, ingen kodefence, ingen forklaring. Ingen linjeskift i hver linje.
+        Vær ultra-konkis; fjern fyldord/gentagelser. Brug datoer fra ugeplanen.
 
         Ugeplan:
         {{ state_attr(ugeplan_entity, 'ugeplan') }}
@@ -91,36 +85,23 @@ actions:
     response_variable: summary_response
 
   - variables:
-      huskeliste_raw: >-
+      huskeliste_text: >-
         {{ summary_response.response.speech.plain.speech
            | string
-           | regex_replace(find='^\\s*```json\\s*', replace='')
+           | regex_replace(find='^\\s*```(?:json|yaml)?\\s*', replace='')
            | regex_replace(find='\\s*```\\s*$', replace='')
            | trim }}
-      huskeliste: >-
-        {% set txt = huskeliste_raw %}
-        {% if txt is string and txt|length > 0 and txt|regex_match('^\\s*\\[') %}
-          {{ txt | from_json }}
-        {% else %}
-          {{ [] }}
-        {% endif %}
 
+  # Fyr event med den FÆRDIGE tekst (KORREKT syntaks)
   - choose:
-      - conditions: "{{ (evt_name | string) | length > 0 }}"
+      - conditions: "{{ (evt_name | default('') | trim) != '' }}"
         sequence:
           - event: "{{ evt_name }}"
             event_data:
-              # Send den parse’de liste som 'huskeliste_json'
-              huskeliste_json: "{{ huskeliste }}"
-    default: []
+              huskeliste_text: "{{ huskeliste_text }}"
 
+  # Skriv en kort (trimmet) udgave til input_text (255-char limit)
   - action: input_text.set_value
     data:
       entity_id: !input output_helper
-      value: >-
-        {%- set lines = [] -%}
-        {%- for item in huskeliste
-              if (item.date | default('')) and (item.message | default('') | trim) -%}
-          {%- set _ = lines.append('- **' ~ item.date ~ '**: ' ~ (item.message | trim)) -%}
-        {%- endfor -%}
-        {{ (lines | join('\n'))[:250] }}
+      value: "{{ huskeliste_text[:250] }}"
