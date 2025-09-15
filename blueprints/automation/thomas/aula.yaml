@@ -1,0 +1,110 @@
+blueprint:
+  name: Huskeliste fra ugeplan (LLM) – v3
+  description: >
+    Trækker "husk"-punkter ud fra sensorens 'ugeplan'-attribut via LLM og skriver
+    en kort opsummering til et input_text helper-felt. Robust JSON-parsing og
+    beskæring til input_text længde.
+  domain: automation
+  input:
+    ugeplan_sensor:
+      name: Ugeplan sensor
+      description: Sensoren med attributten 'ugeplan' (fx sensor.finderuphoj_skole_kamma)
+      selector:
+        entity:
+          filter:
+            - domain: sensor
+    output_helper:
+      name: Output helper (input_text)
+      description: Hvor den menneskelige opsummering skal skrives
+      selector:
+        entity:
+          filter:
+            - domain: input_text
+    conversation_agent:
+      name: Conversation Agent
+      description: Agent der bruges af conversation.process (fx conversation.chatgpt)
+      default: conversation.chatgpt
+      selector:
+        text: {}
+    event_name:
+      name: Event-navn (valgfrit)
+      description: Hvis angivet, affyres et event med dette navn efter parsing
+      default: ""
+      selector:
+        text: {}
+
+mode: single
+
+# NEW-style trigger syntax
+triggers:
+  - trigger: state
+    entity_id: !input ugeplan_sensor
+    attribute: ugeplan
+
+# (optional) conditions block can be empty
+conditions: []
+
+# NEW-style actions syntax
+actions:
+  - variables:
+      ugeplan_entity: !input ugeplan_sensor
+      agent_id: !input conversation_agent
+      out_entity: !input output_helper
+      evt_name: !input event_name
+      summary_response: ""
+
+  - action: conversation.process
+    data:
+      agent_id: "{{ agent_id }}"
+      text: >
+        Givet følgende ugeplan for mit barns skole, list de dage hvor jeg som
+        forælder skal huske mit barn på at have noget med på dagen. F.eks.
+        idrætstøj, turtaske, lektier, bøger, bibliotek, tøj, osv.
+
+        Outputformatet skal være et JSON array med ét objekt for hver dag.
+        Objektet skal være på max 254 tegn i "message".
+
+        Format:
+        [
+          { "date": "YYYY-MM-DD", "message": "det, der skal huskes" }
+        ]
+
+        Returner KUN JSON (ingen forklaring, ingen kodefence).
+
+        Ugeplan:
+        {{ state_attr(ugeplan_entity, 'ugeplan') }}
+    response_variable: summary_response
+
+  - variables:
+      huskeliste_raw: >-
+        {{ summary_response.response.speech.plain.speech
+           | string
+           | regex_replace(find='^\\s*```json\\s*', replace='')
+           | regex_replace(find='\\s*```\\s*$', replace='')
+           | trim }}
+      huskeliste: >-
+        {% set txt = huskeliste_raw %}
+        {% if txt is string and txt|length > 0 and txt|regex_match('^\\s*\\[') %}
+          {{ txt | from_json }}
+        {% else %}
+          {{ [] }}
+        {% endif %}
+
+  - choose:
+      - conditions: "{{ (evt_name | string) | length > 0 }}"
+        sequence:
+          - event: "{{ evt_name }}"
+            event_data:
+              huskeliste_json: "{{ huskeliste_raw }}"
+              items_count: "{{ huskeliste | count }}"
+
+  - action: input_text.set_value
+    target:
+      entity_id: "{{ out_entity }}"
+    data:
+      value: >-
+        {%- set lines = [] -%}
+        {%- for item in huskeliste if item.date and item.message -%}
+          {%- set _ = lines.append('- **' ~ item.date ~ '**: ' ~ item.message) -%}
+        {%- endfor -%}
+        {{ (lines | join('\n'))[ : 250 ] }}

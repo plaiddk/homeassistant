@@ -12,13 +12,13 @@
         "color_temp": 326
     },
     "3": {
-        "state": "OFF",
+        "state": "ON",
         "brightness": 203,
         "color_mode": "color_temp",
         "color_temp": 304
     },
     "4": {
-        "state": "OFF",
+        "state": "ON",
         "brightness": 218,
         "color_mode": "color_temp",
         "color_temp": 170,
@@ -28,7 +28,7 @@
         }
     },
     "5": {
-        "state": "OFF",
+        "state": "ON",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 354,
@@ -38,14 +38,14 @@
         }
     },
     "6": {
-        "state": "OFF",
+        "state": "ON",
         "brightness": 59,
         "color_temp": 318,
         "color_mode": "color_temp"
     },
     "7": {
-        "state": "OFF",
-        "brightness": 254,
+        "state": "ON",
+        "brightness": 203,
         "color_mode": "color_temp",
         "color_temp": 266
     },
@@ -56,10 +56,10 @@
         "color_temp": 310
     },
     "9": {
-        "state": "OFF",
-        "brightness": 218,
+        "state": "ON",
+        "brightness": 203,
         "color_mode": "color_temp",
-        "color_temp": 170,
+        "color_temp": 266,
         "color": {
             "x": 0.3244,
             "y": 0.3339
@@ -100,7 +100,7 @@
             "latest_version": 16788226
         },
         "linkquality": 152,
-        "state": "OFF",
+        "state": "ON",
         "brightness": 59,
         "color_mode": "color_temp",
         "color_temp": 318
@@ -112,7 +112,7 @@
             "latest_version": 16788226
         },
         "linkquality": 132,
-        "state": "OFF",
+        "state": "ON",
         "brightness": 59,
         "color_temp": 318,
         "color_mode": "color_temp"
@@ -120,8 +120,8 @@
     "0x001788010e4fc541": {
         "battery": 100,
         "occupancy": false,
-        "illuminance": 344,
-        "temperature": 22.53,
+        "illuminance": 12,
+        "temperature": 22.36,
         "occupancy_timeout": 0,
         "linkquality": 172,
         "update": {
@@ -136,7 +136,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "OFF",
+        "state": "ON",
         "linkquality": 120,
         "brightness": 218,
         "color_mode": "color_temp",
@@ -152,7 +152,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "OFF",
+        "state": "ON",
         "linkquality": 176,
         "brightness": 218,
         "color_mode": "color_temp",
@@ -164,7 +164,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "OFF",
+        "state": "ON",
         "linkquality": 168,
         "brightness": 218,
         "color_mode": "color_temp",
@@ -180,7 +180,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "OFF",
+        "state": "ON",
         "linkquality": 212,
         "brightness": 218,
         "color_mode": "color_temp",
@@ -192,7 +192,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "OFF",
+        "state": "ON",
         "linkquality": 132,
         "brightness": 218,
         "color_mode": "color_temp",
@@ -208,7 +208,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "OFF",
+        "state": "ON",
         "linkquality": 116,
         "brightness": 203,
         "color_mode": "color_temp",
@@ -220,7 +220,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "OFF",
+        "state": "ON",
         "linkquality": 144,
         "brightness": 203,
         "color_mode": "color_temp",
@@ -232,7 +232,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "OFF",
+        "state": "ON",
         "linkquality": 212,
         "brightness": 203,
         "color_mode": "color_temp",
@@ -244,7 +244,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "OFF",
+        "state": "ON",
         "linkquality": 172,
         "brightness": 203,
         "color_mode": "color_temp",
@@ -256,7 +256,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "OFF",
+        "state": "ON",
         "linkquality": 208,
         "brightness": 203,
         "color_mode": "color_temp",
@@ -266,8 +266,8 @@
         "battery": 63.5,
         "occupancy_timeout": 0,
         "occupancy": false,
-        "temperature": 19.81,
-        "illuminance": 65,
+        "temperature": 19.95,
+        "illuminance": 20,
         "linkquality": 108,
         "update": {
             "state": "idle",
@@ -325,8 +325,8 @@
     },
     "0x001788010e4fc5ac": {
         "occupancy": false,
-        "illuminance": 29,
-        "temperature": 20.87,
+        "illuminance": 1,
+        "temperature": 21.28,
         "battery": 100,
         "occupancy_timeout": 0,
         "linkquality": 148,
@@ -338,8 +338,8 @@
     },
     "0x001788010e4facad": {
         "battery": 100,
-        "illuminance": 2964,
-        "temperature": 22.37,
+        "illuminance": 16,
+        "temperature": 21.85,
         "occupancy": false,
         "occupancy_timeout": 0,
         "linkquality": 152,
@@ -396,8 +396,8 @@
     "0x001788010e504bfb": {
         "battery": 100,
         "occupancy": false,
-        "illuminance": 1,
-        "temperature": 19.35,
+        "illuminance": 2,
+        "temperature": 19.29,
         "occupancy_timeout": 0,
         "linkquality": 128,
         "update": {
@@ -413,7 +413,7 @@
             "latest_version": 16787202
         },
         "linkquality": 152,
-        "state": "OFF",
+        "state": "ON",
         "brightness": 203,
         "color_mode": "color_temp",
         "color_temp": 266
@@ -422,8 +422,8 @@
         "battery": 69.5,
         "occupancy_timeout": 0,
         "occupancy": false,
-        "temperature": 19.05,
-        "illuminance": 51,
+        "temperature": 21.73,
+        "illuminance": 42,
         "linkquality": 128,
         "update": {
             "state": "idle",
@@ -438,7 +438,7 @@
             "latest_version": 16787202
         },
         "linkquality": 144,
-        "state": "OFF",
+        "state": "ON",
         "brightness": 203,
         "color_mode": "color_temp",
         "color_temp": 266
@@ -450,7 +450,7 @@
             "latest_version": 16787202
         },
         "linkquality": 136,
-        "state": "OFF",
+        "state": "ON",
         "brightness": 203,
         "color_mode": "color_temp",
         "color_temp": 266
@@ -462,7 +462,7 @@
             "latest_version": 16787202
         },
         "linkquality": 152,
-        "state": "OFF",
+        "state": "ON",
         "brightness": 203,
         "color_mode": "color_temp",
         "color_temp": 266
@@ -474,7 +474,7 @@
             "latest_version": 16787202
         },
         "linkquality": 128,
-        "state": "OFF",
+        "state": "ON",
         "brightness": 203,
         "color_mode": "color_temp",
         "color_temp": 266
@@ -486,7 +486,7 @@
             "latest_version": 16787202
         },
         "linkquality": 164,
-        "state": "OFF",
+        "state": "ON",
         "brightness": 203,
         "color_mode": "color_temp",
         "color_temp": 266
@@ -498,8 +498,8 @@
             "latest_version": 16787202
         },
         "linkquality": 152,
-        "state": "OFF",
-        "brightness": 254,
+        "state": "ON",
+        "brightness": 203,
         "color_mode": "color_temp",
         "color_temp": 266
     },
@@ -623,7 +623,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "OFF",
+        "state": "ON",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 354,
@@ -635,7 +635,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "OFF",
+        "state": "ON",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 354,
@@ -651,7 +651,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "OFF",
+        "state": "ON",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 354,
@@ -663,7 +663,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "OFF",
+        "state": "ON",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 354,
@@ -675,7 +675,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "OFF",
+        "state": "ON",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 354,
@@ -687,7 +687,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "OFF",
+        "state": "ON",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 354,
@@ -698,7 +698,7 @@
         }
     },
     "0x0017880108497a94": {
-        "state": "OFF",
+        "state": "ON",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 354,
@@ -714,7 +714,7 @@
         }
     },
     "0x0017880109e3f715": {
-        "state": "OFF",
+        "state": "ON",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 354,
@@ -730,7 +730,7 @@
         }
     },
     "0x001788010e616180": {
-        "state": "OFF",
+        "state": "ON",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 354,
@@ -742,7 +742,7 @@
         "linkquality": 180
     },
     "0x001788010e5dd675": {
-        "state": "OFF",
+        "state": "ON",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 354,
@@ -763,9 +763,9 @@
         "linkquality": 104
     },
     "0x00158d000af064a3": {
-        "temperature": 21.07,
-        "humidity": 64.58,
-        "pressure": 992.4,
+        "temperature": 23.41,
+        "humidity": 88.19,
+        "pressure": 992,
         "voltage": 3025,
         "battery": 100,
         "power_outage_count": 17,
