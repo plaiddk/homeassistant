@@ -673,3 +673,12 @@
     action: input_boolean.turn_off
     data: {}
   mode: single
+- id: '1757957483629'
+  alias: 'Kamma Aula '
+  description: ''
+  use_blueprint:
+    path: thomas/aula.yaml
+    input:
+      ugeplan_sensor: sensor.finderuphoj_skole_kamma
+      output_helper: input_text.huskeliste_kamma
+      event_name: kamma_huskeliste_updated

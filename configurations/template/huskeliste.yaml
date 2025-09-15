@@ -1,0 +1,18 @@
+- sensor:
+    - name: "Kamma huskeliste (lang)"
+      unique_id: kamma_huskeliste_full
+      icon: mdi:bag-personal-outline
+      state: >-
+        {{ 'Opdateret' if (state_attr('sensor.kamma_huskeliste','huskeliste') | default('')) else 'Ingen data' }}
+      attributes:
+        full_text: >-
+          {{ state_attr('sensor.kamma_huskeliste','huskeliste') | default('') }}
+
+    - name: "Herman huskeliste (lang)"
+      unique_id: herman_huskeliste_full
+      icon: mdi:bag-personal-outline
+      state: >-
+        {{ 'Opdateret' if (state_attr('sensor.herman_huskeliste','huskeliste') | default('')) else 'Ingen data' }}
+      attributes:
+        full_text: >-
+          {{ state_attr('sensor.herman_huskeliste','huskeliste') | default('') }}
