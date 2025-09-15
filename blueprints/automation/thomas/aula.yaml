@@ -59,10 +59,10 @@ actions:
       text: >
         Givet følgende ugeplan for mit barns skole, list de dage hvor jeg som
         forælder skal huske mit barn på at have noget med på dagen. F.eks.
-        idrætstøj, turtaske, lektier, bøger, bibliotek, tøj, osv.
+        idrætstøj, turtaske, lektier, bøger, bibliotek, tøj, osv. Det er ret vigtigt jeg ser når der er lektier for.
 
         Outputformatet skal være et JSON array med ét objekt for hver dag.
-        Objektet skal være på max 254 tegn i "message".
+        Objektet skal være på max 1000 tegn i "message".
 
         Format:
         [
