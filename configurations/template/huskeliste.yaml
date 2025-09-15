@@ -1,4 +1,4 @@
-# KAMMA – lytter på blueprint-eventet og gemmer FULD tekst i attribut
+# KAMMA – lytter på eventet og gemmer FULD tekst i attributten
 - trigger:
     - trigger: event
       event_type: kamma_huskeliste_updated
@@ -8,10 +8,9 @@
       icon: mdi:bag-personal-outline
       state: "Opdateret"
       attributes:
-        full_text: >-
-          {{ trigger.event.data.huskeliste_text | default('') }}
+        full_text: "{{ trigger.event.data.huskeliste_text | default('') }}"
 
-# HERMAN – tilsvarende
+# HERMAN
 - trigger:
     - trigger: event
       event_type: herman_huskeliste_updated
@@ -21,5 +20,4 @@
       icon: mdi:bag-personal-outline
       state: "Opdateret"
       attributes:
-        full_text: >-
-          {{ trigger.event.data.huskeliste_text | default('') }}
+        full_text: "{{ trigger.event.data.huskeliste_text | default('') }}"

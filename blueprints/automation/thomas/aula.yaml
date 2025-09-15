@@ -96,7 +96,7 @@ actions:
   - choose:
       - conditions: "{{ (evt_name | default('') | trim) != '' }}"
         sequence:
-          - event: "{{ evt_name }}"
+          - event: !input event_name
             event_data:
               huskeliste_text: "{{ huskeliste_text }}"
 
