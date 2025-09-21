@@ -1,0 +1,84 @@
+blueprint:
+  name: Huskeliste fra ugeplan_next (LLM) – v4 (tekst, ingen JSON)
+  description: >
+    Udtrækker vigtige "husk"-punkter fra sensorens 'ugeplan_next'-attribut via LLM
+    og udsender en færdig punktopstilling som ren tekst. Skriver en kort
+    (trimmet) opsummering til input_text. Den fulde tekst lægges i
+    event-data og kan gemmes i en template-sensor-attribut (ingen 255-char limit).
+  domain: automation
+  input:
+    ugeplan_sensor:
+      name: Ugeplan sensor
+      selector:
+        entity:
+          filter:
+            - domain: sensor
+    output_helper:
+      name: Output helper (input_text)
+      selector:
+        entity:
+          filter:
+            - domain: input_text
+    conversation_agent:
+      name: Conversation Agent
+      default: conversation.chatgpt
+      selector:
+        text: {}
+    event_name:
+      name: Event-navn (valgfrit)
+      description: Fx kamma_huskeliste_next_updated / herman_huskeliste_next_updated
+      default: ""
+      selector:
+        text: {}
+
+mode: single
+
+triggers:
+  - trigger: state
+    entity_id: !input ugeplan_sensor
+    attribute: ugeplan_next
+
+conditions: []
+
+actions:
+  - variables:
+      ugeplan_entity: !input ugeplan_sensor
+      agent_id: !input conversation_agent
+      out_entity: !input output_helper
+      evt_name: !input event_name
+      summary_response: ""
+
+  - action: conversation.process
+    data:
+      agent_id: "{{ agent_id }}"
+      text: >
+        Givet NÆSTE UGES ugeplan nedenfor: Udtræk én linje pr. skoledag i den pågældende uge (mandag–fredag). Inkludér ALLE dage, også selvom det ikke nødvendigvis hører under det med særlig fokus. Så bare lav et kort notat om det.
+        (samme regler/detektion som din v4 — uændret)
+
+        Det skal være i dette format:
+        - **YYYY-MM-DD**: Beskeden ud fra de regler som er opstillet og detektion
+
+        Ugeplan (næste uge):
+        {{ state_attr(ugeplan_entity, 'ugeplan_next') }}
+
+    response_variable: summary_response
+
+  - variables:
+      huskeliste_text: >-
+        {{ summary_response.response.speech.plain.speech
+           | string
+           | regex_replace(find='^\\s*```(?:json|yaml)?\\s*', replace='')
+           | regex_replace(find='\\s*```\\s*$', replace='')
+           | trim }}
+
+  - choose:
+      - conditions: "{{ (evt_name | default('') | trim) != '' }}"
+        sequence:
+          - event: !input event_name
+            event_data:
+              huskeliste_text: "{{ huskeliste_text }}"
+
+  - action: input_text.set_value
+    data:
+      entity_id: !input output_helper
+      value: "{{ huskeliste_text[:250] }}"

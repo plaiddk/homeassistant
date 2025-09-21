@@ -21,3 +21,26 @@
       state: "Opdateret"
       attributes:
         full_text: "{{ trigger.event.data.huskeliste_text | default('') }}"
+
+# KAMMA – NEXT (lytter på event og gemmer fuld tekst i attributten)
+- trigger:
+    - trigger: event
+      event_type: kamma_huskeliste_next_updated
+  sensor:
+    - name: "Kamma huskeliste (lang) – next"
+      unique_id: kamma_huskeliste_full_next
+      icon: mdi:bag-personal-outline
+      state: "Opdateret"
+      attributes:
+        full_text: "{{ trigger.event.data.huskeliste_next_text | default('') }}"
+# HERMAN – NEXT
+- trigger:
+    - trigger: event
+      event_type: herman_huskeliste_next_updated
+  sensor:
+    - name: "Herman huskeliste (lang) – next"
+      unique_id: herman_huskeliste_full_next
+      icon: mdi:bag-personal-outline
+      state: "Opdateret"
+      attributes:
+        full_text: "{{ trigger.event.data.huskeliste_next_text | default('') }}"

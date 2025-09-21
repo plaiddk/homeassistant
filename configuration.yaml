@@ -70,6 +70,12 @@ input_text:
   huskeliste_kamma:
     name: Huskeliste Kamma
     max: 255
+  huskeliste_herman_next:
+    name: Huskeliste Herman
+    max: 255
+  huskeliste_kamma_next:
+    name: Huskeliste Kamma
+    max: 255
   beskedliste_alle:
     name: beskederaula
     max: 255
