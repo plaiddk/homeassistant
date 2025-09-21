@@ -145,3 +145,10 @@ pollen_dk:
 #───────────────────────────────────────────────────────────────────────────────
 # Eloverblik
 #───────────────────────────────────────────────────────────────────────────────
+camera:
+  - platform: xiaomi_cloud_map_extractor
+    name: l50_ultra_map_color
+    host: !secret dreame_host
+    token: !secret dreame_token
+    draw: ["all", "segments"] # draws rooms
+    # optional: customize colors per room in `colors:` section

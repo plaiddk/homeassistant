@@ -208,3 +208,77 @@ change_theme:
       cycle: true
   alias: Change Theme
   description: ''
+l50_ultra_toggle_room_selection:
+  alias: L50 Ultra – Toggle room selection
+  mode: queued
+  fields:
+    room_id:
+      name: Room ID
+      description: Segment/room ID (number)
+      selector:
+        number:
+          min: 1
+          max: 99
+          mode: box
+  sequence:
+  - variables:
+      rid: '{{ room_id | int }}'
+      text: '{{ states(''input_text.l50_ultra_selected_segments'') | string }}'
+      list_str: '{{ text | regex_findall(''[0-9]+'') | list }}'
+      list_int: '{{ list_str | map(''int'') | list }}'
+      has: '{{ rid in list_int }}'
+      new_list_str: '{% if has %} {{ list_str | reject(''equalto'', rid|string) |
+        list }} {% else %} {{ (list_str + [rid|string]) | unique | list }} {% endif
+        %}
+
+        '
+      joined: '{{ new_list_str | join('','') }}'
+  - target:
+      entity_id: input_text.l50_ultra_selected_segments
+    data:
+      value: '{{ joined }}'
+    action: input_text.set_value
+l50_ultra_clean_selected_rooms:
+  alias: L50 Ultra – Clean selected rooms
+  mode: single
+  sequence:
+  - variables:
+      text: '{{ states(''input_text.l50_ultra_selected_segments'') | string }}'
+      segs: '{{ text | regex_findall(''[0-9]+'') | map(''int'') | list }}'
+  - choose:
+    - conditions: '{{ segs | count > 0 }}'
+      sequence:
+      - target:
+          entity_id: vacuum.l50_ultra
+        data:
+          segments: '{{ segs }}'
+        action: dreame_vacuum.vacuum_clean_segment
+    default:
+    - target:
+        entity_id: vacuum.l50_ultra
+      action: vacuum.start
+l50_ultra_clean_selected_rooms_2:
+  alias: L50 Ultra – Clean selected rooms
+  mode: restart
+  icon: mdi:play-circle
+  sequence:
+  - variables:
+      raw: '{{ states(''input_text.l50_ultra_selected_segments'') | string }}'
+      segments: '{{ raw | regex_findall(''[0-9]+'') | map(''int'') | unique | list
+        }}
+
+        '
+  - choose:
+    - conditions: '{{ segments | length > 0 }}'
+      sequence:
+      - data:
+          entity_id: vacuum.l50_ultra
+          segments: '{{ segments }}'
+        action: dreame_vacuum.vacuum_clean_segment
+    - conditions: []
+      sequence:
+      - data:
+          title: Dreame – ingen rum valgt
+          message: Vælg mindst ét rum før start.
+        action: persistent_notification.create
+  description: ''
