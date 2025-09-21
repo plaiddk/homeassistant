@@ -32,7 +32,7 @@
       icon: mdi:bag-personal-outline
       state: "Opdateret"
       attributes:
-        full_text: "{{ trigger.event.data.huskeliste_next_text | default('') }}"
+        full_text: "{{ trigger.event.data.huskeliste_text | default('') }}"
 # HERMAN – NEXT
 - trigger:
     - trigger: event
@@ -43,4 +43,4 @@
       icon: mdi:bag-personal-outline
       state: "Opdateret"
       attributes:
-        full_text: "{{ trigger.event.data.huskeliste_next_text | default('') }}"
+        full_text: "{{ trigger.event.data.huskeliste_text | default('') }}"

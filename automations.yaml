@@ -89,86 +89,6 @@
     entity_id: c67f656552a2e7c0209a7926dd38e885
     domain: switch
   mode: single
-- id: '1734283942514'
-  alias: Huskeliste for Herman
-  description: ''
-  triggers:
-  - trigger: state
-    entity_id:
-    - sensor.finderuphoj_skole_herman
-    attribute: ugeplan
-  conditions: []
-  actions:
-  - variables:
-      summary_response: ''
-  - action: conversation.process
-    metadata: {}
-    data:
-      text: "Givet følgende ugeplan for mit barns skole, list de dage hvor jeg som
-        forældre skal huske mit barn på at have noget med på dagen. F.eks. idrætstøj,
-        turtaske, lektier, bøger, bibliotek, tøj, osv. \n\nOutputformatet skal være
-        et JSON array med ét objekt for hver dag. Det må gerne være detajleret dog
-        max 500 karakter langt. Formatet for objektet er:\n{\n  \"date\": \"YYYY-MM-DD\",\n
-        \ \"message\": \"dét, der skal huskes\"\n}\n\nreturner KUN json og intet andet.\n\nUgeplan:\n{{
-        state_attr(\"sensor.finderuphoj_skole_herman\", \"ugeplan\") }}\n"
-      agent_id: conversation.chatgpt
-    response_variable: summary_response
-  - variables:
-      huskeliste: '{{ summary_response.response.speech.plain.speech | string | regex_replace(find="\s*```json\s*",
-        replace='''') | regex_replace(find="\s*```\s*", replace='''')}}'
-  - event: herman_huskeliste_updated
-    event_data:
-      huskeliste: '{{ summary_response.response.speech.plain.speech }}'
-  - target:
-      entity_id: input_text.huskeliste_herman
-    data:
-      value: '{%- for item in huskeliste if item.date and item.message -%}
-
-        {{ ''\n'' ~ ''- **'' ~ item.date ~ ''**: '' ~ item.message }}
-
-        {%- endfor %}'
-    action: input_text.set_value
-  mode: single
-- id: '1734297071604'
-  alias: Huskeliste for Kamma
-  description: ''
-  triggers:
-  - trigger: state
-    entity_id:
-    - sensor.finderuphoj_skole_kamma
-    attribute: ugeplan
-  conditions: []
-  actions:
-  - variables:
-      summary_response: ''
-  - action: conversation.process
-    metadata: {}
-    data:
-      text: "Givet følgende ugeplan for mit barns skole, list de dage hvor jeg som
-        forældre skal huske mit barn på at have noget med på dagen. F.eks. idrætstøj,
-        turtaske, lektier, bøger, bibliotek, tøj, osv. \n\nOutputformatet skal være
-        et JSON array med ét objekt for hver dag. Det må gerne være detajleret dog
-        max 254 karakter langt. Formatet for objektet er:\n{\n  \"date\": \"YYYY-MM-DD\",\n
-        \ \"message\": \"dét, der skal huskes\"\n}\n\nreturner KUN json og intet andet.\n\nUgeplan:\n{{
-        state_attr(\"sensor.finderuphoj_skole_kamma\", \"ugeplan\") }}\n"
-      agent_id: conversation.chatgpt
-    response_variable: summary_response
-  - variables:
-      huskeliste: '{{ summary_response.response.speech.plain.speech | string | regex_replace(find="\s*```json\s*",
-        replace='''') | regex_replace(find="\s*```\s*", replace='''')}}'
-  - event: kamma_huskeliste_updated
-    event_data:
-      huskeliste: '{{ summary_response.response.speech.plain.speech }}'
-  - target:
-      entity_id: input_text.huskeliste_kamma
-    data:
-      value: '{%- for item in huskeliste if item.date and item.message -%}
-
-        {{ ''\n'' ~ ''- **'' ~ item.date ~ ''**: '' ~ item.message }}
-
-        {%- endfor %}'
-    action: input_text.set_value
-  mode: single
 - id: '1734302153700'
   alias: Ulæste beskeder Aula (v2)
   description: Henter ulæste Aula-beskeder, laver kort, ren tekst-opsummering.
@@ -696,3 +616,21 @@
       ugeplan_sensor: sensor.finderuphoj_skole_herman
       output_helper: input_text.huskeliste_herman
       event_name: herman_huskeliste_updated
+- id: '1758479016009'
+  alias: Herman ugeplan next
+  description: ''
+  use_blueprint:
+    path: thomas/aulaugeplan2.yaml
+    input:
+      ugeplan_sensor: sensor.finderuphoj_skole_herman
+      output_helper: input_text.huskeliste_herman_next
+      event_name: herman_huskeliste_next_updated
+- id: '1758479048045'
+  alias: Kamma ugeplan next
+  description: ''
+  use_blueprint:
+    path: thomas/aulaugeplan2.yaml
+    input:
+      ugeplan_sensor: sensor.finderuphoj_skole_kamma
+      output_helper: input_text.huskeliste_kamma_next
+      event_name: kamma_huskeliste_next_updated
