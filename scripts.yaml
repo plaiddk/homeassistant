@@ -1,3 +1,63 @@
+l50_ultra_global_adjust:
+  alias: L50 – Global adjust & apply (compat)
+  mode: parallel
+  sequence:
+    - variables:
+        # Inputs from card call (with safe defaults)
+        kind: "{{ (kind | default('suction')) | lower }}"
+        step_i: "{{ (step | default(1)) | int }}"
+
+        # Selected rooms as list of numeric ids
+        selected_text: "{{ states('input_text.l50_ultra_selected_segments') | string }}"
+        ids: "{{ selected_text | regex_findall('[0-9]+') }}"
+
+        # Which helpers/entities to use
+        idx_entity: >-
+          {% if kind == 'suction' %} input_number.l50_ultra_global_idx_suction
+          {% elif kind == 'mop' %} input_number.l50_ultra_global_idx_mop
+          {% else %} input_number.l50_ultra_global_idx_times
+          {% endif %}
+        ref_entity: >-
+          {% if kind == 'suction' %} select.l50_ultra_room_1_suction_level
+          {% elif kind == 'mop' %} select.l50_ultra_room_1_mop_pad_humidity
+          {% else %} select.l50_ultra_room_1_cleaning_times
+          {% endif %}
+
+        # Read real options from the device
+        opts: "{{ state_attr(ref_entity, 'options') or [] }}"
+        n: "{{ (opts|length) if (opts|length) > 0 else 1 }}"
+        cur: "{{ states(idx_entity) | int(0) }}"
+        new_index: "{{ (cur + step_i) % n }}"
+        choice: "{{ opts[new_index] if (opts|length) > 0 else states(ref_entity) }}"
+
+    # Update the global index so the UI reflects the new choice
+    - service: input_number.set_value
+      entity_id: "{{ idx_entity }}"
+      data:
+        value: "{{ new_index | int }}"
+
+    # Apply the chosen option to each selected room
+    - repeat:
+        for_each: "{{ ids }}"
+        sequence:
+          - variables:
+              ent: >-
+                {% if kind == 'suction' %}
+                  select.l50_ultra_room_{{ repeat.item }}_suction_level
+                {% elif kind == 'mop' %}
+                  select.l50_ultra_room_{{ repeat.item }}_mop_pad_humidity
+                {% else %}
+                  select.l50_ultra_room_{{ repeat.item }}_cleaning_times
+                {% endif %}
+              room_opts: "{{ state_attr(ent, 'options') or [] }}"
+          - choose:
+              - conditions: "{{ choice in room_opts }}"
+                sequence:
+                  - service: select.select_option
+                    entity_id: "{{ ent }}"
+                    data:
+                      option: "{{ choice }}"
+
 plot_energy_usage:
   alias: 00 - Plot energy usage
   icon: mdi:brightness-percent
@@ -41,173 +101,182 @@ plot_energy_usage:
         entity:
     stop_state:
       description: State the entity should have to stop the plot
-      example: 'off'
+      example: "off"
       required: true
       selector:
         text:
   sequence:
-  - variables:
-      not_defined: "{{ [\n      'energy sensor' if sensor is not defined or not sensor
-        else none,\n      'stop entity' if stop_entity is not defined or not stop_entity
-        else none,\n      'stop state' if stop_state is not defined else none\n    ]
-        | reject('none') | list\n}}\n"
-  - if: '{{ not_defined | count > 0 }}'
-    then:
-    - stop: '{{ not_defined | join('', '') }} {{ ''is'' if not_defined | count ==
-        1 else ''are''}} not defined, script has stopped
+    - variables:
+        not_defined:
+          "{{ [\n      'energy sensor' if sensor is not defined or not sensor
+          else none,\n      'stop entity' if stop_entity is not defined or not stop_entity
+          else none,\n      'stop state' if stop_state is not defined else none\n    ]
+          | reject('none') | list\n}}\n"
+    - if: "{{ not_defined | count > 0 }}"
+      then:
+        - stop:
+            "{{ not_defined | join(', ') }} {{ 'is' if not_defined | count ==
+            1 else 'are'}} not defined, script has stopped
 
-        '
-      error: true
-  - variables:
-      description: '{{ description | default(''unknown'') }}'
-      no_weight_points: '{{ no_weight_points | default(4) | int(4) }}'
-  - repeat:
-      until:
-      - condition: template
-        value_template: '{{ is_state(stop_entity, stop_state) }}'
-      sequence:
-      - variables:
-          sensor_state: '{{ states(sensor) | float(''na'') }}'
-      - if: '{{ not sensor_state | is_number }}'
-        then:
-        - stop: Received non numeric state, script has stopped
+            "
           error: true
-      - event: update_energy_plot
-        event_data:
-          description: '{{ description }}'
-          status: '{{ ''first'' if repeat.first else ''ongoing'' }}'
-          state: '{{ sensor_state }}'
-          no_weight_points: '{{ no_weight_points }}'
-      - delay:
-          minutes: '{{ 60 / no_weight_points }}'
-  - event: update_energy_plot
-    event_data:
-      description: '{{ description }}'
-      no_weight_points: '{{ no_weight_points }}'
-      status: complete
+    - variables:
+        description: "{{ description | default('unknown') }}"
+        no_weight_points: "{{ no_weight_points | default(4) | int(4) }}"
+    - repeat:
+        until:
+          - condition: template
+            value_template: "{{ is_state(stop_entity, stop_state) }}"
+        sequence:
+          - variables:
+              sensor_state: "{{ states(sensor) | float('na') }}"
+          - if: "{{ not sensor_state | is_number }}"
+            then:
+              - stop: Received non numeric state, script has stopped
+                error: true
+          - event: update_energy_plot
+            event_data:
+              description: "{{ description }}"
+              status: "{{ 'first' if repeat.first else 'ongoing' }}"
+              state: "{{ sensor_state }}"
+              no_weight_points: "{{ no_weight_points }}"
+          - delay:
+              minutes: "{{ 60 / no_weight_points }}"
+    - event: update_energy_plot
+      event_data:
+        description: "{{ description }}"
+        no_weight_points: "{{ no_weight_points }}"
+        status: complete
 opvaskemaskinestartscript:
   alias: OpvaskemaskineStartScript
   sequence:
-  - variables:
-      selected_time: "{% if is_state('input_boolean.wash_today', 'on') %}\n  {{ states('sensor.elpris_lavest_4t_idag')
-        }}\n{% else %}\n  {{ states('sensor.elpris_lavest_4t') }}\n{% endif %}"
-      start_seconds: '{% set tid = as_timestamp(selected_time) %} {% set startSeconds
-        = (tid - now().timestamp()) | int %} {{ startSeconds }}         '
-  - data:
-      validate: true
-      device_id: eba0e0d1c71ffe0db50d16907e42c5f4
-      program_key: '{{ states(''select.011010524691008792_programs'') }}'
-      options:
-      - key: BSH.Common.Option.StartInRelative
-        value: '{{ start_seconds }}'
-    action: home_connect_alt.start_program
+    - variables:
+        selected_time:
+          "{% if is_state('input_boolean.wash_today', 'on') %}\n  {{ states('sensor.elpris_lavest_4t_idag')
+          }}\n{% else %}\n  {{ states('sensor.elpris_lavest_4t') }}\n{% endif %}"
+        start_seconds:
+          "{% set tid = as_timestamp(selected_time) %} {% set startSeconds
+          = (tid - now().timestamp()) | int %} {{ startSeconds }}         "
+    - data:
+        validate: true
+        device_id: eba0e0d1c71ffe0db50d16907e42c5f4
+        program_key: "{{ states('select.011010524691008792_programs') }}"
+        options:
+          - key: BSH.Common.Option.StartInRelative
+            value: "{{ start_seconds }}"
+      action: home_connect_alt.start_program
 vaskemaskinestartscript:
   alias: VaskemaskineStartScript
   sequence:
-  - action: home_connect_alt.select_program
-    metadata: {}
-    data:
-      validate: true
-      device_id: 5c6a73b87eb6cb1c23a6838140d06a65
-      program_key: '{{ states(''select.484090540289002643_programs'') }}'
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ states(''select.484090540289002643_laundrycare_washer_option_temperature'')
-          != ''unavailable'' }}
+    - action: home_connect_alt.select_program
+      metadata: {}
+      data:
+        validate: true
+        device_id: 5c6a73b87eb6cb1c23a6838140d06a65
+        program_key: "{{ states('select.484090540289002643_programs') }}"
+    - choose:
+        - conditions:
+            - condition: template
+              value_template:
+                "{{ states('select.484090540289002643_laundrycare_washer_option_temperature')
+                != 'unavailable' }}
 
-          '
-      sequence:
-      - action: home_connect_alt.set_program_option
-        data:
-          device_id: 5c6a73b87eb6cb1c23a6838140d06a65
-          key: LaundryCare.Washer.Option.Temperature
-          value: '{{ states(''select.484090540289002643_laundrycare_washer_option_temperature'')
-            }}
+                "
+          sequence:
+            - action: home_connect_alt.set_program_option
+              data:
+                device_id: 5c6a73b87eb6cb1c23a6838140d06a65
+                key: LaundryCare.Washer.Option.Temperature
+                value:
+                  "{{ states('select.484090540289002643_laundrycare_washer_option_temperature')
+                  }}
 
-            '
-  - action: home_connect_alt.set_program_option
-    metadata: {}
-    data:
-      device_id: 5c6a73b87eb6cb1c23a6838140d06a65
-      key: LaundryCare.Washer.Option.SpinSpeed
-      value: '{{ states(''select.484090540289002643_laundrycare_washer_option_spinspeed'')
-        }}'
-  - action: home_connect_alt.set_program_option
-    metadata: {}
-    data:
-      device_id: 5c6a73b87eb6cb1c23a6838140d06a65
-      key: LaundryCare.Washer.Option.IDos1Active
-      value: '{{ true if states(''binary_sensor.484090540289002643_laundrycare_washer_option_idos1active'')
-        == ''on'' else false }}'
-  - action: home_connect_alt.set_program_option
-    metadata: {}
-    data:
-      device_id: 5c6a73b87eb6cb1c23a6838140d06a65
-      key: LaundryCare.Washer.Option.IDos2Active
-      value: '{{ true if states(''binary_sensor.484090540289002643_laundrycare_washer_option_idos2active'')
-        == ''on'' else false }}'
-  - variables:
-      finish_in_relative: '{{ states(''sensor.finish_in_relative'') | int }}'
-  - action: home_connect_alt.start_program
-    metadata: {}
-    data:
-      validate: true
-      options:
-      - key: BSH.Common.Option.FinishInRelative
-        value: '{{ finish_in_relative }}'
-      device_id: 5c6a73b87eb6cb1c23a6838140d06a65
-  description: ''
+                  "
+    - action: home_connect_alt.set_program_option
+      metadata: {}
+      data:
+        device_id: 5c6a73b87eb6cb1c23a6838140d06a65
+        key: LaundryCare.Washer.Option.SpinSpeed
+        value:
+          "{{ states('select.484090540289002643_laundrycare_washer_option_spinspeed')
+          }}"
+    - action: home_connect_alt.set_program_option
+      metadata: {}
+      data:
+        device_id: 5c6a73b87eb6cb1c23a6838140d06a65
+        key: LaundryCare.Washer.Option.IDos1Active
+        value:
+          "{{ true if states('binary_sensor.484090540289002643_laundrycare_washer_option_idos1active')
+          == 'on' else false }}"
+    - action: home_connect_alt.set_program_option
+      metadata: {}
+      data:
+        device_id: 5c6a73b87eb6cb1c23a6838140d06a65
+        key: LaundryCare.Washer.Option.IDos2Active
+        value:
+          "{{ true if states('binary_sensor.484090540289002643_laundrycare_washer_option_idos2active')
+          == 'on' else false }}"
+    - variables:
+        finish_in_relative: "{{ states('sensor.finish_in_relative') | int }}"
+    - action: home_connect_alt.start_program
+      metadata: {}
+      data:
+        validate: true
+        options:
+          - key: BSH.Common.Option.FinishInRelative
+            value: "{{ finish_in_relative }}"
+        device_id: 5c6a73b87eb6cb1c23a6838140d06a65
+  description: ""
   icon: mdi:washing-machine
 skoda_start_afriming:
   sequence:
-  - action: switch.turn_on
-    metadata: {}
-    data: {}
-    target:
-      entity_id: switch.skoda_enyaq_window_heating
+    - action: switch.turn_on
+      metadata: {}
+      data: {}
+      target:
+        entity_id: switch.skoda_enyaq_window_heating
   alias: skoda_start_afriming
-  description: ''
+  description: ""
 skoda_stop_afriming:
   sequence:
-  - action: switch.turn_off
-    metadata: {}
-    data: {}
-    target:
-      entity_id: switch.skoda_enyaq_window_heating
+    - action: switch.turn_off
+      metadata: {}
+      data: {}
+      target:
+        entity_id: switch.skoda_enyaq_window_heating
   alias: skoda_stop_afriming
-  description: ''
+  description: ""
 monta_start_lader:
   sequence:
-  - action: switch.turn_on
-    metadata: {}
-    data: {}
-    target:
-      entity_id: switch.monta_thomas_ladestander_start_stop
+    - action: switch.turn_on
+      metadata: {}
+      data: {}
+      target:
+        entity_id: switch.monta_thomas_ladestander_start_stop
   alias: monta_start_lader
-  description: ''
+  description: ""
 monta_stop_lader:
   sequence:
-  - action: switch.turn_off
-    metadata: {}
-    data: {}
-    target:
-      entity_id: switch.monta_thomas_ladestander_start_stop
+    - action: switch.turn_off
+      metadata: {}
+      data: {}
+      target:
+        entity_id: switch.monta_thomas_ladestander_start_stop
   alias: monta_stop_lader
-  description: ''
+  description: ""
 change_theme:
   sequence:
-  - action: frontend.set_theme
-    metadata: {}
-    data:
-      name: '{{ states(''input_select.theme_selector'') }}'
-  - action: input_select.select_next
-    target:
-      entity_id: input_select.theme_selector
-    data:
-      cycle: true
+    - action: frontend.set_theme
+      metadata: {}
+      data:
+        name: "{{ states('input_select.theme_selector') }}"
+    - action: input_select.select_next
+      target:
+        entity_id: input_select.theme_selector
+      data:
+        cycle: true
   alias: Change Theme
-  description: ''
+  description: ""
 l50_ultra_toggle_room_selection:
   alias: L50 Ultra – Toggle room selection
   mode: queued
@@ -221,64 +290,65 @@ l50_ultra_toggle_room_selection:
           max: 99
           mode: box
   sequence:
-  - variables:
-      rid: '{{ room_id | int }}'
-      text: '{{ states(''input_text.l50_ultra_selected_segments'') | string }}'
-      list_str: '{{ text | regex_findall(''[0-9]+'') | list }}'
-      list_int: '{{ list_str | map(''int'') | list }}'
-      has: '{{ rid in list_int }}'
-      new_list_str: '{% if has %} {{ list_str | reject(''equalto'', rid|string) |
-        list }} {% else %} {{ (list_str + [rid|string]) | unique | list }} {% endif
-        %}
+    - variables:
+        rid: "{{ room_id | int }}"
+        text: "{{ states('input_text.l50_ultra_selected_segments') | string }}"
+        list_str: "{{ text | regex_findall('[0-9]+') | list }}"
+        list_int: "{{ list_str | map('int') | list }}"
+        has: "{{ rid in list_int }}"
+        new_list_str:
+          "{% if has %} {{ list_str | reject('equalto', rid|string) |
+          list }} {% else %} {{ (list_str + [rid|string]) | unique | list }} {% endif
+          %}
 
-        '
-      joined: '{{ new_list_str | join('','') }}'
-  - target:
-      entity_id: input_text.l50_ultra_selected_segments
-    data:
-      value: '{{ joined }}'
-    action: input_text.set_value
+          "
+        joined: "{{ new_list_str | join(',') }}"
+    - target:
+        entity_id: input_text.l50_ultra_selected_segments
+      data:
+        value: "{{ joined }}"
+      action: input_text.set_value
 l50_ultra_clean_selected_rooms:
   alias: L50 Ultra – Clean selected rooms
   mode: single
   sequence:
-  - variables:
-      text: '{{ states(''input_text.l50_ultra_selected_segments'') | string }}'
-      segs: '{{ text | regex_findall(''[0-9]+'') | map(''int'') | list }}'
-  - choose:
-    - conditions: '{{ segs | count > 0 }}'
-      sequence:
-      - target:
-          entity_id: vacuum.l50_ultra
-        data:
-          segments: '{{ segs }}'
-        action: dreame_vacuum.vacuum_clean_segment
-    default:
-    - target:
-        entity_id: vacuum.l50_ultra
-      action: vacuum.start
+    - variables:
+        text: "{{ states('input_text.l50_ultra_selected_segments') | string }}"
+        segs: "{{ text | regex_findall('[0-9]+') | map('int') | list }}"
+    - choose:
+        - conditions: "{{ segs | count > 0 }}"
+          sequence:
+            - target:
+                entity_id: vacuum.l50_ultra
+              data:
+                segments: "{{ segs }}"
+              action: dreame_vacuum.vacuum_clean_segment
+      default:
+        - target:
+            entity_id: vacuum.l50_ultra
+          action: vacuum.start
 l50_ultra_clean_selected_rooms_2:
   alias: L50 Ultra – Clean selected rooms
   mode: restart
   icon: mdi:play-circle
   sequence:
-  - variables:
-      raw: '{{ states(''input_text.l50_ultra_selected_segments'') | string }}'
-      segments: '{{ raw | regex_findall(''[0-9]+'') | map(''int'') | unique | list
-        }}
+    - variables:
+        raw: "{{ states('input_text.l50_ultra_selected_segments') | string }}"
+        segments: "{{ raw | regex_findall('[0-9]+') | map('int') | unique | list
+          }}
 
-        '
-  - choose:
-    - conditions: '{{ segments | length > 0 }}'
-      sequence:
-      - data:
-          entity_id: vacuum.l50_ultra
-          segments: '{{ segments }}'
-        action: dreame_vacuum.vacuum_clean_segment
-    - conditions: []
-      sequence:
-      - data:
-          title: Dreame – ingen rum valgt
-          message: Vælg mindst ét rum før start.
-        action: persistent_notification.create
-  description: ''
+          "
+    - choose:
+        - conditions: "{{ segments | length > 0 }}"
+          sequence:
+            - data:
+                entity_id: vacuum.l50_ultra
+                segments: "{{ segments }}"
+              action: dreame_vacuum.vacuum_clean_segment
+        - conditions: []
+          sequence:
+            - data:
+                title: Dreame – ingen rum valgt
+                message: Vælg mindst ét rum før start.
+              action: persistent_notification.create
+  description: ""
