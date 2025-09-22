@@ -339,7 +339,7 @@
     "0x001788010e4facad": {
         "battery": 100,
         "illuminance": 1,
-        "temperature": 22.41,
+        "temperature": 22.01,
         "occupancy": false,
         "occupancy_timeout": 0,
         "linkquality": 152,
