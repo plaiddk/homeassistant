@@ -611,3 +611,40 @@
       ugeplan_sensor: sensor.finderuphoj_skole_kamma
       output_helper: input_text.huskeliste_kamma_next
       event_name: kamma_huskeliste_next_updated
+- &id001
+  id: ev_smart_charging_follow_connection
+  alias: EV Smart Charging – Follow Connection Sensors
+  triggers:
+    - entity_id:
+        - binary_sensor.monta_thomas_ladestander_cable_plugged_in
+        - binary_sensor.skoda_enyaq_connected
+      trigger: state
+    - event: start
+      trigger: homeassistant
+  actions:
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: binary_sensor.monta_thomas_ladestander_cable_plugged_in
+                  state: "on"
+                - condition: state
+                  entity_id: binary_sensor.skoda_enyaq_connected
+                  state: "on"
+          sequence:
+            - target:
+                entity_id:
+                  - switch.ev_smart_charging_ev_connected
+                  - switch.ev_smart_charging_smart_charging_activated
+              action: switch.turn_on
+      default:
+        - target:
+            entity_id:
+              - switch.ev_smart_charging_ev_connected
+              - switch.ev_smart_charging_smart_charging_activated
+          action: switch.turn_off
+  mode: restart
+  initial_state: true
+- *id001
+- *id001
