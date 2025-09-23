@@ -120,7 +120,7 @@
     "0x001788010e4fc541": {
         "battery": 100,
         "occupancy": false,
-        "illuminance": 303,
+        "illuminance": 844,
         "temperature": 21.98,
         "occupancy_timeout": 0,
         "linkquality": 172,
@@ -267,7 +267,7 @@
         "occupancy_timeout": 0,
         "occupancy": false,
         "temperature": 18.96,
-        "illuminance": 114,
+        "illuminance": 113,
         "linkquality": 108,
         "update": {
             "state": "idle",
@@ -325,8 +325,8 @@
     },
     "0x001788010e4fc5ac": {
         "occupancy": false,
-        "illuminance": 14,
-        "temperature": 19.76,
+        "illuminance": 29,
+        "temperature": 19.95,
         "battery": 100,
         "occupancy_timeout": 0,
         "linkquality": 148,
@@ -338,7 +338,7 @@
     },
     "0x001788010e4facad": {
         "battery": 100,
-        "illuminance": 246,
+        "illuminance": 747,
         "temperature": 21.35,
         "occupancy": false,
         "occupancy_timeout": 0,
@@ -423,7 +423,7 @@
         "occupancy_timeout": 0,
         "occupancy": false,
         "temperature": 19.61,
-        "illuminance": 41,
+        "illuminance": 40,
         "linkquality": 128,
         "update": {
             "state": "idle",
