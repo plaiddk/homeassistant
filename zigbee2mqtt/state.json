@@ -120,7 +120,7 @@
     "0x001788010e4fc541": {
         "battery": 100,
         "occupancy": false,
-        "illuminance": 844,
+        "illuminance": 830,
         "temperature": 21.98,
         "occupancy_timeout": 0,
         "linkquality": 172,
@@ -267,7 +267,7 @@
         "occupancy_timeout": 0,
         "occupancy": false,
         "temperature": 18.96,
-        "illuminance": 113,
+        "illuminance": 107,
         "linkquality": 108,
         "update": {
             "state": "idle",
@@ -325,7 +325,7 @@
     },
     "0x001788010e4fc5ac": {
         "occupancy": false,
-        "illuminance": 29,
+        "illuminance": 62,
         "temperature": 19.95,
         "battery": 100,
         "occupancy_timeout": 0,
@@ -338,7 +338,7 @@
     },
     "0x001788010e4facad": {
         "battery": 100,
-        "illuminance": 747,
+        "illuminance": 730,
         "temperature": 21.35,
         "occupancy": false,
         "occupancy_timeout": 0,
