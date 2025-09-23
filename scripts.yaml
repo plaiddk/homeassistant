@@ -517,47 +517,45 @@ l50_global_reset_presets:
   sequence:
   - variables:
       suction: '{{ suction | default(''Standard'') }}'
-      mop: '{{ mop | default(''Medium'') }}'
+      moist: '{{ moist | default(''moist'') }}'
       times: '{{ times | default(''1'') }}'
       selected_text: '{{ states(''input_text.l50_ultra_selected_segments'') | string
         }}'
       ids: '{{ selected_text | regex_findall(''[0-9]+'') }}'
       opts_suction: '{{ state_attr(''select.l50_ultra_room_1_suction_level'',''options'')
         or [] }}'
-      opts_mop: '{{ state_attr(''select.l50_ultra_room_1_mop_pad_humidity'',''options'')
+      opts_moist: '{{ state_attr(''select.l50_ultra_room_1_mop_pad_humidity'',''options'')
         or [] }}'
       opts_times: '{{ state_attr(''select.l50_ultra_room_1_cleaning_times'',''options'')
         or [] }}'
-      chosen_suction: '{% set opts = opts_suction %} {% set pref = (suction|string)
-        %} {% set re = ''(?i)^('' ~ pref ~ ''|auto|balanced|medium|standard)$'' %}
-        {% set found = (opts | select(''search'', re) | list) %} {{ found[0] if found|length>0
-        else (opts[0] if (opts|length)>0 else '''') }}
-
-        '
-      chosen_mop: '{% set opts = opts_mop %} {% set pref = (mop|string) %} {% set
-        re = ''(?i)^('' ~ pref ~ ''|standard|medium|med|auto)$'' %} {% set found =
-        (opts | select(''search'', re) | list) %} {{ found[0] if found|length>0 else
-        (opts[0] if (opts|length)>0 else '''') }}
-
-        '
+      chosen_suction: "{% set opts = opts_suction %} {% set pref = (suction|string)
+        %} {% set found = (opts | select('search', '(?i)^' ~ pref ~ '$') | list) %}
+        {% if found|length > 0 %}\n  {{ found[0] }}\n{% else %}\n  {% set syn = (opts
+        | select('search', '(?i)^(auto|balanced|medium|standard)$') | list) %}\n  {{
+        syn[0] if syn|length>0 else (opts[0] if (opts|length)>0 else '') }}\n{% endif
+        %}\n"
+      chosen_moist: "{% set opts = opts_moist %} {% set pref = (moist|string) %} {%
+        set exact = (opts | select('search', '(?i)^' ~ pref ~ '$') | list) %} {% if
+        exact|length > 0 %}\n  {{ exact[0] }}\n{% else %}\n  {% set mid = (opts |
+        select('search', '(?i)^moist$') | list) %}\n  {% if mid|length > 0 %}\n    {{
+        mid[0] }}\n  {% else %}\n    {% set known = (opts | select('search', '(?i)^(slightly[_
+        ]?dry|moist|wet)$') | list) %}\n    {{ known[0] if known|length>0 else (opts[0]
+        if (opts|length)>0 else '') }}\n  {% endif %}\n{% endif %}\n"
       chosen_times: '{% set opts = opts_times %} {% set pref = (times|string) %} {%
-        set re = ''(?i)^('' ~ pref ~ ''|1x|1 time|1 times|once)$'' %} {% set found
-        = (opts | select(''search'', re) | list) %} {{ found[0] if found|length>0
-        else (opts[0] if (opts|length)>0 else '''') }}
+        set found = (opts | select(''search'', ''(?i)^('' ~ pref ~ ''|1x|1 time|1
+        times|once)$'') | list) %} {{ found[0] if found|length>0 else (opts[0] if
+        (opts|length)>0 else '''') }}
 
         '
-      idx_suction: '{% set i = (opts_suction | list).index(chosen_suction) if chosen_suction
-        in opts_suction else 0 %} {{ i }}
-
-        '
-      idx_mop: '{% set i = (opts_mop | list).index(chosen_mop) if chosen_mop in opts_mop
-        else 0 %} {{ i }}
-
-        '
-      idx_times: '{% set i = (opts_times | list).index(chosen_times) if chosen_times
-        in opts_times else 0 %} {{ i }}
-
-        '
+      idx_suction: "{% set ns = namespace(i=0) %} {% for o in opts_suction %}\n  {%
+        if o == chosen_suction %}{% set ns.i = loop.index0 %}{% endif %}\n{% endfor
+        %} {{ ns.i }}\n"
+      idx_moist: "{% set ns = namespace(i=0) %} {% for o in opts_moist %}\n  {% if
+        o == chosen_moist %}{% set ns.i = loop.index0 %}{% endif %}\n{% endfor %}
+        {{ ns.i }}\n"
+      idx_times: "{% set ns = namespace(i=0) %} {% for o in opts_times %}\n  {% if
+        o == chosen_times %}{% set ns.i = loop.index0 %}{% endif %}\n{% endfor %}
+        {{ ns.i }}\n"
   - target:
       entity_id: input_number.l50_ultra_global_idx_suction
     data:
@@ -566,7 +564,7 @@ l50_global_reset_presets:
   - target:
       entity_id: input_number.l50_ultra_global_idx_mop
     data:
-      value: '{{ idx_mop }}'
+      value: '{{ idx_moist }}'
     action: input_number.set_value
   - target:
       entity_id: input_number.l50_ultra_global_idx_times
@@ -648,75 +646,75 @@ l50_global_reset_presets:
               option: '{{ chosen_suction }}'
             action: select.select_option
       - choose:
-        - conditions: '{{ repeat.item == ''1'' and chosen_mop|length>0 }}'
+        - conditions: '{{ repeat.item == ''1'' and chosen_moist|length>0 }}'
           sequence:
           - target:
               entity_id: select.l50_ultra_room_1_mop_pad_humidity
             data:
-              option: '{{ chosen_mop }}'
+              option: '{{ chosen_moist }}'
             action: select.select_option
-        - conditions: '{{ repeat.item == ''2'' and chosen_mop|length>0 }}'
+        - conditions: '{{ repeat.item == ''2'' and chosen_moist|length>0 }}'
           sequence:
           - target:
               entity_id: select.l50_ultra_room_2_mop_pad_humidity
             data:
-              option: '{{ chosen_mop }}'
+              option: '{{ chosen_moist }}'
             action: select.select_option
-        - conditions: '{{ repeat.item == ''3'' and chosen_mop|length>0 }}'
+        - conditions: '{{ repeat.item == ''3'' and chosen_moist|length>0 }}'
           sequence:
           - target:
               entity_id: select.l50_ultra_room_3_mop_pad_humidity
             data:
-              option: '{{ chosen_mop }}'
+              option: '{{ chosen_moist }}'
             action: select.select_option
-        - conditions: '{{ repeat.item == ''4'' and chosen_mop|length>0 }}'
+        - conditions: '{{ repeat.item == ''4'' and chosen_moist|length>0 }}'
           sequence:
           - target:
               entity_id: select.l50_ultra_room_4_mop_pad_humidity
             data:
-              option: '{{ chosen_mop }}'
+              option: '{{ chosen_moist }}'
             action: select.select_option
-        - conditions: '{{ repeat.item == ''5'' and chosen_mop|length>0 }}'
+        - conditions: '{{ repeat.item == ''5'' and chosen_moist|length>0 }}'
           sequence:
           - target:
               entity_id: select.l50_ultra_room_5_mop_pad_humidity
             data:
-              option: '{{ chosen_mop }}'
+              option: '{{ chosen_moist }}'
             action: select.select_option
-        - conditions: '{{ repeat.item == ''6'' and chosen_mop|length>0 }}'
+        - conditions: '{{ repeat.item == ''6'' and chosen_moist|length>0 }}'
           sequence:
           - target:
               entity_id: select.l50_ultra_room_6_mop_pad_humidity
             data:
-              option: '{{ chosen_mop }}'
+              option: '{{ chosen_moist }}'
             action: select.select_option
-        - conditions: '{{ repeat.item == ''7'' and chosen_mop|length>0 }}'
+        - conditions: '{{ repeat.item == ''7'' and chosen_moist|length>0 }}'
           sequence:
           - target:
               entity_id: select.l50_ultra_room_7_mop_pad_humidity
             data:
-              option: '{{ chosen_mop }}'
+              option: '{{ chosen_moist }}'
             action: select.select_option
-        - conditions: '{{ repeat.item == ''9'' and chosen_mop|length>0 }}'
+        - conditions: '{{ repeat.item == ''9'' and chosen_moist|length>0 }}'
           sequence:
           - target:
               entity_id: select.l50_ultra_room_9_mop_pad_humidity
             data:
-              option: '{{ chosen_mop }}'
+              option: '{{ chosen_moist }}'
             action: select.select_option
-        - conditions: '{{ repeat.item == ''10'' and chosen_mop|length>0 }}'
+        - conditions: '{{ repeat.item == ''10'' and chosen_moist|length>0 }}'
           sequence:
           - target:
               entity_id: select.l50_ultra_room_10_mop_pad_humidity
             data:
-              option: '{{ chosen_mop }}'
+              option: '{{ chosen_moist }}'
             action: select.select_option
-        - conditions: '{{ repeat.item == ''11'' and chosen_mop|length>0 }}'
+        - conditions: '{{ repeat.item == ''11'' and chosen_moist|length>0 }}'
           sequence:
           - target:
               entity_id: select.l50_ultra_room_11_mop_pad_humidity
             data:
-              option: '{{ chosen_mop }}'
+              option: '{{ chosen_moist }}'
             action: select.select_option
       - choose:
         - conditions: '{{ repeat.item == ''1'' and chosen_times|length>0 }}'
@@ -789,4 +787,3 @@ l50_global_reset_presets:
             data:
               option: '{{ chosen_times }}'
             action: select.select_option
-  description: ''

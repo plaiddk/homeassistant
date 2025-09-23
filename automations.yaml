@@ -1,431 +1,434 @@
-- id: '1732746359999'
+- id: "1732746359999"
   alias: Opvask hvis tændt og lukkes
-  description: Hvis opvaskemaskine tændes og lukkes, så klargøres opvask i den billigste
+  description:
+    Hvis opvaskemaskine tændes og lukkes, så klargøres opvask i den billigste
     time.
   triggers:
-  - trigger: state
-    entity_id:
-    - input_boolean.smart_wash
-    from: 'off'
-    to: 'on'
+    - trigger: state
+      entity_id:
+        - input_boolean.smart_wash
+      from: "off"
+      to: "on"
   conditions:
-  - condition: state
-    entity_id: switch.011010524691008792_bsh_common_setting_powerstate
-    state: 'on'
-  - condition: state
-    entity_id: sensor.011010524691008792_bsh_common_status_operationstate
-    state: BSH.Common.EnumType.OperationState.Ready
-  - condition: state
-    entity_id: binary_sensor.011010524691008792_bsh_common_status_doorstate
-    state: 'off'
+    - condition: state
+      entity_id: switch.011010524691008792_bsh_common_setting_powerstate
+      state: "on"
+    - condition: state
+      entity_id: sensor.011010524691008792_bsh_common_status_operationstate
+      state: BSH.Common.EnumType.OperationState.Ready
+    - condition: state
+      entity_id: binary_sensor.011010524691008792_bsh_common_status_doorstate
+      state: "off"
   actions:
-  - data: {}
-    action: script.OpvaskemaskineStartScript
+    - data: {}
+      action: script.OpvaskemaskineStartScript
   mode: single
-- id: '1732804116596'
+- id: "1732804116596"
   alias: Vaskemaskine når lukket så tænd
-  description: ''
+  description: ""
   triggers:
-  - trigger: state
-    entity_id:
-    - input_boolean.smart_wash_vaskemaskine
-    from: 'off'
-    to: 'on'
+    - trigger: state
+      entity_id:
+        - input_boolean.smart_wash_vaskemaskine
+      from: "off"
+      to: "on"
   conditions:
-  - condition: state
-    entity_id: binary_sensor.484090540289002643_bsh_common_status_doorstate
-    state: 'off'
-  - condition: state
-    entity_id: switch.484090540289002643_bsh_common_setting_powerstate
-    state: 'on'
-  - condition: state
-    entity_id: binary_sensor.484090540289002643_bsh_common_status_remotecontrolstartallowed
-    state: 'on'
+    - condition: state
+      entity_id: binary_sensor.484090540289002643_bsh_common_status_doorstate
+      state: "off"
+    - condition: state
+      entity_id: switch.484090540289002643_bsh_common_setting_powerstate
+      state: "on"
+    - condition: state
+      entity_id: binary_sensor.484090540289002643_bsh_common_status_remotecontrolstartallowed
+      state: "on"
   actions:
-  - action: script.vaskemaskinestartscript
-    metadata: {}
-    data: {}
+    - action: script.vaskemaskinestartscript
+      metadata: {}
+      data: {}
   mode: single
-- id: '1732920374482'
+- id: "1732920374482"
   alias: Update Finish In Relative
   triggers:
-  - entity_id:
-    - sensor.elpris_lavest_4t_vaskemaskine
-    trigger: state
-    from: unavailable
-    to:
-    enabled: true
+    - entity_id:
+        - sensor.elpris_lavest_4t_vaskemaskine
+      trigger: state
+      from: unavailable
+      to:
+      enabled: true
   conditions:
-  - condition: state
-    entity_id: input_boolean.wash_today_vaskemaskine
-    state: 'off'
+    - condition: state
+      entity_id: input_boolean.wash_today_vaskemaskine
+      state: "off"
   actions:
-  - data:
-      current_time: '{{ now().timestamp() }}'
-    action: python_script.set_finish_in_relative
-- id: '1734031676650'
+    - data:
+        current_time: "{{ now().timestamp() }}"
+      action: python_script.set_finish_in_relative
+- id: "1734031676650"
   alias: Turn off Outdoor light
-  description: ''
+  description: ""
   triggers:
-  - trigger: time
-    at: '23:00:00'
+    - trigger: time
+      at: "23:00:00"
   conditions: []
   actions:
-  - type: turn_off
-    device_id: c4f7e37e29037c007a3ecfc66a9152fd
-    entity_id: c67f656552a2e7c0209a7926dd38e885
-    domain: switch
+    - type: turn_off
+      device_id: c4f7e37e29037c007a3ecfc66a9152fd
+      entity_id: c67f656552a2e7c0209a7926dd38e885
+      domain: switch
   mode: single
-- id: '1734265997853'
+- id: "1734265997853"
   alias: Turn on light christmas outside
-  description: ''
+  description: ""
   triggers:
-  - trigger: time
-    at: '16:00:00'
+    - trigger: time
+      at: "16:00:00"
   conditions: []
   actions:
-  - type: turn_on
-    device_id: c4f7e37e29037c007a3ecfc66a9152fd
-    entity_id: c67f656552a2e7c0209a7926dd38e885
-    domain: switch
+    - type: turn_on
+      device_id: c4f7e37e29037c007a3ecfc66a9152fd
+      entity_id: c67f656552a2e7c0209a7926dd38e885
+      domain: switch
   mode: single
-- id: '1734302153700'
+- id: "1734302153700"
   alias: Ulæste beskeder Aula (v2)
   description: Henter ulæste Aula-beskeder, laver kort, ren tekst-opsummering.
   triggers: []
   conditions: []
   actions:
-  - variables:
-      aula_messages: ''
-      summary_response: ''
-  - action: aula.api_call
-    data:
-      uri: ?method=messaging.getThreads&sortOn=date&orderDirection=desc&page=0&filterOn=unread
-    response_variable: aula_messages
-  - action: conversation.process
-    data:
-      agent_id: conversation.chatgpt
-      text: 'Herunder er ulæste beskeder (tråde) fra Aula. Giv en kort, præcis opsummering
-        **kun for de sidste 30 dage**. Medtag kun det, der er værd at huske/handle
-        på (aftaler, forfaldsdage, afleveringer/lektier, udstyr, tests, tidspunkter,
-        links, mødested, ændringer). Angiv hvilket barn beskeden handler om: (Kamma),
-        (Herman), eller (Generelt), baseret på indhold/afsender/emne.
+    - variables:
+        aula_messages: ""
+        summary_response: ""
+    - action: aula.api_call
+      data:
+        uri: ?method=messaging.getThreads&sortOn=date&orderDirection=desc&page=0&filterOn=unread
+      response_variable: aula_messages
+    - action: conversation.process
+      data:
+        agent_id: conversation.chatgpt
+        text:
+          "Herunder er ulæste beskeder (tråde) fra Aula. Giv en kort, præcis opsummering
+          **kun for de sidste 30 dage**. Medtag kun det, der er værd at huske/handle
+          på (aftaler, forfaldsdage, afleveringer/lektier, udstyr, tests, tidspunkter,
+          links, mødested, ændringer). Angiv hvilket barn beskeden handler om: (Kamma),
+          (Herman), eller (Generelt), baseret på indhold/afsender/emne.
 
-        Returnér KUN én linje pr. relevant besked i præcis dette format (ingen overskrift,
-        ingen kodefence, ingen tomme linjer): - **YYYY-MM-DD** (Kamma|Herman|Generelt):
-        kort besked i én linje
+          Returnér KUN én linje pr. relevant besked i præcis dette format (ingen overskrift,
+          ingen kodefence, ingen tomme linjer): - **YYYY-MM-DD** (Kamma|Herman|Generelt):
+          kort besked i én linje
 
-        Regler: - Brug datoen for beskeden eller tydeligt angivet forfaldsdato. -
-        Ingen linjeskift i én linje; brug ; som separator. - Ingen personfølsomme
-        detaljer udover navnene Kamma/Herman. - Maksimer klarhed, minimer fyld.
+          Regler: - Brug datoen for beskeden eller tydeligt angivet forfaldsdato. -
+          Ingen linjeskift i én linje; brug ; som separator. - Ingen personfølsomme
+          detaljer udover navnene Kamma/Herman. - Maksimer klarhed, minimer fyld.
 
-        Rå data: {{ aula_messages }}
+          Rå data: {{ aula_messages }}
 
-        '
-    response_variable: summary_response
-  - variables:
-      beskeder_text: "{{ summary_response.response.speech.plain.speech\n   | string\n
-        \  | regex_replace(find='^\\\\s*```(?:json|yaml)?\\\\s*', replace='')\n   |
-        regex_replace(find='\\\\s*```\\\\s*$', replace='')\n   | trim }}"
-  - event: aula_beskeder_updated
-    event_data:
-      beskeder_text: '{{ beskeder_text }}'
-  - action: input_text.set_value
-    data:
-      entity_id: input_text.beskedliste_alle
-      value: '{{ beskeder_text[:250] }}'
+          "
+      response_variable: summary_response
+    - variables:
+        beskeder_text:
+          "{{ summary_response.response.speech.plain.speech\n   | string\n
+          \  | regex_replace(find='^\\\\s*```(?:json|yaml)?\\\\s*', replace='')\n   |
+          regex_replace(find='\\\\s*```\\\\s*$', replace='')\n   | trim }}"
+    - event: aula_beskeder_updated
+      event_data:
+        beskeder_text: "{{ beskeder_text }}"
+    - action: input_text.set_value
+      data:
+        entity_id: input_text.beskedliste_alle
+        value: "{{ beskeder_text[:250] }}"
   mode: single
-- id: '1734942363531'
+- id: "1734942363531"
   alias: Badeværelse stor Dag og Nat
-  description: ''
+  description: ""
   triggers:
-  - entity_id: binary_sensor.sensorstorbad_occupancy
-    from: 'off'
-    to: 'on'
-    trigger: state
+    - entity_id: binary_sensor.sensorstorbad_occupancy
+      from: "off"
+      to: "on"
+      trigger: state
   conditions: []
   actions:
-  - choose:
-    - conditions:
-      - condition: state
-        entity_id: sun.sun
-        state: above_horizon
-      sequence:
-      - target:
-          area_id: storbad
-        data:
-          kelvin: 3750
-          brightness_pct: 80
-        action: light.turn_on
-      - delay:
-          minutes: 5
-    - conditions:
-      - condition: state
-        entity_id: sun.sun
-        state: below_horizon
-      sequence:
-      - target:
-          area_id: storbad
-        data:
-          kelvin: 2446
-          brightness_pct: 40
-        action: light.turn_on
-      - delay:
-          minutes: 5
-  - choose:
-    - conditions:
-      - condition: numeric_state
-        entity_id: sensor.aqarastorbad_humidity
-        above: 60
-      sequence:
-      - wait_for_trigger:
-        - entity_id: sensor.aqarastorbad_humidity
-          below: 60
-          trigger: numeric_state
-        timeout:
-          minutes: 30
-  - target:
-      area_id: storbad
-    action: light.turn_off
-    data: {}
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: sun.sun
+              state: above_horizon
+          sequence:
+            - target:
+                area_id: storbad
+              data:
+                kelvin: 3750
+                brightness_pct: 80
+              action: light.turn_on
+            - delay:
+                minutes: 5
+        - conditions:
+            - condition: state
+              entity_id: sun.sun
+              state: below_horizon
+          sequence:
+            - target:
+                area_id: storbad
+              data:
+                kelvin: 2446
+                brightness_pct: 40
+              action: light.turn_on
+            - delay:
+                minutes: 5
+    - choose:
+        - conditions:
+            - condition: numeric_state
+              entity_id: sensor.aqarastorbad_humidity
+              above: 60
+          sequence:
+            - wait_for_trigger:
+                - entity_id: sensor.aqarastorbad_humidity
+                  below: 60
+                  trigger: numeric_state
+              timeout:
+                minutes: 30
+    - target:
+        area_id: storbad
+      action: light.turn_off
+      data: {}
   mode: restart
-- id: '1734950158733'
+- id: "1734950158733"
   alias: Gangen Dag og Nat
-  description: ''
+  description: ""
   triggers:
-  - entity_id: binary_sensor.sensorgangen_occupancy
-    from: 'off'
-    to: 'on'
-    trigger: state
+    - entity_id: binary_sensor.sensorgangen_occupancy
+      from: "off"
+      to: "on"
+      trigger: state
   conditions: []
   actions:
-  - choose:
-    - conditions:
-      - condition: time
-        after: 07:00:00
-        before: '23:00:00'
-      sequence:
-      - data:
-          kelvin: 3283
-          brightness_pct: 80
-        target:
-          area_id: gangen
-        action: light.turn_on
-      - delay:
-          hours: 0
-          minutes: 5
-          seconds: 0
-    - conditions:
-      - condition: time
-        after: '23:00:00'
-        before: 07:00:00
-      sequence:
-      - data:
-          kelvin: 2446
-          brightness_pct: 30
-        target:
-          area_id: gangen
-        action: light.turn_on
-      - delay:
-          hours: 0
-          minutes: 0
-          seconds: 30
-  - target:
-      area_id: gangen
-    action: light.turn_off
-    data: {}
+    - choose:
+        - conditions:
+            - condition: time
+              after: 07:00:00
+              before: "23:00:00"
+          sequence:
+            - data:
+                kelvin: 3283
+                brightness_pct: 80
+              target:
+                area_id: gangen
+              action: light.turn_on
+            - delay:
+                hours: 0
+                minutes: 5
+                seconds: 0
+        - conditions:
+            - condition: time
+              after: "23:00:00"
+              before: 07:00:00
+          sequence:
+            - data:
+                kelvin: 2446
+                brightness_pct: 30
+              target:
+                area_id: gangen
+              action: light.turn_on
+            - delay:
+                hours: 0
+                minutes: 0
+                seconds: 30
+    - target:
+        area_id: gangen
+      action: light.turn_off
+      data: {}
   mode: restart
-- id: '1734952593845'
+- id: "1734952593845"
   alias: Garage Dag og Nat
-  description: ''
+  description: ""
   triggers:
-  - entity_id: binary_sensor.sensorgarage_occupancy
-    from: 'off'
-    to: 'on'
-    trigger: state
+    - entity_id: binary_sensor.sensorgarage_occupancy
+      from: "off"
+      to: "on"
+      trigger: state
   conditions: []
   actions:
-  - choose:
-    - conditions:
-      - condition: time
-        after: 06:00:00
-        before: '23:00:00'
-      sequence:
-      - data:
-          kelvin: 3793
-          brightness_pct: 100
-        target:
-          area_id: garage
-        action: light.turn_on
-      - delay:
-          hours: 0
-          minutes: 15
-          seconds: 0
-          milliseconds: 0
-    - conditions:
-      - condition: time
-        after: '23:00:00'
-        before: 07:00:00
-      sequence:
-      - data:
-          kelvin: 2446
-          brightness_pct: 30
-        target:
-          area_id: garage
-        action: light.turn_on
-      - delay:
-          hours: 0
-          minutes: 0
-          seconds: 30
-  - target:
-      area_id: garage
-    action: light.turn_off
-    data: {}
+    - choose:
+        - conditions:
+            - condition: time
+              after: 06:00:00
+              before: "23:00:00"
+          sequence:
+            - data:
+                kelvin: 3793
+                brightness_pct: 100
+              target:
+                area_id: garage
+              action: light.turn_on
+            - delay:
+                hours: 0
+                minutes: 15
+                seconds: 0
+                milliseconds: 0
+        - conditions:
+            - condition: time
+              after: "23:00:00"
+              before: 07:00:00
+          sequence:
+            - data:
+                kelvin: 2446
+                brightness_pct: 30
+              target:
+                area_id: garage
+              action: light.turn_on
+            - delay:
+                hours: 0
+                minutes: 0
+                seconds: 30
+    - target:
+        area_id: garage
+      action: light.turn_off
+      data: {}
   mode: restart
-- id: '1734953278254'
+- id: "1734953278254"
   alias: Lille bad Dag og Nat
-  description: ''
+  description: ""
   triggers:
-  - entity_id: binary_sensor.sensorlillebad_occupancy
-    from: 'off'
-    to: 'on'
-    trigger: state
+    - entity_id: binary_sensor.sensorlillebad_occupancy
+      from: "off"
+      to: "on"
+      trigger: state
   conditions: []
   actions:
-  - choose:
-    - conditions:
-      - condition: time
-        after: 07:00:00
-        before: '23:00:00'
-      sequence:
-      - data:
-          kelvin: 5880
-          brightness_pct: 86
-        target:
-          area_id:
+    - choose:
+        - conditions:
+            - condition: time
+              after: 07:00:00
+              before: "23:00:00"
+          sequence:
+            - data:
+                kelvin: 5880
+                brightness_pct: 86
+              target:
+                area_id:
+                  - lillebad
+              action: light.turn_on
+            - delay:
+                hours: 0
+                minutes: 5
+                seconds: 0
+        - conditions:
+            - condition: time
+              after: "23:00:00"
+              before: 07:00:00
+          sequence:
+            - data:
+                kelvin: 2446
+                brightness_pct: 30
+              target:
+                area_id:
+                  - lillebad
+              action: light.turn_on
+            - delay:
+                hours: 0
+                minutes: 10
+                seconds: 30
+                milliseconds: 0
+    - target:
+        area_id:
           - lillebad
-        action: light.turn_on
-      - delay:
-          hours: 0
-          minutes: 5
-          seconds: 0
-    - conditions:
-      - condition: time
-        after: '23:00:00'
-        before: 07:00:00
-      sequence:
-      - data:
-          kelvin: 2446
-          brightness_pct: 30
-        target:
-          area_id:
-          - lillebad
-        action: light.turn_on
-      - delay:
-          hours: 0
-          minutes: 10
-          seconds: 30
-          milliseconds: 0
-  - target:
-      area_id:
-      - lillebad
-    action: light.turn_off
-    data: {}
+      action: light.turn_off
+      data: {}
   mode: restart
-- id: '1734981021690'
+- id: "1734981021690"
   alias: Bryggers Dag og Nat
-  description: ''
+  description: ""
   triggers:
-  - entity_id: binary_sensor.sensorbryggers_occupancy
-    from: 'off'
-    to: 'on'
-    trigger: state
+    - entity_id: binary_sensor.sensorbryggers_occupancy
+      from: "off"
+      to: "on"
+      trigger: state
   conditions: []
   actions:
-  - choose:
-    - conditions:
-      - condition: time
-        after: 06:00:00
-        before: '23:00:00'
-      sequence:
-      - data:
-          kelvin: 3065
-          brightness_pct: 76
-        target:
-          area_id:
+    - choose:
+        - conditions:
+            - condition: time
+              after: 06:00:00
+              before: "23:00:00"
+          sequence:
+            - data:
+                kelvin: 3065
+                brightness_pct: 76
+              target:
+                area_id:
+                  - bryggers
+              action: light.turn_on
+            - delay:
+                hours: 0
+                minutes: 15
+                seconds: 0
+        - conditions:
+            - condition: time
+              after: "23:00:00"
+              before: 07:00:00
+          sequence:
+            - data:
+                kelvin: 2446
+                brightness_pct: 30
+              action: light.turn_on
+              target:
+                area_id: bryggers
+            - delay:
+                hours: 0
+                minutes: 1
+                seconds: 0
+    - target:
+        area_id:
           - bryggers
-        action: light.turn_on
-      - delay:
-          hours: 0
-          minutes: 15
-          seconds: 0
-    - conditions:
-      - condition: time
-        after: '23:00:00'
-        before: 07:00:00
-      sequence:
-      - data:
-          kelvin: 2446
-          brightness_pct: 30
-        action: light.turn_on
-        target:
-          area_id: bryggers
-      - delay:
-          hours: 0
-          minutes: 1
-          seconds: 0
-  - target:
-      area_id:
-      - bryggers
-    action: light.turn_off
-    data: {}
+      action: light.turn_off
+      data: {}
   mode: restart
-- id: '1735592446297'
+- id: "1735592446297"
   alias: Viktualie Dag og Nat
-  description: ''
+  description: ""
   triggers:
-  - entity_id: binary_sensor.sensorviktualie_occupancy
-    from: 'off'
-    to: 'on'
-    trigger: state
+    - entity_id: binary_sensor.sensorviktualie_occupancy
+      from: "off"
+      to: "on"
+      trigger: state
   conditions: []
   actions:
-  - choose:
-    - conditions:
-      - condition: time
-        after: 07:00:00
-        before: '23:00:00'
-      sequence:
-      - data:
-          kelvin: 5880
-          brightness_pct: 86
-        target:
-          area_id: viktualie
-        action: light.turn_on
-      - delay: 00:02:00
-    - conditions:
-      - condition: time
-        after: '23:00:00'
-        before: 07:00:00
-      sequence:
-      - data:
-          kelvin: 2446
-          brightness_pct: 30
-        target:
-          area_id: viktualie
-        action: light.turn_on
-      - delay:
-          hours: 0
-          minutes: 0
-          seconds: 30
-  - target:
-      area_id: viktualie
-    action: light.turn_off
-    data: {}
+    - choose:
+        - conditions:
+            - condition: time
+              after: 07:00:00
+              before: "23:00:00"
+          sequence:
+            - data:
+                kelvin: 5880
+                brightness_pct: 86
+              target:
+                area_id: viktualie
+              action: light.turn_on
+            - delay: 00:02:00
+        - conditions:
+            - condition: time
+              after: "23:00:00"
+              before: 07:00:00
+          sequence:
+            - data:
+                kelvin: 2446
+                brightness_pct: 30
+              target:
+                area_id: viktualie
+              action: light.turn_on
+            - delay:
+                hours: 0
+                minutes: 0
+                seconds: 30
+    - target:
+        area_id: viktualie
+      action: light.turn_off
+      data: {}
   mode: restart
-- id: '1735599280975'
+- id: "1735599280975"
   alias: Philips Stue kontakt
-  description: ''
+  description: ""
   use_blueprint:
     path: fleeman/zigbee2mqtt-philips-hue-tap-dial-switch-by-smarthomegeeks-io.yaml
     input:
@@ -433,27 +436,27 @@
       tap_counter: counter.philips_hue_dial_switch_counter_stue
       last_pressed: input_text.philips_hue_dial_switch_last_pressed_stue
       button_1_single_press:
-      - action: light.toggle
-        metadata: {}
-        data:
-          kelvin: 2411
-        target:
-          area_id: lille_stue
+        - action: light.toggle
+          metadata: {}
+          data:
+            kelvin: 2411
+          target:
+            area_id: lille_stue
       button_1_double_press: []
       button_1_rotate_clockwise: []
       button_1_rotate_counter_clockwise: []
       button_2_single_press:
-      - action: light.toggle
-        metadata: {}
-        data: {}
-        target:
-          area_id:
-          - stue
+        - action: light.toggle
+          metadata: {}
+          data: {}
+          target:
+            area_id:
+              - stue
       button_2_rotate_clockwise: []
       button_2_rotate_counter_clockwise: []
-- id: '1735632269449'
+- id: "1735632269449"
   alias: Philips Køkken kontakt
-  description: ''
+  description: ""
   use_blueprint:
     path: fleeman/zigbee2mqtt-philips-hue-tap-dial-switch-by-smarthomegeeks-io.yaml
     input:
@@ -461,177 +464,206 @@
       tap_counter: counter.philips_hue_dial_switch_button_counter_kokken
       last_pressed: input_text.philips_hue_dial_switch_last_pressed_kokken
       button_1_single_press:
-      - action: light.toggle
-        metadata: {}
-        data: {}
-        target:
-          area_id: kokken
+        - action: light.toggle
+          metadata: {}
+          data: {}
+          target:
+            area_id: kokken
       button_1_double_press: []
       button_1_rotate_clockwise: []
       button_1_rotate_counter_clockwise: []
       button_2_single_press:
-      - action: light.toggle
-        metadata: {}
-        data: {}
-        target:
-          area_id:
-          - spisebord
+        - action: light.toggle
+          metadata: {}
+          data: {}
+          target:
+            area_id:
+              - spisebord
       button_2_double_press: []
-- id: '1735909049964'
+- id: "1735909049964"
   alias: Kontakt gangen Sluk alt lys
-  description: ''
+  description: ""
   use_blueprint:
     path: patpac9/Hue_Dimmer_Switch_Easy_Custom_Buttons.yaml
     input:
       controller: kontaktalle
       on_press:
-      - action: light.turn_on
-        metadata: {}
-        data: {}
-        target:
-          area_id:
-          - kontor
-          - gangen
-          - spisebord
+        - action: light.turn_on
+          metadata: {}
+          data: {}
+          target:
+            area_id:
+              - kontor
+              - gangen
+              - spisebord
       off_pressed:
-      - action: light.turn_off
-        metadata: {}
-        data: {}
-        target:
-          entity_id: light.altlys
+        - action: light.turn_off
+          metadata: {}
+          data: {}
+          target:
+            entity_id: light.altlys
       on_hold_released: []
-- id: '1737450274941'
+- id: "1737450274941"
   alias: EV Smart Charging - EV connected
-  description: ''
+  description: ""
   triggers:
-  - trigger: state
-    entity_id:
-    - sensor.thomas_jensen_charger_mode
+    - trigger: state
+      entity_id:
+        - sensor.thomas_jensen_charger_mode
   conditions: []
   actions:
-  - if:
-    - condition: state
-      entity_id: sensor.thomas_jensen_charger_mode
-      state: Waiting
-    then:
-    - action: switch.turn_on
-      data: {}
-      target:
-        entity_id: switch.ev_smart_charging_ev_connected
-    else:
     - if:
-      - condition: state
-        entity_id: sensor.thomas_jensen_charger_mode
-        state: Disconnected
+        - condition: state
+          entity_id: sensor.thomas_jensen_charger_mode
+          state: Waiting
       then:
-      - action: switch.turn_off
-        data: {}
-        target:
-          entity_id: switch.ev_smart_charging_ev_connected
+        - action: switch.turn_on
+          data: {}
+          target:
+            entity_id: switch.ev_smart_charging_ev_connected
+      else:
+        - if:
+            - condition: state
+              entity_id: sensor.thomas_jensen_charger_mode
+              state: Disconnected
+          then:
+            - action: switch.turn_off
+              data: {}
+              target:
+                entity_id: switch.ev_smart_charging_ev_connected
   mode: single
-- id: '1737732096328'
+- id: "1737732096328"
   alias: Turn Off Smart Wash When Dishwasher Is Finished
-  description: Automatically turn off Smart Wash when the dishwasher finishes its
+  description:
+    Automatically turn off Smart Wash when the dishwasher finishes its
     cycle
   triggers:
-  - entity_id: sensor.011010524691008792_bsh_common_status_operationstate
-    to: BSH.Common.EnumType.OperationState.Finished
-    trigger: state
+    - entity_id: sensor.011010524691008792_bsh_common_status_operationstate
+      to: BSH.Common.EnumType.OperationState.Finished
+      trigger: state
   conditions: []
   actions:
-  - target:
-      entity_id:
-      - input_boolean.smart_wash
-      - input_boolean.wash_today
-    action: input_boolean.turn_off
-    data: {}
+    - target:
+        entity_id:
+          - input_boolean.smart_wash
+          - input_boolean.wash_today
+      action: input_boolean.turn_off
+      data: {}
   mode: single
-- id: '1738433854384'
+- id: "1738433854384"
   alias: Kontakt kontor - Tænd og sluk lys
-  description: ''
+  description: ""
   use_blueprint:
     path: patpac9/Hue_Dimmer_Switch_Easy_Custom_Buttons.yaml
     input:
       controller: kontaktKontor
       on_press:
-      - action: light.turn_on
-        metadata: {}
-        data: {}
-        target:
-          area_id:
-          - kontor
+        - action: light.turn_on
+          metadata: {}
+          data: {}
+          target:
+            area_id:
+              - kontor
       off_pressed:
-      - action: light.turn_off
-        metadata: {}
-        data: {}
-        target:
-          area_id: kontor
+        - action: light.turn_off
+          metadata: {}
+          data: {}
+          target:
+            area_id: kontor
       on_hold_released: []
-- id: '1751014841612'
+- id: "1751014841612"
   alias: update_finish_in_relative_today
-  description: ''
+  description: ""
   triggers:
-  - entity_id:
-    - input_boolean.wash_today_vaskemaskine
-    trigger: state
-    from: 'off'
-    to: 'on'
-    enabled: true
+    - entity_id:
+        - input_boolean.wash_today_vaskemaskine
+      trigger: state
+      from: "off"
+      to: "on"
+      enabled: true
   conditions: []
   actions:
-  - action: python_script.set_finish_in_relative_idag
-    data: {}
+    - action: python_script.set_finish_in_relative_idag
+      data: {}
   mode: single
-- id: '1751143125288'
+- id: "1751143125288"
   alias: Turn Off Smart Wash When Washer Is Finished
-  description: Automatically turn off Smart Wash when the dishwasher finishes its
+  description:
+    Automatically turn off Smart Wash when the dishwasher finishes its
     cycle
   triggers:
-  - entity_id: sensor.484090540289002643_bsh_common_status_operationstate
-    to: BSH.Common.EnumType.OperationState.Finished
-    trigger: state
+    - entity_id: sensor.484090540289002643_bsh_common_status_operationstate
+      to: BSH.Common.EnumType.OperationState.Finished
+      trigger: state
   conditions: []
   actions:
-  - target:
-      entity_id:
-      - input_boolean.smart_wash_vaskemaskine
-      - input_boolean.wash_today_vaskemaskine
-    action: input_boolean.turn_off
-    data: {}
+    - target:
+        entity_id:
+          - input_boolean.smart_wash_vaskemaskine
+          - input_boolean.wash_today_vaskemaskine
+      action: input_boolean.turn_off
+      data: {}
   mode: single
-- id: '1757957483629'
-  alias: 'Kamma Aula '
-  description: ''
+- id: "1757957483629"
+  alias: "Kamma Aula "
+  description: ""
   use_blueprint:
     path: thomas/aula.yaml
     input:
       ugeplan_sensor: sensor.finderuphoj_skole_kamma
       output_helper: input_text.huskeliste_kamma
       event_name: kamma_huskeliste_updated
-- id: '1757967411947'
+- id: "1757967411947"
   alias: Herman Aula Huskeliste
-  description: ''
+  description: ""
   use_blueprint:
     path: thomas/aula.yaml
     input:
       ugeplan_sensor: sensor.finderuphoj_skole_herman
       output_helper: input_text.huskeliste_herman
       event_name: herman_huskeliste_updated
-- id: '1758479016009'
+- id: "1758479016009"
   alias: Herman ugeplan next
-  description: ''
+  description: ""
   use_blueprint:
     path: thomas/aulaugeplan2.yaml
     input:
       ugeplan_sensor: sensor.finderuphoj_skole_herman
       output_helper: input_text.huskeliste_herman_next
       event_name: herman_huskeliste_next_updated
-- id: '1758479048045'
+- id: "1758479048045"
   alias: Kamma ugeplan next
-  description: ''
+  description: ""
   use_blueprint:
     path: thomas/aulaugeplan2.yaml
     input:
       ugeplan_sensor: sensor.finderuphoj_skole_kamma
       output_helper: input_text.huskeliste_kamma_next
       event_name: kamma_huskeliste_next_updated
+- id: ev_smart_charging_follow_connection
+  alias: EV Smart Charging – Follow Connection Sensors
+  description: ""
+  triggers:
+    - entity_id:
+        - binary_sensor.monta_thomas_ladestander_cable_plugged_in
+        - binary_sensor.skoda_enyaq_connected
+      trigger: state
+    - event: start
+      trigger: homeassistant
+  actions:
+    - choose:
+        - conditions:
+            - condition: template
+              value_template:
+                "{{ is_state('binary_sensor.monta_thomas_ladestander_cable_plugged_in','on')\n
+                \  or is_state('binary_sensor.skoda_enyaq_connected','on') }}\n"
+          sequence:
+            - target:
+                entity_id: switch.ev_smart_charging_ev_connected
+              action: switch.turn_on
+      default:
+        - target:
+            entity_id: switch.ev_smart_charging_ev_connected
+          action: switch.turn_off
+  mode: restart
+  initial_state: true
