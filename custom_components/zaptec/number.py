@@ -17,8 +17,9 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import ZaptecBaseEntity, ZaptecConfigEntry
-from .api import Charger, Installation
+from .entity import ZaptecBaseEntity
+from .manager import ZaptecConfigEntry
+from .zaptec import Charger, Installation
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -54,7 +55,7 @@ class ZaptecAvailableCurrentNumber(ZaptecNumber):
     zaptec_obj: Installation
     entity_description: ZapNumberEntityDescription
 
-    def _post_init(self):
+    def _post_init(self) -> None:
         # Get the max current rating from the reported max current
         self.entity_description = replace(
             self.entity_description,
@@ -97,7 +98,7 @@ class ZaptecSettingNumber(ZaptecNumber):
     zaptec_obj: Charger
     entity_description: ZapNumberEntityDescription
 
-    def _post_init(self):
+    def _post_init(self) -> None:
         # Get the max current rating from the reported max current
         self.entity_description = replace(
             self.entity_description,
@@ -219,4 +220,4 @@ async def async_setup_entry(
         INSTALLATION_ENTITIES,
         CHARGER_ENTITIES,
     )
-    async_add_entities(entities, True)
+    async_add_entities(entities, update_before_add=True)

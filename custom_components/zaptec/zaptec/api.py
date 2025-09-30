@@ -11,10 +11,12 @@ import json
 import logging
 import random
 import time
-from typing import Any, ClassVar, Protocol
+from typing import Any, ClassVar, Protocol, Self
 
 import aiohttp
 from aiolimiter import AsyncLimiter
+from azure.servicebus.aio import ServiceBusClient
+from azure.servicebus.exceptions import ServiceBusError
 import pydantic
 
 from .const import (
@@ -28,14 +30,23 @@ from .const import (
     API_TIMEOUT,
     API_URL,
     CHARGER_EXCLUDES,
+    MAX_DEBUG_TEXT_LEN_ON_500,
     MISSING,
     TOKEN_URL,
     TRUTHY,
 )
-from .misc import mc_nbfx_decoder, to_under
+from .exceptions import (
+    AuthenticationError,
+    RequestConnectionError,
+    RequestDataError,
+    RequestError,
+    RequestRetryError,
+    RequestTimeoutError,
+)
 from .redact import Redactor
+from .utils import mc_nbfx_decoder, to_under
 from .validate import validate
-from .zconst import CommandType, ZConst
+from .zconst import ZCONST, CommandType
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,9 +54,6 @@ _LOGGER = logging.getLogger(__name__)
 DEBUG_API_CALLS = True
 DEBUG_API_DATA = False
 DEBUG_API_EXCEPTIONS = False
-
-# Global var for the API constants from Zaptec
-ZCONST: ZConst = ZConst()
 
 # Type definitions
 TValue = str | int | float | bool
@@ -56,39 +64,6 @@ class TLogExc(Protocol):
     """Protocol for logging exceptions."""
 
     def __call__(self, exc: Exception) -> Exception: ...
-
-
-class ZaptecApiError(Exception):
-    """Base exception for all Zaptec API errors."""
-
-
-class AuthenticationError(ZaptecApiError):
-    """Authenatication failed."""
-
-
-class RequestError(ZaptecApiError):
-    """Failed to get the results from the API."""
-
-    def __init__(self, message, error_code) -> None:
-        """Initialize the RequestError."""
-        super().__init__(message)
-        self.error_code = error_code
-
-
-class RequestConnectionError(ZaptecApiError):
-    """Failed to make the request to the API."""
-
-
-class RequestTimeoutError(ZaptecApiError):
-    """Failed to get the results from the API."""
-
-
-class RequestRetryError(ZaptecApiError):
-    """Retries too many times."""
-
-
-class RequestDataError(ZaptecApiError):
-    """Data is not valid."""
 
 
 class ZaptecBase(Mapping[str, TValue]):
@@ -129,7 +104,7 @@ class ZaptecBase(Mapping[str, TValue]):
         return self._attrs["name"]
 
     @property
-    def qual_id(self):
+    def qual_id(self) -> str:
         """Return a qualified name for the object."""
         qn = self.__class__.__qualname__
         if "id" not in self._attrs:
@@ -154,7 +129,7 @@ class ZaptecBase(Mapping[str, TValue]):
     async def poll_state(self) -> None:
         """Poll the state of the object."""
 
-    def set_attributes(self, data: TDict) -> bool:
+    def set_attributes(self, data: TDict) -> None:
         """Set the class attributes from the given data."""
         redact = self.zaptec.redact
         for k, v in data.items():
@@ -262,6 +237,15 @@ class Installation(ZaptecBase):
         # Get the hierarchy of circurits and chargers
         try:
             hierarchy = await self.zaptec.request(f"installation/{self.id}/hierarchy")
+            if not hierarchy:
+                # 2025-09-19: It appears Zaptec started returning HTTPStatus.NO_CONTENT instead of
+                # HTTPStatus.FORBIDDEN when user doesn't have access.
+                _LOGGER.warning(
+                    ("No hierarchy returned for installation %s. The user might not have access"),
+                    self.qual_id,
+                )
+                self.chargers = []
+                return
         except RequestError as err:
             if err.error_code == HTTPStatus.FORBIDDEN:
                 _LOGGER.warning(
@@ -305,7 +289,7 @@ class Installation(ZaptecBase):
 
                 self.chargers.append(charger)
 
-    async def poll_info(self):
+    async def poll_info(self) -> None:
         """Update the installation info."""
         _LOGGER.debug("Poll info from %s (%s)", self.qual_id, self.get("Name"))
 
@@ -316,15 +300,14 @@ class Installation(ZaptecBase):
         # HA database appreciates for the size of attributes.
         # FIXME: SupportGroup is sub dict. This is not within the declared type
         supportgroup = data.get("SupportGroup")
-        if supportgroup is not None:
-            if "LogoBase64" in supportgroup:
-                logo = supportgroup["LogoBase64"]
-                supportgroup["LogoBase64"] = f"<Removed, was {len(logo)} bytes>"
+        if supportgroup is not None and "LogoBase64" in supportgroup:
+            logo = supportgroup["LogoBase64"]
+            supportgroup["LogoBase64"] = f"<Removed, was {len(logo)} bytes>"
 
         # Set the attributes
         self.set_attributes(data)
 
-    async def poll_firmware_info(self):
+    async def poll_firmware_info(self) -> None:
         """Update the installation firmware info."""
         _LOGGER.debug("Poll firmware info from %s (%s)", self.qual_id, self.get("Name"))
 
@@ -358,13 +341,6 @@ class Installation(ZaptecBase):
 
     async def stream(self, cb=None, ssl_context=None) -> asyncio.Task | None:
         """Kickoff the steam in the background."""
-        try:
-            from azure.servicebus.aio import ServiceBusClient
-            from azure.servicebus.exceptions import ServiceBusError
-        except ImportError:
-            _LOGGER.debug("Azure Service bus is not available. Resolving to polling")
-            return None
-
         await self.cancel_stream()
         self._stream_task = asyncio.create_task(self.stream_main(cb=cb, ssl_context=ssl_context))
         return self._stream_task
@@ -383,15 +359,9 @@ class Installation(ZaptecBase):
             data.pop("DeviceType", None)
         _LOGGER.debug("@@@  EVENT %s", self.zaptec.redact(data))
 
-    async def stream_main(self, cb=None, ssl_context=None):
+    async def stream_main(self, cb=None, ssl_context=None) -> None:
         """Main stream handler."""
         try:
-            try:
-                from azure.servicebus.aio import ServiceBusClient
-            except ImportError:
-                _LOGGER.warning("Azure Service bus is not available. Resolving to polling")
-                return
-
             # Already running?
             if self._stream_running:
                 raise RuntimeError(
@@ -484,10 +454,8 @@ class Installation(ZaptecBase):
             self._stream_running = False
             _LOGGER.info("Servicebus stream stopped for %s", self.qual_id)
 
-    async def stream_close(self):
+    async def stream_close(self) -> None:
         """Close the stream receiver."""
-        from azure.servicebus.exceptions import ServiceBusError
-
         try:
             if self._stream_receiver is not None:
                 await self._stream_receiver.close()
@@ -496,7 +464,7 @@ class Installation(ZaptecBase):
             # or closing when are trying to close it.
             pass
 
-    async def cancel_stream(self):
+    async def cancel_stream(self) -> None:
         """Cancel the running stream task."""
         if self._stream_task is not None:
             await self.stream_close()
@@ -508,8 +476,8 @@ class Installation(ZaptecBase):
             finally:
                 self._stream_task = None
 
-    def stream_update(self, data: TDict):
-        """Streamm event callback."""
+    def stream_update(self, data: TDict) -> None:
+        """Stream event callback."""
 
         charger_id = data.pop("ChargerId", None)
         if charger_id is None:
@@ -662,7 +630,7 @@ class Charger(ZaptecBase):
                     self.set_attributes(chg)
                     break
 
-    async def poll_state(self):
+    async def poll_state(self) -> None:
         """Update the charger state."""
         _LOGGER.debug("Poll state from %s (%s)", self.qual_id, self.get("Name"))
 
@@ -721,7 +689,7 @@ class Charger(ZaptecBase):
         data = await self.zaptec.request(f"chargers/{self.id}/SendCommand/{cmdid}", method="post")
         return data
 
-    def is_command_valid(self, command: str, raise_value_error_if_invalid=False) -> bool:
+    def is_command_valid(self, command: str, raise_value_error_if_invalid: bool = False) -> bool:
         """Check if the command is valid."""
 
         valid_command = True
@@ -819,7 +787,7 @@ class Charger(ZaptecBase):
 
 
 class Zaptec(Mapping[str, ZaptecBase]):
-    """This class represent a Zaptec account."""
+    """Represents a Zaptec account."""
 
     def __init__(
         self,
@@ -854,7 +822,7 @@ class Zaptec(Mapping[str, ZaptecBase]):
         self.show_all_updates: bool = show_all_updates
         """Flag to indicate if all updates should be logged, even if no changes."""
 
-    async def __aenter__(self) -> Zaptec:
+    async def __aenter__(self) -> Self:
         """Enter the context manager."""
         return self
 
@@ -884,13 +852,10 @@ class Zaptec(Mapping[str, ZaptecBase]):
         """Check if an object with the given id is registered."""
         # Overload the default implementation to support checking of objects using "in" operator.
         if isinstance(key, ZaptecBase):
-            for obj in self._map.values():
-                if obj is key:
-                    return True
-            return False
+            return any(obj is key for obj in self._map.values())
         return key in self._map
 
-    def register(self, id: str, data: ZaptecBase):
+    def register(self, id: str, data: ZaptecBase) -> None:
         """Register an object data with id."""
         if id in self._map:
             raise ValueError(
@@ -898,7 +863,7 @@ class Zaptec(Mapping[str, ZaptecBase]):
             )
         self._map[id] = data
 
-    def unregister(self, id: str):
+    def unregister(self, id: str) -> None:
         """Unregister an object data with id."""
         del self._map[id]
 
@@ -1068,7 +1033,7 @@ class Zaptec(Mapping[str, ZaptecBase]):
         """Login to the Zaptec API and get an access token."""
         await self._refresh_token()
 
-    async def _refresh_token(self):
+    async def _refresh_token(self) -> None:
         # So for some reason they used grant_type password..
         # what the point with oauth then? Anyway this is valid for 24 hour
         p = {
@@ -1120,7 +1085,7 @@ class Zaptec(Mapping[str, ZaptecBase]):
                     )
                 )
 
-    async def request(self, url: str, *, method="get", data=None, base_url=API_URL):
+    async def request(self, url: str, *, method: str = "get", data=None, base_url: str = API_URL):
         """Make a request to the API."""
 
         full_url = base_url + url
@@ -1191,8 +1156,8 @@ class Zaptec(Mapping[str, ZaptecBase]):
                         # There are additional details in the response that Zaptec
                         # provides on 500. Let's log it.
                         text = await response.text()
-                        if len(text) > 60:
-                            text = text[:60] + "..."
+                        if len(text) > MAX_DEBUG_TEXT_LEN_ON_500:
+                            text = text[:MAX_DEBUG_TEXT_LEN_ON_500] + "..."
                         _LOGGER.debug("     PAYLOAD %r", text)
                     if method.lower() == "get":
                         continue  # GET: Retry request
@@ -1205,18 +1170,17 @@ class Zaptec(Mapping[str, ZaptecBase]):
     # =======================================================================
     #   UPDATE METHODS
 
-    async def build(self):
+    async def build(self) -> None:
         """Make the python interface."""
         _LOGGER.debug("Discover and build hierarchy")
 
         # Get the API constants
-        const = await self.request("constants")
+        const: dict = await self.request("constants")
         ZCONST.clear()
         ZCONST.update(const)
         ZCONST.update_ids_from_schema(None)
 
         # Update the redactor
-        self.redact.obs_ids = ZCONST.observations
         for objid, obj in self._map.items():
             self.redact.add(objid, replace_by=f"<--{obj.qual_id}-->")
         redact = self.redact
@@ -1311,7 +1275,7 @@ class Zaptec(Mapping[str, ZaptecBase]):
         info: bool = False,
         state: bool = True,
         firmware: bool = False,
-    ):
+    ) -> None:
         """Update the info and state from Zaptec."""
         if objs is None:
             objs = iter(self)
@@ -1326,32 +1290,3 @@ class Zaptec(Mapping[str, ZaptecBase]):
                 await obj.poll_state()
             if firmware and isinstance(obj, Installation):
                 await obj.poll_firmware_info()
-
-
-if __name__ == "__main__":
-    # Just to execute the script manually with "python -m custom_components.zaptec.api"
-    import os
-    from pprint import pprint
-
-    logging.basicConfig(level=logging.DEBUG)
-    logging.getLogger("azure").setLevel(logging.WARNING)
-
-    async def gogo():
-        username = os.environ.get("zaptec_username")
-        password = os.environ.get("zaptec_password")
-
-        async with Zaptec(username, password) as zaptec:
-            # Builds the interface.
-            await zaptec.login()
-            await zaptec.build()
-            await zaptec.poll(info=True, state=True, firmware=True)
-
-            # Dump redaction database
-            print("Redaction database:")
-            print(zaptec.redact.dumps())
-
-            # Print all the attributes.
-            for obj in zaptec.objects():
-                pprint(obj.asdict())
-
-    asyncio.run(gogo())

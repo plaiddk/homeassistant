@@ -15,7 +15,8 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import ZaptecBaseEntity, ZaptecConfigEntry
+from .entity import ZaptecBaseEntity
+from .manager import ZaptecConfigEntry
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -109,4 +110,4 @@ async def async_setup_entry(
         INSTALLATION_ENTITIES,
         CHARGER_ENTITIES,
     )
-    async_add_entities(entities, True)
+    async_add_entities(entities, update_before_add=True)

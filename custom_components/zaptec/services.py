@@ -12,11 +12,12 @@ from homeassistant.helpers import device_registry as dr, entity_registry as er
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 
-from .api import Charger, Installation
 from .const import DOMAIN
+from .zaptec import Charger, Installation
 
 if TYPE_CHECKING:
-    from . import ZaptecManager, ZaptecUpdateCoordinator
+    from .coordinator import ZaptecUpdateCoordinator
+    from .manager import ZaptecManager
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -177,10 +178,7 @@ async def async_setup_services(hass: HomeAssistant, manager: ZaptecManager) -> N
         # Loop through every uid and find the object
         for uid in uids:
             # Set the human readable identifier for the error message
-            if uid in lookup:
-                err_device = f"{lookup[uid]} ({uid})"
-            else:
-                err_device = f"id {uid}"
+            err_device = f"{lookup[uid]} ({uid})" if uid in lookup else f"id {uid}"
 
             zaptec_object = manager.zaptec.get(uid)
             if zaptec_object is None:
@@ -224,8 +222,8 @@ async def async_setup_services(hass: HomeAssistant, manager: ZaptecManager) -> N
     async def service_handle_authorize_charging(service_call: ServiceCall) -> None:
         _LOGGER.debug("Called authorize charging")
         _LOGGER.warning(
-            "The 'authorize_charging' action is deprecated and will be removed in a future release. "
-            "Use the 'Authorize charging' button entity instead"
+            "The 'authorize_charging' action is deprecated and will be removed in a future "
+            "release. Use the 'Authorize charging' button entity instead"
         )
         for coordinator, obj in iter_objects(service_call, mustbe=Charger):
             _LOGGER.debug("  >> to %s", obj.id)
@@ -238,8 +236,8 @@ async def async_setup_services(hass: HomeAssistant, manager: ZaptecManager) -> N
     async def service_handle_deauthorize_charging(service_call: ServiceCall) -> None:
         _LOGGER.debug("Called deauthorize charging and stop")
         _LOGGER.warning(
-            "The 'deauthorize_charging' action is deprecated and will be removed in a future release. "
-            "Use the 'Deauthorize charging' button entity instead"
+            "The 'deauthorize_charging' action is deprecated and will be removed in a future "
+            "release. Use the 'Deauthorize charging' button entity instead"
         )
         for coordinator, obj in iter_objects(service_call, mustbe=Charger):
             _LOGGER.debug("  >> to %s", obj.id)
@@ -266,8 +264,8 @@ async def async_setup_services(hass: HomeAssistant, manager: ZaptecManager) -> N
     async def service_handle_upgrade_firmware(service_call: ServiceCall) -> None:
         _LOGGER.debug("Called update firmware")
         _LOGGER.warning(
-            "The 'upgrade_firmware' action is deprecated and will be removed in a future release. "
-            "Use the 'Upgrade firmware' button entity instead"
+            "The 'upgrade_firmware' action is deprecated and will be removed in a future "
+            "release. Use the 'Upgrade firmware' button entity instead"
         )
         for coordinator, obj in iter_objects(service_call, mustbe=Charger):
             _LOGGER.debug("  >> to %s", obj.id)
@@ -283,11 +281,17 @@ async def async_setup_services(hass: HomeAssistant, manager: ZaptecManager) -> N
         # only add the relevant arguments if they are not None
         if (available_current := service_call.data.get("available_current")) is not None:
             limit_args["availableCurrent"] = available_current
-        if (available_current_phase1 := service_call.data.get("available_current_phase1")) is not None:
+        if (
+            available_current_phase1 := service_call.data.get("available_current_phase1")
+        ) is not None:
             limit_args["availableCurrentPhase1"] = available_current_phase1
-        if (available_current_phase2 := service_call.data.get("available_current_phase2")) is not None:
+        if (
+            available_current_phase2 := service_call.data.get("available_current_phase2")
+        ) is not None:
             limit_args["availableCurrentPhase2"] = available_current_phase2
-        if (available_current_phase3 := service_call.data.get("available_current_phase3")) is not None:
+        if (
+            available_current_phase3 := service_call.data.get("available_current_phase3")
+        ) is not None:
             limit_args["availableCurrentPhase3"] = available_current_phase3
         for coordinator, obj in iter_objects(service_call, mustbe=Installation):
             _LOGGER.debug("  >> to %s", obj.id)

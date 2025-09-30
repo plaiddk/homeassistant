@@ -18,6 +18,18 @@ from .const import (
     CONF_WEEKPLAN,
     CONF_HOMEWORK,
     CONF_PRESENCE,
+    CONF_WEEKPLAN_INTERVAL,
+    CONF_HOMEWORK_INTERVAL,
+    CONF_PRESENCE_INTERVAL,
+    CONF_MESSAGES_INTERVAL,
+    CONF_WEEKPLAN_DAYS,
+    CONF_HOMEWORK_DAYS,
+    DEFAULT_WEEKPLAN_INTERVAL,
+    DEFAULT_HOMEWORK_INTERVAL,
+    DEFAULT_PRESENCE_INTERVAL,
+    DEFAULT_MESSAGES_INTERVAL,
+    DEFAULT_WEEKPLAN_DAYS,
+    DEFAULT_HOMEWORK_DAYS,
     DOMAIN,
 )
 
@@ -129,6 +141,30 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                         CONF_PRESENCE,
                         default=self._get_option(CONF_PRESENCE, True),
                     ): bool,
+                    vol.Optional(
+                        CONF_WEEKPLAN_INTERVAL,
+                        default=self._get_option(CONF_WEEKPLAN_INTERVAL, DEFAULT_WEEKPLAN_INTERVAL),
+                    ): vol.All(vol.Coerce(int), vol.Range(min=60, max=3600)),
+                    vol.Optional(
+                        CONF_HOMEWORK_INTERVAL,
+                        default=self._get_option(CONF_HOMEWORK_INTERVAL, DEFAULT_HOMEWORK_INTERVAL),
+                    ): vol.All(vol.Coerce(int), vol.Range(min=60, max=3600)),
+                    vol.Optional(
+                        CONF_PRESENCE_INTERVAL,
+                        default=self._get_option(CONF_PRESENCE_INTERVAL, DEFAULT_PRESENCE_INTERVAL),
+                    ): vol.All(vol.Coerce(int), vol.Range(min=60, max=3600)),
+                    vol.Optional(
+                        CONF_MESSAGES_INTERVAL,
+                        default=self._get_option(CONF_MESSAGES_INTERVAL, DEFAULT_MESSAGES_INTERVAL),
+                    ): vol.All(vol.Coerce(int), vol.Range(min=60, max=3600)),
+                    vol.Optional(
+                        CONF_WEEKPLAN_DAYS,
+                        default=self._get_option(CONF_WEEKPLAN_DAYS, DEFAULT_WEEKPLAN_DAYS),
+                    ): vol.All(vol.Coerce(int), vol.Range(min=1, max=14)),
+                    vol.Optional(
+                        CONF_HOMEWORK_DAYS,
+                        default=self._get_option(CONF_HOMEWORK_DAYS, DEFAULT_HOMEWORK_DAYS),
+                    ): vol.All(vol.Coerce(int), vol.Range(min=1, max=14)),
                 }
             ),
         )

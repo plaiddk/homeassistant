@@ -7,22 +7,44 @@ from typing import Any
 import datetime
 import json
 
+# Import dependencies with better error handling
+aiohttp = None
+BeautifulSoup = None
+pytz = None
+requests = None
+BS4 = None
+
+# Try to import each dependency individually
 try:
     import aiohttp
+except ImportError:
+    aiohttp = None
+
+try:
     from bs4 import BeautifulSoup
+except ImportError:
+    BeautifulSoup = None
+
+try:
     import pytz
 except ImportError:
-    # For testing without Home Assistant dependencies
-    aiohttp = None
-    BeautifulSoup = None
     pytz = None
 
-# Also import requests for synchronous authentication (working approach)
+# For requests, try different approaches
 try:
     import requests
+except ImportError:
+    try:
+        # Try importing without any potential conflicts
+        import sys
+        import importlib
+        requests = importlib.import_module('requests')
+    except ImportError:
+        requests = None
+
+try:
     from bs4 import BeautifulSoup as BS4
 except ImportError:
-    requests = None
     BS4 = None
 
 try:
@@ -122,7 +144,6 @@ class EasyIQClient:
             
             # Step 1: Get initial login page (simplified approach from working Aula client)
             headers = {
-                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/112.0",
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
                 "Accept-Language": "da,en-US;q=0.7,en;q=0.3",
                 "DNT": "1",
@@ -146,7 +167,6 @@ class EasyIQClient:
             # Step 2: Submit IdP selection (simplified)
             headers = {
                 "Host": "broker.unilogin.dk",
-                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/112.0",
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
                 "Accept-Language": "da,en-US;q=0.7,en;q=0.3",
                 "Content-Type": "application/x-www-form-urlencoded",
@@ -779,109 +799,110 @@ class EasyIQClient:
             return {}
 
     async def get_presence(self, child_id: str) -> dict[str, Any]:
-        """Get presence data based on current schedule events."""
+        """Get presence data using the proper Aula API."""
         if not self._authenticated:
             _LOGGER.warning("Not authenticated - cannot fetch presence")
             return {}
         
         try:
-            # Get calendar events to determine current presence
-            events = await self._get_calendar_events(child_id)
-            if not events:
+            # Get the child's actual ID for the API call (same as calendar API)
+            child_data = self._children_data.get(child_id)
+            if not child_data:
+                _LOGGER.error("Child data not found for %s", child_id)
                 return {
-                    "status": "No Schedule Data",
+                    "status": "Error - Child Not Found",
                     "status_code": 0,
                     "last_updated": datetime.datetime.now().isoformat()
                 }
             
-            # Filter for today's schedule events (itemType 9)
-            now = datetime.datetime.now()
-            today_str = now.strftime("%Y/%m/%d")
+            # Use the child's actual ID for the API call (this was the bug!)
+            actual_child_id = child_data.get("id", child_id)
+            _LOGGER.debug(f"Child {child_id} -> using actual_child_id: {actual_child_id} for presence API call")
             
-            current_events = []
-            for event in events:
-                if event.get("itemType") == 9:  # Schedule events
-                    event_start = event.get("start", "")
-                    if event_start.startswith(today_str):
-                        # Parse start and end times
-                        try:
-                            start_time_str = event_start  # Format: "2025/09/15 08:05"
-                            end_time_str = event.get("end", "")
-                            
-                            start_time = datetime.datetime.strptime(start_time_str, "%Y/%m/%d %H:%M")
-                            end_time = datetime.datetime.strptime(end_time_str, "%Y/%m/%d %H:%M")
-                            
-                            # Check if current time is within this event
-                            if start_time <= now <= end_time:
-                                current_events.append({
-                                    "course": event.get("courses", ""),
-                                    "activity": event.get("activities", ""),
-                                    "start": start_time_str,
-                                    "end": end_time_str,
-                                    "description": event.get("description", "")
-                                })
-                        except ValueError:
-                            continue
+            # Use the proper presence API endpoint
+            url = f"{API}{API_VERSION}/"
+            params = {
+                "method": "presence.getDailyOverview",
+                f"childIds[]": actual_child_id
+            }
             
-            # Determine presence status based on current events
-            if current_events:
-                # Child is currently in a scheduled class
-                current_event = current_events[0]  # Take the first if multiple
-                status = f"In Class - {current_event['course']}"
-                status_code = 3  # KOMMET/TIL STEDE (Present)
-                
+            _LOGGER.debug("Fetching presence data for child %s (actual ID: %s)", child_id, actual_child_id)
+            
+            # Use synchronous session in thread pool to maintain authentication cookies
+            import asyncio
+            loop = asyncio.get_event_loop()
+            response = await loop.run_in_executor(
+                None,
+                lambda: self._session.get(url, params=params, verify=True)
+            )
+            
+            if response.status_code != 200:
+                _LOGGER.error("Failed to fetch presence data: HTTP %s", response.status_code)
                 return {
-                    "status": status,
-                    "status_code": status_code,
-                    "current_event": current_event,
-                    "last_updated": now.isoformat()
+                    "status": "Error - API Failed",
+                    "status_code": 0,
+                    "last_updated": datetime.datetime.now().isoformat()
                 }
-            else:
-                # Check if there are any events today to determine if it's a school day
-                today_events = [e for e in events if e.get("itemType") == 9 and e.get("start", "").startswith(today_str)]
-                
-                if today_events:
-                    # It's a school day but no current class
-                    # Check if school day has started or ended
-                    earliest_start = None
-                    latest_end = None
-                    
-                    for event in today_events:
+            
+            data = response.json()
+            
+            if data.get("status", {}).get("code") != 0:
+                _LOGGER.error("API returned error: %s", data.get("status", {}).get("message", "Unknown"))
+                return {
+                    "status": "Error - API Error",
+                    "status_code": 0,
+                    "last_updated": datetime.datetime.now().isoformat()
+                }
+            
+            # Extract presence data for this child
+            presence_entries = data.get("data", [])
+            for entry in presence_entries:
+                if str(entry.get("institutionProfile", {}).get("id")) == str(actual_child_id):
+                        # Extract the relevant information
+                        status_code = entry.get("status", 0)
+                        check_in_time = entry.get("checkInTime", "")
+                        check_out_time = entry.get("checkOutTime", "")
+                        entry_time = entry.get("entryTime", "")
+                        exit_time = entry.get("exitTime", "")
+                        comment = entry.get("comment", "")
+                        exit_with = entry.get("exitWith", "")
+                        
+                        # Format status text based on status code
                         try:
-                            start_time = datetime.datetime.strptime(event.get("start", ""), "%Y/%m/%d %H:%M")
-                            end_time = datetime.datetime.strptime(event.get("end", ""), "%Y/%m/%d %H:%M")
-                            
-                            if earliest_start is None or start_time < earliest_start:
-                                earliest_start = start_time
-                            if latest_end is None or end_time > latest_end:
-                                latest_end = end_time
-                        except ValueError:
-                            continue
-                    
-                    if earliest_start and latest_end:
-                        if now < earliest_start:
-                            status = "Before School"
-                            status_code = 0  # IKKE KOMMET (Not arrived)
-                        elif now > latest_end:
-                            status = "After School"
-                            status_code = 8  # HENTET/GÅET (Picked up/Gone)
-                        else:
-                            status = "Between Classes"
-                            status_code = 3  # KOMMET/TIL STEDE (Present)
-                    else:
-                        status = "School Day - No Schedule"
-                        status_code = 0
-                else:
-                    # No school today
-                    status = "No School Today"
-                    status_code = 2  # FERIE/FRI (Holiday/Free)
-                
-                return {
-                    "status": status,
-                    "status_code": status_code,
-                    "last_updated": now.isoformat()
-                }
-                
+                            from .const import PRESENCE_STATUS
+                        except ImportError:
+                            # Fallback for testing
+                            PRESENCE_STATUS = {
+                                0: "IKKE KOMMET",      # Not arrived
+                                1: "SYG",              # Sick
+                                2: "FERIE/FRI",        # Holiday/Free
+                                3: "KOMMET/TIL STEDE", # Arrived/Present
+                                4: "PÅ TUR",           # On trip
+                                5: "SOVER",            # Sleeping
+                                8: "HENTET/GÅET",      # Picked up/Gone
+                            }
+                        status_text = PRESENCE_STATUS.get(status_code, f"Unknown Status ({status_code})")
+                        
+                        return {
+                            "status": status_text,
+                            "status_code": status_code,
+                            "check_in_time": check_in_time,
+                            "check_out_time": check_out_time,
+                            "entry_time": entry_time,
+                            "exit_time": exit_time,
+                            "comment": comment,
+                            "exit_with": exit_with,
+                            "last_updated": datetime.datetime.now().isoformat()
+                        }
+            
+            # Child not found in response
+            _LOGGER.warning("Child %s not found in presence data", child_id)
+            return {
+                "status": "No Data",
+                "status_code": 0,
+                "last_updated": datetime.datetime.now().isoformat()
+            }
+            
         except Exception as err:
             _LOGGER.error("Failed to get presence for child %s: %s", child_id, err)
             return {
@@ -890,7 +911,7 @@ class EasyIQClient:
                 "last_updated": datetime.datetime.now().isoformat()
             }
 
-    async def update_data(self) -> None:
+    async def update_data(self, weekplan_days: int = 5, homework_days: int = 5) -> None:
         """Update all data from the API using business days approach."""
         try:
             # First authenticate if not already authenticated
@@ -921,19 +942,26 @@ class EasyIQClient:
                         _LOGGER.error(f"  No child data found for {child_name} (ID: {child_id})")
                         _LOGGER.error(f"  Available child data keys: {list(self._children_data.keys())}")
                     
-                    # Get events for next 5 business days instead of just current week
+                    # Get events for configured number of business days
                     try:
-                        business_day_events = await self.get_calendar_events_for_business_days(child_id, 5)
+                        # Use the maximum of weekplan_days and homework_days to get all needed events
+                        max_days = max(weekplan_days, homework_days)
+                        business_day_events = await self.get_calendar_events_for_business_days(child_id, max_days)
                         
                         # Separate weekplan and homework events
-                        weekplan_events = [event for event in business_day_events if event.get("itemType") == 9]
-                        homework_events = [event for event in business_day_events if event.get("itemType") == 4]
+                        all_weekplan_events = [event for event in business_day_events if event.get("itemType") == 9]
+                        all_homework_events = [event for event in business_day_events if event.get("itemType") == 4]
+                        
+                        # Filter events based on configured days
+                        weekplan_events = self._filter_events_by_days(all_weekplan_events, weekplan_days)
+                        homework_events = self._filter_events_by_days(all_homework_events, homework_days)
                         
                         # Store weekplan data
+                        weekplan_desc = f"Next {weekplan_days} Business Day{'s' if weekplan_days != 1 else ''}"
                         self.weekplan_data[child_id] = {
-                            "week": f"Next 5 Business Days",
+                            "week": weekplan_desc,
                             "events": weekplan_events,
-                            "html_content": self._build_weekplan_html(weekplan_events),
+                            "html_content": self._build_weekplan_html(weekplan_events, weekplan_days),
                             "raw_data": business_day_events
                         }
                         
@@ -950,10 +978,11 @@ class EasyIQClient:
                             }
                             homework_assignments.append(assignment_data)
                         
+                        homework_desc = f"Next {homework_days} Business Day{'s' if homework_days != 1 else ''}"
                         self.homework_data[child_id] = {
-                            "week": f"Next 5 Business Days",
+                            "week": homework_desc,
                             "assignments": homework_assignments,
-                            "html_content": self._build_homework_html(homework_assignments),
+                            "html_content": self._build_homework_html(homework_assignments, homework_days),
                             "raw_data": business_day_events
                         }
                         
@@ -998,9 +1027,150 @@ class EasyIQClient:
             _LOGGER.error("Failed to update data: %s", err)
             raise
 
-    def _build_weekplan_html(self, weekplan_events: list[dict[str, Any]]) -> str:
+    async def update_data_selective(
+        self,
+        update_weekplan: bool = True,
+        update_homework: bool = True,
+        update_presence: bool = True,
+        update_messages: bool = True,
+        weekplan_days: int = 5,
+        homework_days: int = 5
+    ) -> None:
+        """Update specific data types from the API based on flags."""
+        try:
+            # First authenticate if not already authenticated
+            if not await self.authenticate():
+                _LOGGER.error("Failed to authenticate - cannot update data")
+                return
+            
+            # Always update children data (lightweight operation)
+            self.children = await self.get_children()
+            
+            # Initialize data structures if they don't exist
+            if not hasattr(self, 'weekplan_data'):
+                self.weekplan_data = {}
+            if not hasattr(self, 'homework_data'):
+                self.homework_data = {}
+            if not hasattr(self, 'presence_data'):
+                self.presence_data = {}
+            
+            # Update data selectively for each child
+            for child in self.children:
+                child_id = child.get("id", "")
+                child_name = child.get("name", "Unknown")
+                if child_id:
+                    _LOGGER.debug(f"Selective update for child: {child_name} (ID: {child_id})")
+                    _LOGGER.debug(f"  Flags - weekplan: {update_weekplan}, homework: {update_homework}, presence: {update_presence}")
+                    _LOGGER.debug(f"  Days - weekplan: {weekplan_days}, homework: {homework_days}")
+                    
+                    # Update weekplan and/or homework data if requested
+                    if update_weekplan or update_homework:
+                        try:
+                            # Use the maximum of weekplan_days and homework_days to get all needed events
+                            max_days = max(weekplan_days, homework_days)
+                            business_day_events = await self.get_calendar_events_for_business_days(child_id, max_days)
+                            
+                            if update_weekplan:
+                                # Separate and filter weekplan events
+                                all_weekplan_events = [event for event in business_day_events if event.get("itemType") == 9]
+                                weekplan_events = self._filter_events_by_days(all_weekplan_events, weekplan_days)
+                                weekplan_desc = f"Next {weekplan_days} Business Day{'s' if weekplan_days != 1 else ''}"
+                                self.weekplan_data[child_id] = {
+                                    "week": weekplan_desc,
+                                    "events": weekplan_events,
+                                    "html_content": self._build_weekplan_html(weekplan_events, weekplan_days),
+                                    "raw_data": business_day_events,
+                                    "last_updated": datetime.datetime.now().isoformat()
+                                }
+                                _LOGGER.debug(f"Updated weekplan for {child_name}: {len(weekplan_events)} events")
+                            
+                            if update_homework:
+                                # Separate and filter homework events
+                                all_homework_events = [event for event in business_day_events if event.get("itemType") == 4]
+                                homework_events = self._filter_events_by_days(all_homework_events, homework_days)
+                                homework_assignments = []
+                                for event in homework_events:
+                                    assignment_data = {
+                                        "title": event.get("courses", ""),
+                                        "subject": event.get("courses", ""),
+                                        "description": event.get("description", ""),
+                                        "start_time": event.get("start", ""),
+                                        "activities": event.get("activities", ""),
+                                        "raw_data": event
+                                    }
+                                    homework_assignments.append(assignment_data)
+                                
+                                homework_desc = f"Next {homework_days} Business Day{'s' if homework_days != 1 else ''}"
+                                self.homework_data[child_id] = {
+                                    "week": homework_desc,
+                                    "assignments": homework_assignments,
+                                    "html_content": self._build_homework_html(homework_assignments, homework_days),
+                                    "raw_data": business_day_events,
+                                    "last_updated": datetime.datetime.now().isoformat()
+                                }
+                                _LOGGER.debug(f"Updated homework for {child_name}: {len(homework_events)} assignments")
+                                
+                        except Exception as calendar_err:
+                            _LOGGER.error(f"Failed to update calendar data for child {child_name}: {calendar_err}")
+                    
+                    # Update presence data if requested
+                    if update_presence:
+                        try:
+                            self.presence_data[child_id] = await self.get_presence(child_id)
+                            _LOGGER.debug(f"Updated presence for {child_name}")
+                        except Exception as presence_err:
+                            _LOGGER.error(f"Failed to update presence for child {child_name}: {presence_err}")
+            
+            # Update messages if requested
+            if update_messages:
+                try:
+                    self.message = await self.get_messages()
+                    self.unread_messages = self.message.get("unread_count", 0) if isinstance(self.message, dict) else 0
+                    _LOGGER.debug(f"Updated messages: {self.unread_messages} unread")
+                except Exception as messages_err:
+                    _LOGGER.error(f"Failed to update messages: {messages_err}")
+            
+            _LOGGER.debug("Selective data update completed successfully")
+            
+        except Exception as err:
+            _LOGGER.error("Failed to update data selectively: %s", err)
+            raise
+
+    def _filter_events_by_days(self, events: list[dict[str, Any]], days: int) -> list[dict[str, Any]]:
+        """Filter events to only include those within the specified number of business days."""
+        if not events or days <= 0:
+            return []
+        
+        # Get current date
+        current_date = datetime.datetime.now().date()
+        
+        # Calculate the target business days
+        business_days_found = 0
+        check_date = current_date
+        target_dates = []
+        
+        while business_days_found < days:
+            # Skip weekends (Saturday=5, Sunday=6)
+            if check_date.weekday() < 5:  # Monday=0 to Friday=4
+                target_dates.append(check_date.strftime("%Y/%m/%d"))
+                business_days_found += 1
+            check_date += datetime.timedelta(days=1)
+        
+        # Filter events to only include those on target dates
+        filtered_events = []
+        for event in events:
+            start_time = event.get("start", "")
+            if start_time:
+                date_part = start_time.split(" ")[0]  # Get "2025/09/15" part
+                if date_part in target_dates:
+                    filtered_events.append(event)
+        
+        return filtered_events
+
+    def _build_weekplan_html(self, weekplan_events: list[dict[str, Any]], days: int = 5) -> str:
         """Build HTML content for weekplan events."""
-        html = "<h2>Next 5 Business Days - Schedule</h2>"
+        day_text = f"{days} Business Day{'s' if days != 1 else ''}"
+        html = f"<h2>Next {day_text} - Schedule</h2>"
         
         if not weekplan_events:
             html += "<p>No scheduled events found.</p>"
@@ -1052,9 +1222,10 @@ class EasyIQClient:
         
         return html
     
-    def _build_homework_html(self, homework_assignments: list[dict[str, Any]]) -> str:
+    def _build_homework_html(self, homework_assignments: list[dict[str, Any]], days: int = 5) -> str:
         """Build HTML content for homework assignments."""
-        html = "<h2>Next 5 Business Days - Homework</h2>"
+        day_text = f"{days} Business Day{'s' if days != 1 else ''}"
+        html = f"<h2>Next {day_text} - Homework</h2>"
         
         if not homework_assignments:
             html += "<p>No homework assignments found.</p>"
