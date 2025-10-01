@@ -1,0 +1,15 @@
+- number:
+    - name: "Car Climate Temperature"
+      unique_id: car_climate_temperature
+      state: "{{ state_attr('climate.skoda_enyaq_klimaanlaeg', 'temperature') | float(22.5) }}"
+      set_value:
+        - action: climate.set_temperature
+          target:
+            entity_id: climate.skoda_enyaq_klimaanlaeg
+          data:
+            temperature: "{{ value }}"
+      min: 15.5
+      max: 30
+      step: 0.5
+      unit_of_measurement: "°C"
+      icon: mdi:thermometer
