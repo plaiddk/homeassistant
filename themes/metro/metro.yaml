@@ -760,7 +760,7 @@ Metro Red:
   card-mod-theme: "Metro Red"
   card-mod-root-yaml: |
     .: |
-      .toolbar > sl-tab-group {
+      .toolbar > ha-tab-group {
         pointer-events: none;
         opacity: 0;
       }
@@ -801,7 +801,7 @@ Fluent Red:
   card-mod-theme: "Fluent Red"
   card-mod-root-yaml: |
     .: |
-      .toolbar > sl-tab-group {
+      .toolbar > ha-tab-group {
         pointer-events: none;
         opacity: 0;
       }
@@ -854,7 +854,7 @@ Metro Blue:
   card-mod-theme: "Metro Blue"
   card-mod-root-yaml: |
     .: |
-      .toolbar > sl-tab-group {
+      .toolbar > ha-tab-group {
         pointer-events: none;
         opacity: 0;
       }
@@ -895,7 +895,7 @@ Fluent Blue:
   card-mod-theme: "Fluent Blue"
   card-mod-root-yaml: |
     .: |
-      .toolbar > sl-tab-group {
+      .toolbar > ha-tab-group {
         pointer-events: none;
         opacity: 0;
       }
@@ -947,7 +947,7 @@ Metro Green:
   card-mod-theme: "Metro Green"
   card-mod-root-yaml: |
     .: |
-      .toolbar > sl-tab-group {
+      .toolbar > ha-tab-group {
         pointer-events: none;
         opacity: 0;
       }
@@ -988,7 +988,7 @@ Fluent Green:
   card-mod-theme: "Fluent Green"
   card-mod-root-yaml: |
     .: |
-      .toolbar > sl-tab-group {
+      .toolbar > ha-tab-group {
         pointer-events: none;
         opacity: 0;
       }
@@ -1040,7 +1040,7 @@ Metro Orange:
   card-mod-theme: "Metro Orange"
   card-mod-root-yaml: |
     .: |
-      .toolbar > sl-tab-group {
+      .toolbar > ha-tab-group {
         pointer-events: none;
         opacity: 0;
       }
@@ -1081,7 +1081,7 @@ Fluent Orange:
   card-mod-theme: "Fluent Orange"
   card-mod-root-yaml: |
     .: |
-      .toolbar > sl-tab-group {
+      .toolbar > ha-tab-group {
         pointer-events: none;
         opacity: 0;
       }
@@ -1133,7 +1133,7 @@ Metro Purple:
   card-mod-theme: "Metro Purple"
   card-mod-root-yaml: |
     .: |
-      .toolbar > sl-tab-group {
+      .toolbar > ha-tab-group {
         pointer-events: none;
         opacity: 0;
       }
@@ -1174,7 +1174,7 @@ Fluent Purple:
   card-mod-theme: "Fluent Purple"
   card-mod-root-yaml: |
     .: |
-      .toolbar > sl-tab-group {
+      .toolbar > ha-tab-group {
         pointer-events: none;
         opacity: 0;
       }
@@ -1228,7 +1228,7 @@ Metro Slate:
   card-mod-theme: "Metro Slate"
   card-mod-root-yaml: |
     .: |
-      .toolbar > sl-tab-group {
+      .toolbar > ha-tab-group {
         pointer-events: none;
         opacity: 0;
       }
@@ -1269,7 +1269,7 @@ Fluent Slate:
   card-mod-theme: "Fluent Slate"
   card-mod-root-yaml: |
     .: |
-      .toolbar > sl-tab-group {
+      .toolbar > ha-tab-group {
         pointer-events: none;
         opacity: 0;
       }
