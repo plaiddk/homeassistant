@@ -83,7 +83,7 @@ input_text:
 input_boolean:
   smart_wash:
     name: Smart Wash
-    initial: off # Default state is off when Home Assistant starts
+    initial: off # Default state is off when Home Assistant starts - test
     icon: mdi:dishwasher
   smart_wash_vaskemaskine:
     name: Smart Wash2
