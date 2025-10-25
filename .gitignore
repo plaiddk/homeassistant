@@ -24,3 +24,4 @@ home-assistant_v2.db-wal
 # Sensitive files & folders
 secrets.yaml
 .storage/
+.cloud/
