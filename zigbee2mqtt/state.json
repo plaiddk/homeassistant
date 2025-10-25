@@ -12,13 +12,13 @@
         "color_temp": 326
     },
     "3": {
-        "state": "ON",
+        "state": "OFF",
         "brightness": 203,
         "color_mode": "color_temp",
         "color_temp": 304
     },
     "4": {
-        "state": "ON",
+        "state": "OFF",
         "brightness": 218,
         "color_mode": "color_temp",
         "color_temp": 170,
@@ -57,7 +57,7 @@
     },
     "9": {
         "state": "ON",
-        "brightness": 203,
+        "brightness": 218,
         "color_mode": "color_temp",
         "color_temp": 304,
         "color": {
@@ -120,7 +120,7 @@
     "0x001788010e4fc541": {
         "battery": 100,
         "occupancy": false,
-        "illuminance": 96,
+        "illuminance": 10,
         "temperature": 22.83,
         "occupancy_timeout": 0,
         "linkquality": 172,
@@ -136,7 +136,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 120,
         "brightness": 218,
         "color_mode": "color_temp",
@@ -152,7 +152,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 176,
         "brightness": 218,
         "color_mode": "color_temp",
@@ -164,7 +164,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 168,
         "brightness": 218,
         "color_mode": "color_temp",
@@ -180,7 +180,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 212,
         "brightness": 218,
         "color_mode": "color_temp",
@@ -192,7 +192,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 132,
         "brightness": 218,
         "color_mode": "color_temp",
@@ -208,7 +208,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 116,
         "brightness": 203,
         "color_mode": "color_temp",
@@ -220,7 +220,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 144,
         "brightness": 203,
         "color_mode": "color_temp",
@@ -232,7 +232,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 212,
         "brightness": 203,
         "color_mode": "color_temp",
@@ -244,7 +244,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 172,
         "brightness": 203,
         "color_mode": "color_temp",
@@ -256,7 +256,7 @@
             "installed_version": 16787202,
             "latest_version": 16787202
         },
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 208,
         "brightness": 203,
         "color_mode": "color_temp",
@@ -267,7 +267,7 @@
         "occupancy_timeout": 0,
         "occupancy": false,
         "temperature": 20.23,
-        "illuminance": 26,
+        "illuminance": 14,
         "linkquality": 108,
         "update": {
             "state": "idle",
@@ -338,7 +338,7 @@
     },
     "0x001788010e4facad": {
         "battery": 100,
-        "illuminance": 37,
+        "illuminance": 30,
         "temperature": 17.41,
         "occupancy": false,
         "occupancy_timeout": 0,
@@ -423,7 +423,7 @@
         "occupancy_timeout": 0,
         "occupancy": false,
         "temperature": 20.32,
-        "illuminance": 58,
+        "illuminance": 59,
         "linkquality": 128,
         "update": {
             "state": "idle",
