@@ -1,3 +1,22 @@
+- id: runplanner_sync_select_names
+  alias: 'RunPlanner: Sync route names to dropdown'
+  mode: single
+  trigger:
+  - platform: state
+    entity_id: sensor.runplanner_routes_names
+  - platform: homeassistant
+    event: start
+  action:
+  - variables:
+      json: '{{ states(''sensor.runplanner_routes_names'') | string }}'
+      list: '{% set s = json if json not in [''unknown'',''unavailable'',''none'','''']
+        else ''[]'' %} {{ s | replace("''", ''"'') | from_json }}'
+      names: '{{ list | map(attribute=''name'') | list }}'
+  - service: input_select.set_options
+    target:
+      entity_id: input_select.runplanner_route
+    data:
+      options: '{{ names if names|length>0 else [''—''] }}'
 - id: '1732746359999'
   alias: Opvask hvis tændt og lukkes
   description: Hvis opvaskemaskine tændes og lukkes, så klargøres opvask i den billigste
@@ -206,7 +225,7 @@
         before: '23:00:00'
       sequence:
       - data:
-          kelvin: 3283
+          color_temp_kelvin: 3283
           brightness_pct: 80
         target:
           area_id: gangen
@@ -221,7 +240,7 @@
         before: 07:00:00
       sequence:
       - data:
-          kelvin: 2446
+          color_temp_kelvin: 2446
           brightness_pct: 30
         target:
           area_id: gangen
@@ -252,7 +271,7 @@
         before: '23:00:00'
       sequence:
       - data:
-          kelvin: 3793
+          color_temp_kelvin: 3793
           brightness_pct: 100
         target:
           area_id: garage
@@ -268,7 +287,7 @@
         before: 07:00:00
       sequence:
       - data:
-          kelvin: 2446
+          color_temp_kelvin: 2446
           brightness_pct: 30
         target:
           area_id: garage
@@ -299,7 +318,7 @@
         before: '23:00:00'
       sequence:
       - data:
-          kelvin: 5880
+          color_temp_kelvin: 5880
           brightness_pct: 86
         target:
           area_id:
@@ -315,7 +334,7 @@
         before: 07:00:00
       sequence:
       - data:
-          kelvin: 2446
+          color_temp_kelvin: 2446
           brightness_pct: 30
         target:
           area_id:
@@ -349,7 +368,7 @@
         before: '23:00:00'
       sequence:
       - data:
-          kelvin: 3065
+          color_temp_kelvin: 3065
           brightness_pct: 76
         target:
           area_id:
@@ -365,7 +384,7 @@
         before: 07:00:00
       sequence:
       - data:
-          kelvin: 2446
+          color_temp_kelvin: 2446
           brightness_pct: 30
         action: light.turn_on
         target:
@@ -397,7 +416,7 @@
         before: '23:00:00'
       sequence:
       - data:
-          kelvin: 5880
+          color_temp_kelvin: 5880
           brightness_pct: 86
         target:
           area_id: viktualie
@@ -409,7 +428,7 @@
         before: 07:00:00
       sequence:
       - data:
-          kelvin: 2446
+          color_temp_kelvin: 2446
           brightness_pct: 30
         target:
           area_id: viktualie

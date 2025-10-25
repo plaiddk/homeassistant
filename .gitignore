@@ -9,7 +9,9 @@ home-assistant_v2.db-wal
 
 # Ignore log files
 *.log
-g
+skoleskema.json
+
+
 # Ignore media
 /media/*
 www/*.mp4

@@ -78,12 +78,12 @@ from .const import (
     SWITCH,
 )
 from .helpers.coordinator import (
-    Raw,
     Scheduler,
     get_charging_value,
     get_ready_quarter_utc,
     get_start_quarter_utc,
 )
+from .helpers.raw import Raw
 from .helpers.general import Utils, Validator, get_parameter, get_quarter_index
 from .sensor import (
     EVSmartChargingSensor,
@@ -602,6 +602,17 @@ class EVSmartChargingCoordinator:
                     service=SERVICE_TURN_OFF,
                     target={"entity_id": self.switch_opportunistic_entity_id},
                 )
+        # If state is True and the price limit is set to zero,
+        # then make a notification to warn the user.
+        if state and self.max_price == 0 and not self.is_during_intialization():
+            await self.hass.services.async_call(
+                "persistent_notification",
+                "create",
+                {
+                    "message": "Apply price limit is turn on, but the price limit is set to zero.",
+                    "title": "EV Smart Charging",
+                },
+            )
         await self.update_configuration()
 
     async def switch_continuous_update(self, state: bool):
@@ -745,12 +756,40 @@ class EVSmartChargingCoordinator:
         """Handle the low price charging switch"""
         self.switch_low_price_charging = state
         _LOGGER.debug("switch_low_price_charging_update = %s", state)
+        # If state is True and low price charging level is set to zero,
+        # then make a notification to warn the user.
+        if (
+            state
+            and self.low_price_charging == 0
+            and not self.is_during_intialization()
+        ):
+            await self.hass.services.async_call(
+                "persistent_notification",
+                "create",
+                {
+                    "message": "Low price charging is turn on, "
+                    "but the low price charging level is set to zero.",
+                    "title": "EV Smart Charging",
+                },
+            )
         await self.update_configuration()
 
     async def switch_low_soc_charging_update(self, state: bool):
         """Handle the low SOC charging switch"""
         self.switch_low_soc_charging = state
         _LOGGER.debug("switch_low_soc_charging_update = %s", state)
+        # If state is True and low SOC charging level is set to zero,
+        # then make a notification to warn the user.
+        if state and self.low_soc_charging == 0 and not self.is_during_intialization():
+            await self.hass.services.async_call(
+                "persistent_notification",
+                "create",
+                {
+                    "message": "Low SOC charging is turn on, "
+                    "but the low SOC charging level is set to zero.",
+                    "title": "EV Smart Charging",
+                },
+            )
         await self.update_configuration()
 
     async def update_configuration(self):
@@ -989,7 +1028,14 @@ class EVSmartChargingCoordinator:
                 )
             )
         ):
-            self.scheduler.create_base_schedule(scheduling_params, self.raw_two_days)
+            if self.raw_two_days is not None:
+                self.scheduler.create_base_schedule(
+                    scheduling_params, self.raw_two_days
+                )
+            else:
+                _LOGGER.debug(
+                    "Deferring schedule creation: price data not yet available"
+                )
 
         # If the ready_quarter is updated to next day before next day's prices are available,
         # then remove the schedule
@@ -1000,7 +1046,10 @@ class EVSmartChargingCoordinator:
         ):
             self.scheduler.set_empty_schedule()
 
-        if self.scheduler.base_schedule_exists() is True:
+        if (
+            self.scheduler.base_schedule_exists() is True
+            and self.raw_two_days is not None
+        ):
             max_value = self.raw_two_days.max_value()
             # Make sure max_value > 0
             if max_value <= 0:

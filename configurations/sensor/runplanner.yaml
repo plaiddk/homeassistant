@@ -1,0 +1,24 @@
+- platform: rest
+  name: RunPlanner Routes Count
+  resource: http://192.168.1.211:8089/api/routes
+  scan_interval: 60
+  headers:
+    accept: application/json
+  value_template: "{{ value_json | length }}"
+
+- platform: rest
+  name: RunPlanner Routes IDs
+  resource: http://192.168.1.211:8089/api/routes
+  scan_interval: 60
+  headers:
+    accept: application/json
+  value_template: "{{ value_json | map(attribute='id') | join(',') }}"
+
+- platform: rest
+  name: RunPlanner Routes Names
+  resource: http://192.168.1.211:8089/api/routes
+  scan_interval: 60
+  headers:
+    accept: application/json
+  # Return the FULL list as JSON (id, name, created_at, ...)
+  value_template: "{{ value_json | tojson }}"

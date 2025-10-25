@@ -1,0 +1,12 @@
+- sensor:
+    - name: "RunPlanner Current Route ID"
+      state: >-
+        {% set list = states('sensor.runplanner_routes_names') | replace("'", '"') %}
+        {% set name = states('input_select.runplanner_route') %}
+        {% if list in ['unknown','unavailable','none',''] or name in ['unknown','unavailable','—','', none] %}
+          {{ '' }}
+        {% else %}
+          {% set arr = list | from_json %}
+          {% set match = arr | selectattr('name','equalto', name) | list %}
+          {{ match[0].id if match|length>0 else '' }}
+        {% endif %}
