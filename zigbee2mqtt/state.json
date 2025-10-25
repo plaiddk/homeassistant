@@ -72,7 +72,7 @@
         "color_mode": "color_temp"
     },
     "11": {
-        "state": "OFF",
+        "state": "ON",
         "brightness": 218
     },
     "12": {
@@ -120,7 +120,7 @@
     "0x001788010e4fc541": {
         "battery": 100,
         "occupancy": false,
-        "illuminance": 10,
+        "illuminance": 14,
         "temperature": 22.83,
         "occupancy_timeout": 0,
         "linkquality": 172,
@@ -267,7 +267,7 @@
         "occupancy_timeout": 0,
         "occupancy": false,
         "temperature": 20.23,
-        "illuminance": 14,
+        "illuminance": 20,
         "linkquality": 108,
         "update": {
             "state": "idle",
@@ -326,7 +326,7 @@
     "0x001788010e4fc5ac": {
         "occupancy": false,
         "illuminance": 1,
-        "temperature": 16.66,
+        "temperature": 16.35,
         "battery": 100,
         "occupancy_timeout": 0,
         "linkquality": 148,
@@ -338,8 +338,8 @@
     },
     "0x001788010e4facad": {
         "battery": 100,
-        "illuminance": 30,
-        "temperature": 17.41,
+        "illuminance": 53,
+        "temperature": 17.58,
         "occupancy": false,
         "occupancy_timeout": 0,
         "linkquality": 152,
@@ -374,7 +374,7 @@
         "color_temp": 326
     },
     "0x001788010e217524": {
-        "state": "OFF",
+        "state": "ON",
         "update": {
             "state": "idle",
             "installed_version": 16787202,
@@ -384,7 +384,7 @@
         "brightness": 218
     },
     "0x001788010e21722a": {
-        "state": "OFF",
+        "state": "ON",
         "update": {
             "state": "idle",
             "installed_version": 16787202,
@@ -396,7 +396,7 @@
     "0x001788010e504bfb": {
         "battery": 100,
         "occupancy": false,
-        "illuminance": 1,
+        "illuminance": 31,
         "temperature": 19.02,
         "occupancy_timeout": 0,
         "linkquality": 128,
@@ -423,7 +423,7 @@
         "occupancy_timeout": 0,
         "occupancy": false,
         "temperature": 20.32,
-        "illuminance": 59,
+        "illuminance": 61,
         "linkquality": 128,
         "update": {
             "state": "idle",
