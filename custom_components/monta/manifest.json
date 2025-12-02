@@ -10,7 +10,11 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/nickknissen/hass-monta/issues",
   "loggers": [
-    "custom_components.monta"
+    "custom_components.monta",
+    "monta"
   ],
-  "version": "1.6.3"
+  "requirements": [
+    "monta==1.0.4"
+  ],
+  "version": "2.0.2"
 }

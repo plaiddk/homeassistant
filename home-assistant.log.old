@@ -1,0 +1,881 @@
+2025-11-05 21:01:28.997 WARNING (SyncWorker_0) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 760
+2025-11-05 21:01:28.997 WARNING (SyncWorker_0) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 801
+2025-11-05 21:01:28.997 WARNING (SyncWorker_0) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 854
+2025-11-05 21:01:28.998 WARNING (SyncWorker_0) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 895
+2025-11-05 21:01:28.998 WARNING (SyncWorker_0) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 947
+2025-11-05 21:01:28.998 WARNING (SyncWorker_0) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 988
+2025-11-05 21:01:28.998 WARNING (SyncWorker_0) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 1040
+2025-11-05 21:01:28.999 WARNING (SyncWorker_0) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 1081
+2025-11-05 21:01:28.999 WARNING (SyncWorker_0) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 1133
+2025-11-05 21:01:28.999 WARNING (SyncWorker_0) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 1174
+2025-11-05 21:01:29.000 WARNING (SyncWorker_0) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 1228
+2025-11-05 21:01:29.001 WARNING (SyncWorker_0) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 1269
+2025-11-05 21:01:29.031 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration aula_easyiq which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.032 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration google_home which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.033 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration browser_mod which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.034 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration nordpool which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.035 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration xiaomi_cloud_map_extractor which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.035 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration home_connect_alt which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.036 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration eloverblik which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.037 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration myskoda which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.037 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration hacs which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.038 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration aula which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.039 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration pyscript which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.040 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration tplink_router which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.041 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration ev_smart_charging which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.042 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration auto_backup which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.042 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration monta which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.043 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration pollen_dk which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.044 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration skodaconnect which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.045 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration dreame_vacuum which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.047 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration generic_hygrostat which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.047 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration zaptec which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.048 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration energidataservice which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.049 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration extended_openai_conversation which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:29.050 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration ui_lovelace_minimalist which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-11-05 21:01:31.473 WARNING (MainThread) [custom_components.generic_hygrostat.binary_sensor] Unknown humidity sensor 'sensor.aqarastorbad_humidity'
+2025-11-05 21:01:32.504 WARNING (ImportExecutor_0) [py.warnings] /usr/local/lib/python3.13/site-packages/miio/miot_device.py:23: FutureWarning: functools.partial will be a method descriptor in future Python versions; wrap it in enum.member() if you want to preserve the old behavior
+  Bool = partial(_str2bool)
+
+2025-11-05 21:01:33.261 WARNING (SyncWorker_1) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 760
+2025-11-05 21:01:33.262 WARNING (SyncWorker_1) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 801
+2025-11-05 21:01:33.262 WARNING (SyncWorker_1) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 854
+2025-11-05 21:01:33.262 WARNING (SyncWorker_1) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 895
+2025-11-05 21:01:33.263 WARNING (SyncWorker_1) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 947
+2025-11-05 21:01:33.263 WARNING (SyncWorker_1) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 988
+2025-11-05 21:01:33.263 WARNING (SyncWorker_1) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 1040
+2025-11-05 21:01:33.263 WARNING (SyncWorker_1) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 1081
+2025-11-05 21:01:33.264 WARNING (SyncWorker_1) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 1133
+2025-11-05 21:01:33.264 WARNING (SyncWorker_1) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 1174
+2025-11-05 21:01:33.264 WARNING (SyncWorker_1) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 1228
+2025-11-05 21:01:33.265 WARNING (SyncWorker_1) [annotatedyaml.constructors] YAML file /config/themes/metro/metro.yaml contains duplicate key "card-mod-root-yaml". Check lines 593 and 1269
+2025-11-05 21:01:36.117 ERROR (MainThread) [homeassistant.setup] The 'pollen_dk' integration does not support YAML setup, please remove it from your configuration
+2025-11-05 21:01:39.020 ERROR (MainThread) [homeassistant.components.automation] Automation with alias 'Turn off Outdoor light' failed to setup actions and has been disabled: Unknown device 'c4f7e37e29037c007a3ecfc66a9152fd'
+2025-11-05 21:01:39.021 ERROR (MainThread) [homeassistant.components.automation] Automation with alias 'Turn on light christmas outside' failed to setup actions and has been disabled: Unknown device 'c4f7e37e29037c007a3ecfc66a9152fd'
+2025-11-05 21:01:39.159 ERROR (MainThread) [homeassistant.components.automation] Platform automation does not generate unique IDs. ID ev_smart_charging_follow_connection already exists - ignoring automation.ev_smart_charging_follow_connection_sensors
+2025-11-05 21:01:39.159 ERROR (MainThread) [homeassistant.components.automation] Platform automation does not generate unique IDs. ID ev_smart_charging_follow_connection already exists - ignoring automation.ev_smart_charging_follow_connection_sensors
+2025-11-05 21:01:39.568 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_rssi uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_rssi"` option with `"default_entity_id": "sensor.ams-4c10_rssi"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.570 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_vcc uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_vcc"` option with `"default_entity_id": "sensor.ams-4c10_vcc"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.572 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_up uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_up"` option with `"default_entity_id": "sensor.ams-4c10_up"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.577 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_pricesmin uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_pricesmin"` option with `"default_entity_id": "sensor.ams-4c10_pricesmin"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.579 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_pricesmax uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_pricesmax"` option with `"default_entity_id": "sensor.ams-4c10_pricesmax"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.582 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_pricescheapest1hr uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_pricescheapest1hr"` option with `"default_entity_id": "sensor.ams-4c10_pricescheapest1hr"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.584 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_pricescheapest3hr uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_pricescheapest3hr"` option with `"default_entity_id": "sensor.ams-4c10_pricescheapest3hr"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.585 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_pricescheapest6hr uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_pricescheapest6hr"` option with `"default_entity_id": "sensor.ams-4c10_pricescheapest6hr"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.586 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices0 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices0"` option with `"default_entity_id": "sensor.ams-4c10_prices0"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.588 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices1 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices1"` option with `"default_entity_id": "sensor.ams-4c10_prices1"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.589 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices2 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices2"` option with `"default_entity_id": "sensor.ams-4c10_prices2"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.590 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices3 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices3"` option with `"default_entity_id": "sensor.ams-4c10_prices3"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.591 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices4 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices4"` option with `"default_entity_id": "sensor.ams-4c10_prices4"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.592 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices5 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices5"` option with `"default_entity_id": "sensor.ams-4c10_prices5"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.594 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices6 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices6"` option with `"default_entity_id": "sensor.ams-4c10_prices6"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.595 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices7 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices7"` option with `"default_entity_id": "sensor.ams-4c10_prices7"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.596 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices8 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices8"` option with `"default_entity_id": "sensor.ams-4c10_prices8"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.597 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices9 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices9"` option with `"default_entity_id": "sensor.ams-4c10_prices9"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.598 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices10 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices10"` option with `"default_entity_id": "sensor.ams-4c10_prices10"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.600 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_exportprices0 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_exportprices0"` option with `"default_entity_id": "sensor.ams-4c10_exportprices0"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.601 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_p uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_P"` option with `"default_entity_id": "sensor.ams-4c10_P"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.602 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_t uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_t"` option with `"default_entity_id": "sensor.ams-4c10_t"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.605 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_q uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_Q"` option with `"default_entity_id": "sensor.ams-4c10_Q"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.607 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_qo uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_QO"` option with `"default_entity_id": "sensor.ams-4c10_QO"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.609 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_i1 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_I1"` option with `"default_entity_id": "sensor.ams-4c10_I1"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.610 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_i2 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_I2"` option with `"default_entity_id": "sensor.ams-4c10_I2"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.611 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_i3 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_I3"` option with `"default_entity_id": "sensor.ams-4c10_I3"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.613 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_u1 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_U1"` option with `"default_entity_id": "sensor.ams-4c10_U1"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.618 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_u2 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_U2"` option with `"default_entity_id": "sensor.ams-4c10_U2"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.620 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_u3 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_U3"` option with `"default_entity_id": "sensor.ams-4c10_U3"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.622 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_max uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_max"` option with `"default_entity_id": "sensor.ams-4c10_max"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.623 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_threshold uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_threshold"` option with `"default_entity_id": "sensor.ams-4c10_threshold"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.625 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_houruse uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_houruse"` option with `"default_entity_id": "sensor.ams-4c10_houruse"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.627 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_hourcost uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_hourcost"` option with `"default_entity_id": "sensor.ams-4c10_hourcost"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.628 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_dayuse uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_dayuse"` option with `"default_entity_id": "sensor.ams-4c10_dayuse"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.630 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_daycost uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_daycost"` option with `"default_entity_id": "sensor.ams-4c10_daycost"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.631 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_monthuse uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_monthuse"` option with `"default_entity_id": "sensor.ams-4c10_monthuse"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.632 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_monthcost uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_monthcost"` option with `"default_entity_id": "sensor.ams-4c10_monthcost"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.633 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_peaks0 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_peaks0"` option with `"default_entity_id": "sensor.ams-4c10_peaks0"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.636 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_peaks1 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_peaks1"` option with `"default_entity_id": "sensor.ams-4c10_peaks1"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.638 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_peaks2 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_peaks2"` option with `"default_entity_id": "sensor.ams-4c10_peaks2"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.639 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_thresholds0 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_thresholds0"` option with `"default_entity_id": "sensor.ams-4c10_thresholds0"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.641 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_thresholds1 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_thresholds1"` option with `"default_entity_id": "sensor.ams-4c10_thresholds1"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.642 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_thresholds2 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_thresholds2"` option with `"default_entity_id": "sensor.ams-4c10_thresholds2"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.643 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_thresholds3 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_thresholds3"` option with `"default_entity_id": "sensor.ams-4c10_thresholds3"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.645 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_thresholds4 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_thresholds4"` option with `"default_entity_id": "sensor.ams-4c10_thresholds4"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.646 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_thresholds5 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_thresholds5"` option with `"default_entity_id": "sensor.ams-4c10_thresholds5"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.647 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_thresholds6 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_thresholds6"` option with `"default_entity_id": "sensor.ams-4c10_thresholds6"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.649 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_thresholds7 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_thresholds7"` option with `"default_entity_id": "sensor.ams-4c10_thresholds7"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.650 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_thresholds8 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_thresholds8"` option with `"default_entity_id": "sensor.ams-4c10_thresholds8"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.651 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices11 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices11"` option with `"default_entity_id": "sensor.ams-4c10_prices11"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.653 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices12 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices12"` option with `"default_entity_id": "sensor.ams-4c10_prices12"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.654 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices13 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices13"` option with `"default_entity_id": "sensor.ams-4c10_prices13"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.656 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices14 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices14"` option with `"default_entity_id": "sensor.ams-4c10_prices14"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.657 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices15 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices15"` option with `"default_entity_id": "sensor.ams-4c10_prices15"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.659 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices16 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices16"` option with `"default_entity_id": "sensor.ams-4c10_prices16"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.661 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices17 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices17"` option with `"default_entity_id": "sensor.ams-4c10_prices17"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.663 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices18 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices18"` option with `"default_entity_id": "sensor.ams-4c10_prices18"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.665 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices19 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices19"` option with `"default_entity_id": "sensor.ams-4c10_prices19"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.667 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices20 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices20"` option with `"default_entity_id": "sensor.ams-4c10_prices20"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.668 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices21 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices21"` option with `"default_entity_id": "sensor.ams-4c10_prices21"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.669 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices22 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices22"` option with `"default_entity_id": "sensor.ams-4c10_prices22"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.670 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices23 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices23"` option with `"default_entity_id": "sensor.ams-4c10_prices23"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.672 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices24 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices24"` option with `"default_entity_id": "sensor.ams-4c10_prices24"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.673 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices25 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices25"` option with `"default_entity_id": "sensor.ams-4c10_prices25"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.674 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices26 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices26"` option with `"default_entity_id": "sensor.ams-4c10_prices26"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.675 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices27 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices27"` option with `"default_entity_id": "sensor.ams-4c10_prices27"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.677 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices28 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices28"` option with `"default_entity_id": "sensor.ams-4c10_prices28"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.678 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices29 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices29"` option with `"default_entity_id": "sensor.ams-4c10_prices29"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.679 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices30 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices30"` option with `"default_entity_id": "sensor.ams-4c10_prices30"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.681 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices31 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices31"` option with `"default_entity_id": "sensor.ams-4c10_prices31"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.682 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices32 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices32"` option with `"default_entity_id": "sensor.ams-4c10_prices32"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.683 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices33 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices33"` option with `"default_entity_id": "sensor.ams-4c10_prices33"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.684 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices34 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices34"` option with `"default_entity_id": "sensor.ams-4c10_prices34"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.685 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices36 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices36"` option with `"default_entity_id": "sensor.ams-4c10_prices36"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.687 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices35 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices35"` option with `"default_entity_id": "sensor.ams-4c10_prices35"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.688 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_tpi uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_tPI"` option with `"default_entity_id": "sensor.ams-4c10_tPI"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.690 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_tqi uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_tQI"` option with `"default_entity_id": "sensor.ams-4c10_tQI"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.691 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_tqo uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_tQO"` option with `"default_entity_id": "sensor.ams-4c10_tQO"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.692 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_rtc uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_rtc"` option with `"default_entity_id": "sensor.ams-4c10_rtc"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:39.707 WARNING (MainThread) [homeassistant.components.mqtt.entity] The configuration for entity sensor.ams_4c10_prices37 uses the deprecated option `object_id` to set the default entity id. Replace the `"object_id": "ams-4c10_prices37"` option with `"default_entity_id": "sensor.ams-4c10_prices37"` in your published discovery configuration to fix this issue, or contact the maintainer of the integration that published this config to fix this. This will stop working in Home Assistant Core 2026.4
+2025-11-05 21:01:41.975 ERROR (SyncWorker_2) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 21:01:43.602 ERROR (SyncWorker_1) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 21:01:44.602 ERROR (MainThread) [homeassistant.helpers.event] Error while processing template: Template<template=({% from 'cheapest_energy_hours.jinja' import cheapest_energy_hours %}
+
+{# Fetch the estimated program duration as a string (e.g., "3:40") #}
+{% set program_time_string = states('sensor.484090540289002643_bsh_common_option_estimatedtotalprogramtime') %}
+{% set program_parts = program_time_string.split(':') %}
+{% set program_hours = program_parts[0] | int %}
+{% set program_minutes = program_parts[1] | int %}
+
+{# Convert program duration to total seconds #}
+{% set program_duration_seconds = (program_hours * 3600) + (program_minutes * 60) %}
+
+{# Get the resolved start time from the cheapest_energy_hours script #}
+{% set energi_priser = 'sensor.energi_data_service' %}
+{% set start_time_string = cheapest_energy_hours(
+    sensor=energi_priser, 
+    time_key='hour', 
+    value_key='price', 
+    hours=4, 
+    look_ahead=true, 
+    include_today=true, 
+    include_tomorrow=true, 
+    mode='start') 
+%}
+
+{# Convert the start time string to a timestamp #}
+{% set start_timestamp = as_timestamp(start_time_string) %}
+
+{# Add the program duration in seconds to the timestamp #}
+{% set finish_timestamp = start_timestamp + program_duration_seconds %}
+
+{# Convert the finish timestamp back to the original format #}
+{% set finish_time_string = finish_timestamp | timestamp_custom('%Y-%m-%dT%H:%M:%S%z', true) %}
+
+{# Output the start and finish times #}
+{#Start time: {{ start_time_string }} #}
+{#Finish time: {{ finish_time_string }} #}
+{{ finish_time_string }}) renders=2>
+Traceback (most recent call last):
+  File "/usr/src/homeassistant/homeassistant/helpers/template/__init__.py", line 494, in async_render
+    render_result = render_with_context(self.template, compiled, **kwargs)
+  File "/usr/src/homeassistant/homeassistant/helpers/template/context.py", line 45, in render_with_context
+    return template.render(**kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "<template>", line 6, in top-level template code
+  File "/usr/src/homeassistant/homeassistant/helpers/template/__init__.py", line 2084, in forgiving_int_filter
+    raise_no_default("int", value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/helpers/template/helpers.py", line 13, in raise_no_default
+    raise ValueError(
+    ...<2 lines>...
+    )
+ValueError: Template error: int got invalid input 'unavailable' when rendering template '{% from 'cheapest_energy_hours.jinja' import cheapest_energy_hours %}
+
+{# Fetch the estimated program duration as a string (e.g., "3:40") #}
+{% set program_time_string = states('sensor.484090540289002643_bsh_common_option_estimatedtotalprogramtime') %}
+{% set program_parts = program_time_string.split(':') %}
+{% set program_hours = program_parts[0] | int %}
+{% set program_minutes = program_parts[1] | int %}
+
+{# Convert program duration to total seconds #}
+{% set program_duration_seconds = (program_hours * 3600) + (program_minutes * 60) %}
+
+{# Get the resolved start time from the cheapest_energy_hours script #}
+{% set energi_priser = 'sensor.energi_data_service' %}
+{% set start_time_string = cheapest_energy_hours(
+    sensor=energi_priser, 
+    time_key='hour', 
+    value_key='price', 
+    hours=4, 
+    look_ahead=true, 
+    include_today=true, 
+    include_tomorrow=true, 
+    mode='start') 
+%}
+
+{# Convert the start time string to a timestamp #}
+{% set start_timestamp = as_timestamp(start_time_string) %}
+
+{# Add the program duration in seconds to the timestamp #}
+{% set finish_timestamp = start_timestamp + program_duration_seconds %}
+
+{# Convert the finish timestamp back to the original format #}
+{% set finish_time_string = finish_timestamp | timestamp_custom('%Y-%m-%dT%H:%M:%S%z', true) %}
+
+{# Output the start and finish times #}
+{#Start time: {{ start_time_string }} #}
+{#Finish time: {{ finish_time_string }} #}
+{{ finish_time_string }}' but no default was specified
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/src/homeassistant/homeassistant/helpers/template/__init__.py", line 611, in async_render_to_info
+    render_info._result = self.async_render(  # noqa: SLF001
+                          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+        variables, strict=strict, log_fn=log_fn, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/src/homeassistant/homeassistant/helpers/template/__init__.py", line 496, in async_render
+    raise TemplateError(err) from err
+homeassistant.exceptions.TemplateError: ValueError: Template error: int got invalid input 'unavailable' when rendering template '{% from 'cheapest_energy_hours.jinja' import cheapest_energy_hours %}
+
+{# Fetch the estimated program duration as a string (e.g., "3:40") #}
+{% set program_time_string = states('sensor.484090540289002643_bsh_common_option_estimatedtotalprogramtime') %}
+{% set program_parts = program_time_string.split(':') %}
+{% set program_hours = program_parts[0] | int %}
+{% set program_minutes = program_parts[1] | int %}
+
+{# Convert program duration to total seconds #}
+{% set program_duration_seconds = (program_hours * 3600) + (program_minutes * 60) %}
+
+{# Get the resolved start time from the cheapest_energy_hours script #}
+{% set energi_priser = 'sensor.energi_data_service' %}
+{% set start_time_string = cheapest_energy_hours(
+    sensor=energi_priser, 
+    time_key='hour', 
+    value_key='price', 
+    hours=4, 
+    look_ahead=true, 
+    include_today=true, 
+    include_tomorrow=true, 
+    mode='start') 
+%}
+
+{# Convert the start time string to a timestamp #}
+{% set start_timestamp = as_timestamp(start_time_string) %}
+
+{# Add the program duration in seconds to the timestamp #}
+{% set finish_timestamp = start_timestamp + program_duration_seconds %}
+
+{# Convert the finish timestamp back to the original format #}
+{% set finish_time_string = finish_timestamp | timestamp_custom('%Y-%m-%dT%H:%M:%S%z', true) %}
+
+{# Output the start and finish times #}
+{#Start time: {{ start_time_string }} #}
+{#Finish time: {{ finish_time_string }} #}
+{{ finish_time_string }}' but no default was specified
+2025-11-05 21:01:44.606 ERROR (MainThread) [homeassistant.components.template.template_entity] TemplateError('ValueError: Template error: int got invalid input 'unavailable' when rendering template '{% from 'cheapest_energy_hours.jinja' import cheapest_energy_hours %}
+
+{# Fetch the estimated program duration as a string (e.g., "3:40") #}
+{% set program_time_string = states('sensor.484090540289002643_bsh_common_option_estimatedtotalprogramtime') %}
+{% set program_parts = program_time_string.split(':') %}
+{% set program_hours = program_parts[0] | int %}
+{% set program_minutes = program_parts[1] | int %}
+
+{# Convert program duration to total seconds #}
+{% set program_duration_seconds = (program_hours * 3600) + (program_minutes * 60) %}
+
+{# Get the resolved start time from the cheapest_energy_hours script #}
+{% set energi_priser = 'sensor.energi_data_service' %}
+{% set start_time_string = cheapest_energy_hours(
+    sensor=energi_priser, 
+    time_key='hour', 
+    value_key='price', 
+    hours=4, 
+    look_ahead=true, 
+    include_today=true, 
+    include_tomorrow=true, 
+    mode='start') 
+%}
+
+{# Convert the start time string to a timestamp #}
+{% set start_timestamp = as_timestamp(start_time_string) %}
+
+{# Add the program duration in seconds to the timestamp #}
+{% set finish_timestamp = start_timestamp + program_duration_seconds %}
+
+{# Convert the finish timestamp back to the original format #}
+{% set finish_time_string = finish_timestamp | timestamp_custom('%Y-%m-%dT%H:%M:%S%z', true) %}
+
+{# Output the start and finish times #}
+{#Start time: {{ start_time_string }} #}
+{#Finish time: {{ finish_time_string }} #}
+{{ finish_time_string }}' but no default was specified') while processing template 'Template<template=({% from 'cheapest_energy_hours.jinja' import cheapest_energy_hours %}
+
+{# Fetch the estimated program duration as a string (e.g., "3:40") #}
+{% set program_time_string = states('sensor.484090540289002643_bsh_common_option_estimatedtotalprogramtime') %}
+{% set program_parts = program_time_string.split(':') %}
+{% set program_hours = program_parts[0] | int %}
+{% set program_minutes = program_parts[1] | int %}
+
+{# Convert program duration to total seconds #}
+{% set program_duration_seconds = (program_hours * 3600) + (program_minutes * 60) %}
+
+{# Get the resolved start time from the cheapest_energy_hours script #}
+{% set energi_priser = 'sensor.energi_data_service' %}
+{% set start_time_string = cheapest_energy_hours(
+    sensor=energi_priser, 
+    time_key='hour', 
+    value_key='price', 
+    hours=4, 
+    look_ahead=true, 
+    include_today=true, 
+    include_tomorrow=true, 
+    mode='start') 
+%}
+
+{# Convert the start time string to a timestamp #}
+{% set start_timestamp = as_timestamp(start_time_string) %}
+
+{# Add the program duration in seconds to the timestamp #}
+{% set finish_timestamp = start_timestamp + program_duration_seconds %}
+
+{# Convert the finish timestamp back to the original format #}
+{% set finish_time_string = finish_timestamp | timestamp_custom('%Y-%m-%dT%H:%M:%S%z', true) %}
+
+{# Output the start and finish times #}
+{#Start time: {{ start_time_string }} #}
+{#Finish time: {{ finish_time_string }} #}
+{{ finish_time_string }}) renders=4>' for attribute '_attr_native_value' in entity 'sensor.elpris_lavest_4t_vaskemaskine'
+2025-11-05 21:01:44.619 ERROR (MainThread) [homeassistant.helpers.event] Error while processing template: Template<template=({% from 'cheapest_energy_hours.jinja' import cheapest_energy_hours %}
+
+{# Fetch the estimated program duration as a string (e.g., "3:40") #}
+{% set program_time_string = states('sensor.484090540289002643_bsh_common_option_estimatedtotalprogramtime') %}
+{% set program_parts = program_time_string.split(':') %}
+{% set program_hours = program_parts[0] | int %}
+{% set program_minutes = program_parts[1] | int %}
+
+{# Convert program duration to total seconds #}
+{% set program_duration_seconds = (program_hours * 3600) + (program_minutes * 60) %}
+
+{# Get the resolved start time from the cheapest_energy_hours script #}
+{% set energi_priser = 'sensor.energi_data_service' %}
+{% set start_time_string = cheapest_energy_hours(
+    sensor=energi_priser, 
+    time_key='hour', 
+    value_key='price', 
+    hours=4, 
+    look_ahead=true, 
+    include_today=true, 
+    include_tomorrow=false, 
+    mode='start') 
+%}
+
+{# Convert the start time string to a timestamp #}
+{% set start_timestamp = as_timestamp(start_time_string) %}
+
+{# Add the program duration in seconds to the timestamp #}
+{% set finish_timestamp = start_timestamp + program_duration_seconds %}
+
+{# Convert the finish timestamp back to the original format #}
+{% set finish_time_string = finish_timestamp | timestamp_custom('%Y-%m-%dT%H:%M:%S%z', true) %}
+
+{# Output the start and finish times #}
+{#Start time: {{ start_time_string }} #}
+{#Finish time: {{ finish_time_string }} #}
+{{ finish_time_string }}) renders=2>
+Traceback (most recent call last):
+  File "/usr/src/homeassistant/homeassistant/helpers/template/__init__.py", line 494, in async_render
+    render_result = render_with_context(self.template, compiled, **kwargs)
+  File "/usr/src/homeassistant/homeassistant/helpers/template/context.py", line 45, in render_with_context
+    return template.render(**kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "<template>", line 6, in top-level template code
+  File "/usr/src/homeassistant/homeassistant/helpers/template/__init__.py", line 2084, in forgiving_int_filter
+    raise_no_default("int", value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/helpers/template/helpers.py", line 13, in raise_no_default
+    raise ValueError(
+    ...<2 lines>...
+    )
+ValueError: Template error: int got invalid input 'unavailable' when rendering template '{% from 'cheapest_energy_hours.jinja' import cheapest_energy_hours %}
+
+{# Fetch the estimated program duration as a string (e.g., "3:40") #}
+{% set program_time_string = states('sensor.484090540289002643_bsh_common_option_estimatedtotalprogramtime') %}
+{% set program_parts = program_time_string.split(':') %}
+{% set program_hours = program_parts[0] | int %}
+{% set program_minutes = program_parts[1] | int %}
+
+{# Convert program duration to total seconds #}
+{% set program_duration_seconds = (program_hours * 3600) + (program_minutes * 60) %}
+
+{# Get the resolved start time from the cheapest_energy_hours script #}
+{% set energi_priser = 'sensor.energi_data_service' %}
+{% set start_time_string = cheapest_energy_hours(
+    sensor=energi_priser, 
+    time_key='hour', 
+    value_key='price', 
+    hours=4, 
+    look_ahead=true, 
+    include_today=true, 
+    include_tomorrow=false, 
+    mode='start') 
+%}
+
+{# Convert the start time string to a timestamp #}
+{% set start_timestamp = as_timestamp(start_time_string) %}
+
+{# Add the program duration in seconds to the timestamp #}
+{% set finish_timestamp = start_timestamp + program_duration_seconds %}
+
+{# Convert the finish timestamp back to the original format #}
+{% set finish_time_string = finish_timestamp | timestamp_custom('%Y-%m-%dT%H:%M:%S%z', true) %}
+
+{# Output the start and finish times #}
+{#Start time: {{ start_time_string }} #}
+{#Finish time: {{ finish_time_string }} #}
+{{ finish_time_string }}' but no default was specified
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/src/homeassistant/homeassistant/helpers/template/__init__.py", line 611, in async_render_to_info
+    render_info._result = self.async_render(  # noqa: SLF001
+                          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+        variables, strict=strict, log_fn=log_fn, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/src/homeassistant/homeassistant/helpers/template/__init__.py", line 496, in async_render
+    raise TemplateError(err) from err
+homeassistant.exceptions.TemplateError: ValueError: Template error: int got invalid input 'unavailable' when rendering template '{% from 'cheapest_energy_hours.jinja' import cheapest_energy_hours %}
+
+{# Fetch the estimated program duration as a string (e.g., "3:40") #}
+{% set program_time_string = states('sensor.484090540289002643_bsh_common_option_estimatedtotalprogramtime') %}
+{% set program_parts = program_time_string.split(':') %}
+{% set program_hours = program_parts[0] | int %}
+{% set program_minutes = program_parts[1] | int %}
+
+{# Convert program duration to total seconds #}
+{% set program_duration_seconds = (program_hours * 3600) + (program_minutes * 60) %}
+
+{# Get the resolved start time from the cheapest_energy_hours script #}
+{% set energi_priser = 'sensor.energi_data_service' %}
+{% set start_time_string = cheapest_energy_hours(
+    sensor=energi_priser, 
+    time_key='hour', 
+    value_key='price', 
+    hours=4, 
+    look_ahead=true, 
+    include_today=true, 
+    include_tomorrow=false, 
+    mode='start') 
+%}
+
+{# Convert the start time string to a timestamp #}
+{% set start_timestamp = as_timestamp(start_time_string) %}
+
+{# Add the program duration in seconds to the timestamp #}
+{% set finish_timestamp = start_timestamp + program_duration_seconds %}
+
+{# Convert the finish timestamp back to the original format #}
+{% set finish_time_string = finish_timestamp | timestamp_custom('%Y-%m-%dT%H:%M:%S%z', true) %}
+
+{# Output the start and finish times #}
+{#Start time: {{ start_time_string }} #}
+{#Finish time: {{ finish_time_string }} #}
+{{ finish_time_string }}' but no default was specified
+2025-11-05 21:01:44.620 ERROR (MainThread) [homeassistant.components.template.template_entity] TemplateError('ValueError: Template error: int got invalid input 'unavailable' when rendering template '{% from 'cheapest_energy_hours.jinja' import cheapest_energy_hours %}
+
+{# Fetch the estimated program duration as a string (e.g., "3:40") #}
+{% set program_time_string = states('sensor.484090540289002643_bsh_common_option_estimatedtotalprogramtime') %}
+{% set program_parts = program_time_string.split(':') %}
+{% set program_hours = program_parts[0] | int %}
+{% set program_minutes = program_parts[1] | int %}
+
+{# Convert program duration to total seconds #}
+{% set program_duration_seconds = (program_hours * 3600) + (program_minutes * 60) %}
+
+{# Get the resolved start time from the cheapest_energy_hours script #}
+{% set energi_priser = 'sensor.energi_data_service' %}
+{% set start_time_string = cheapest_energy_hours(
+    sensor=energi_priser, 
+    time_key='hour', 
+    value_key='price', 
+    hours=4, 
+    look_ahead=true, 
+    include_today=true, 
+    include_tomorrow=false, 
+    mode='start') 
+%}
+
+{# Convert the start time string to a timestamp #}
+{% set start_timestamp = as_timestamp(start_time_string) %}
+
+{# Add the program duration in seconds to the timestamp #}
+{% set finish_timestamp = start_timestamp + program_duration_seconds %}
+
+{# Convert the finish timestamp back to the original format #}
+{% set finish_time_string = finish_timestamp | timestamp_custom('%Y-%m-%dT%H:%M:%S%z', true) %}
+
+{# Output the start and finish times #}
+{#Start time: {{ start_time_string }} #}
+{#Finish time: {{ finish_time_string }} #}
+{{ finish_time_string }}' but no default was specified') while processing template 'Template<template=({% from 'cheapest_energy_hours.jinja' import cheapest_energy_hours %}
+
+{# Fetch the estimated program duration as a string (e.g., "3:40") #}
+{% set program_time_string = states('sensor.484090540289002643_bsh_common_option_estimatedtotalprogramtime') %}
+{% set program_parts = program_time_string.split(':') %}
+{% set program_hours = program_parts[0] | int %}
+{% set program_minutes = program_parts[1] | int %}
+
+{# Convert program duration to total seconds #}
+{% set program_duration_seconds = (program_hours * 3600) + (program_minutes * 60) %}
+
+{# Get the resolved start time from the cheapest_energy_hours script #}
+{% set energi_priser = 'sensor.energi_data_service' %}
+{% set start_time_string = cheapest_energy_hours(
+    sensor=energi_priser, 
+    time_key='hour', 
+    value_key='price', 
+    hours=4, 
+    look_ahead=true, 
+    include_today=true, 
+    include_tomorrow=false, 
+    mode='start') 
+%}
+
+{# Convert the start time string to a timestamp #}
+{% set start_timestamp = as_timestamp(start_time_string) %}
+
+{# Add the program duration in seconds to the timestamp #}
+{% set finish_timestamp = start_timestamp + program_duration_seconds %}
+
+{# Convert the finish timestamp back to the original format #}
+{% set finish_time_string = finish_timestamp | timestamp_custom('%Y-%m-%dT%H:%M:%S%z', true) %}
+
+{# Output the start and finish times #}
+{#Start time: {{ start_time_string }} #}
+{#Finish time: {{ finish_time_string }} #}
+{{ finish_time_string }}) renders=4>' for attribute '_attr_native_value' in entity 'sensor.elpris_lavest_4t_vaskemaskine_idag'
+2025-11-05 21:01:44.621 ERROR (MainThread) [homeassistant.helpers.event] Error while processing template: Template<template=({{ states('sensor.finish_in_relative') | int }}) renders=2>
+Traceback (most recent call last):
+  File "/usr/src/homeassistant/homeassistant/helpers/template/__init__.py", line 494, in async_render
+    render_result = render_with_context(self.template, compiled, **kwargs)
+  File "/usr/src/homeassistant/homeassistant/helpers/template/context.py", line 45, in render_with_context
+    return template.render(**kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "<template>", line 1, in top-level template code
+  File "/usr/src/homeassistant/homeassistant/helpers/template/__init__.py", line 2084, in forgiving_int_filter
+    raise_no_default("int", value)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/helpers/template/helpers.py", line 13, in raise_no_default
+    raise ValueError(
+    ...<2 lines>...
+    )
+ValueError: Template error: int got invalid input 'unknown' when rendering template '{{ states('sensor.finish_in_relative') | int }}' but no default was specified
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/src/homeassistant/homeassistant/helpers/template/__init__.py", line 611, in async_render_to_info
+    render_info._result = self.async_render(  # noqa: SLF001
+                          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+        variables, strict=strict, log_fn=log_fn, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/src/homeassistant/homeassistant/helpers/template/__init__.py", line 496, in async_render
+    raise TemplateError(err) from err
+homeassistant.exceptions.TemplateError: ValueError: Template error: int got invalid input 'unknown' when rendering template '{{ states('sensor.finish_in_relative') | int }}' but no default was specified
+2025-11-05 21:01:44.622 ERROR (MainThread) [homeassistant.components.template.template_entity] TemplateError('ValueError: Template error: int got invalid input 'unknown' when rendering template '{{ states('sensor.finish_in_relative') | int }}' but no default was specified') while processing template 'Template<template=({{ states('sensor.finish_in_relative') | int }}) renders=4>' for attribute '_attr_native_value' in entity 'sensor.finish_in_relative'
+2025-11-05 21:01:44.698 WARNING (MainThread) [custom_components.hacs] You have 'custom-cards/bar-card' installed with HACS this repository has been removed from HACS, please consider removing it. Removal reason (Repository is no longer maintained)
+2025-11-05 21:01:53.840 ERROR (SyncWorker_3) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 21:01:59.626 WARNING (MainThread) [homeassistant.core] Something is blocking Home Assistant from wrapping up the start up phase. We're going to continue anyway. Please report the following info at https://github.com/home-assistant/core/issues: sun.binary_sensor, analytics, system_health, dreame_vacuum, light, zeroconf, tplink_router.device_tracker, synology_dsm.switch, zaptec.update, systemmonitor, home_connect_alt.time, aula, recorder, switch, hassio.sensor, hacs, config, script, browser_mod.binary_sensor, homeassistant_alerts, home_connect_alt, myskoda.climate, zaptec.binary_sensor, auth, dreame_vacuum.sensor, aula.calendar, alexa, home_connect_alt.number, template.number, dhcp, time, ffmpeg, update, scene, usage_prediction, matter.update, energidataservice, camera, mqtt, conversation, tplink_router.sensor, file_upload, matter.sensor, image_upload, zone, eloverblik, ev_smart_charging, todo, home_connect_alt.binary_sensor, openai_conversation.conversation, homeassistant, cloud.stt, ssdp, matter.event, myskoda.number, ecovacs, network, matter.number, select, zaptec, device_automation, tplink_router, radio_browser, backup, media_player, dreame_vacuum.vacuum, rest, input_number, browser_mod.light, mqtt.button, matter.binary_sensor, matter.valve, time_date.sensor, mqtt.light, mqtt.switch, google.calendar, frontend, home_connect.sensor, onboarding, event, sun.sensor, tts, mobile_app, my, browser_mod, zaptec.number, home_connect, home_connect.number, go2rtc, hacs.switch, mqtt.sensor, aula.binary_sensor, mobile_app.notify, sun, usb, climate, ecovacs.vacuum, lovelace, myskoda.image, lock, monta.switch, synology_dsm.button, trace, home_connect.binary_sensor, mobile_app.sensor, dreame_vacuum.number, systemmonitor.sensor, search, eloverblik.sensor, hardware, generic_hygrostat.binary_sensor, google_translate.tts, upnp.binary_sensor, nordpool, synology_dsm, openai_conversation, ecovacs.binary_sensor, ecovacs.select, input_select, ecovacs.sensor, number, browser_mod.camera, myskoda.lock, openweathermap.weather, ecovacs.button, mqtt.binary_sensor, timer, uptime.sensor, myskoda.binary_sensor, cloud.tts, matter.button, template, vacuum, myskoda, diagnostics, home_connect_alt.button, google_assistant, energy.sensor, systemmonitor.binary_sensor, time_date, openweathermap, auto_backup.binary_sensor, nordpool.sensor, home_connect.select, media_source, cast.media_player, ecovacs.event, myskoda.sensor, notify, device_tracker, home_connect.light, cast, home_connect_alt.select, weather, energy, statistics.sensor, wake_word, zaptec.sensor, shopping_list, dreame_vacuum.button, ipp, matter.lock, openai_conversation.ai_task, input_boolean, lawn_mower, cover, binary_sensor, hassio.update, myskoda.device_tracker, ecovacs.number, fan, browser_mod.sensor, monta.sensor, pollen_dk.sensor, matter.select, energidataservice.sensor, home_connect.switch, input_button, dreame_vacuum.time, file, matter.vacuum, synology_dsm.update, uptime, matter.fan, dreame_vacuum.binary_sensor, dreame_vacuum.switch, websocket_api, matter.climate, zaptec.button, calendar, home_connect_alt.sensor, backup.sensor, backup.event, monta, synology_dsm.sensor, template.sensor, default_config, openweathermap.sensor, panel_custom, counter, application_credentials, system_log, sensor, mobile_app.binary_sensor, hassio, history, auto_backup, shopping_list.todo, mqtt.update, hassio.binary_sensor, hassio.switch, input_datetime, ecovacs.lawn_mower, image, api, upnp.sensor, input_text, dreame_vacuum.select, button, synology_dsm.binary_sensor, cloud.binary_sensor, mobile_app.device_tracker, logbook, tplink_router.button, auto_backup.sensor, matter.water_heater, mqtt.select, automation, water_heater, person, persistent_notification, synology_dsm.camera, logger, ecovacs.switch, auto_backup.button, python_script, cloud, stream, browser_mod.media_player, ecovacs.image, tag, ai_task, monta.binary_sensor, tplink_router.switch, schedule, matter.cover, webhook, matter.switch, matter, matter.light, hacs.update, repairs, google_translate, valve, google, myskoda.button, mqtt.number, intent, wake_on_lan, home_connect_alt.switch, assist_pipeline, rest.sensor, zaptec.switch, upnp, pollen_dk, dreame_vacuum.camera, bluetooth, myskoda.switch, home_connect.button, http, stt, aula.sensor, homeassistant.scene, blueprint The system is waiting for tasks: {<Task pending name='Task-742' coro=<AbstractConfig.async_initialize.<locals>.sync_google() running at /usr/src/homeassistant/homeassistant/components/google_assistant/helpers.py:114> wait_for=<_GatheringFuture pending cb=[Task.task_wakeup()]> cb=[set.remove()]>}
+2025-11-05 21:01:59.638 WARNING (MainThread) [homeassistant.components.input_select] Current option: — no longer valid (possible options: 10 KM, 5 KM, 3-5 KM)
+2025-11-05 21:02:00.033 WARNING (Recorder) [homeassistant.components.recorder.db_schema] State attributes for sensor.nordpool_kwh_dk1_dkk_3_10_025 exceed maximum size of 16384 bytes. This can cause database performance issues; Attributes will not be stored
+2025-11-05 21:02:00.457 WARNING (Recorder) [homeassistant.components.recorder.db_schema] State attributes for sensor.nordpool_kwh_dk1_dkk_3_10_025 exceed maximum size of 16384 bytes. This can cause database performance issues; Attributes will not be stored
+2025-11-05 21:02:06.029 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{ trigger.payload_json.action is match('^button_[1-4]_press$') }}'
+2025-11-05 21:02:06.029 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{ trigger.payload_json.action is match('button_[1-4]_press_release') and states(counter_var) > '1' }}'
+2025-11-05 21:02:06.029 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{ trigger.payload_json.action is match('button_[1-4]_press_release') }}'
+2025-11-05 21:02:06.030 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{ states(input_text_var) == '2' and trigger.payload_json.action is match('^dial_rotate_') }}'
+2025-11-05 21:02:06.032 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{ trigger.payload_json.action is match('^button_[1-4]_press$') }}'
+2025-11-05 21:02:06.032 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{ trigger.payload_json.action is match('button_[1-4]_press_release') and states(counter_var) > '1' }}'
+2025-11-05 21:02:06.032 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{ trigger.payload_json.action is match('button_[1-4]_press_release') }}'
+2025-11-05 21:02:06.033 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{ states(input_text_var) == '2' and trigger.payload_json.action is match('^dial_rotate_') }}'
+2025-11-05 21:02:06.046 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{('hold' in trigger.payload_json.action) or ('release' in trigger.payload_json.action) or 'press' in trigger.payload_json.action}}'
+2025-11-05 21:02:06.046 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{('hold' in trigger.payload_json.action) or ('release' in trigger.payload_json.action) or 'press' in trigger.payload_json.action}}'
+2025-11-05 21:02:06.046 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{('hold' in trigger.payload_json.action) or ('release' in trigger.payload_json.action) or 'press' in trigger.payload_json.action}}'
+2025-11-05 21:02:41.501 WARNING (MainThread) [homeassistant.helpers.entity] Update of sensor.runplanner_routes_count is taking over 10 seconds
+2025-11-05 21:02:41.503 WARNING (MainThread) [homeassistant.helpers.entity] Update of sensor.runplanner_routes_ids is taking over 10 seconds
+2025-11-05 21:02:41.504 WARNING (MainThread) [homeassistant.helpers.entity] Update of sensor.runplanner_routes_names is taking over 10 seconds
+2025-11-05 21:02:42.405 ERROR (MainThread) [homeassistant.components.rest.data] Timeout while fetching data: http://192.168.1.211:8089/api/routes
+2025-11-05 21:02:42.405 ERROR (MainThread) [homeassistant.components.rest.data] Timeout while fetching data: http://192.168.1.211:8089/api/routes
+2025-11-05 21:02:42.406 ERROR (MainThread) [homeassistant.components.rest.data] Timeout while fetching data: http://192.168.1.211:8089/api/routes
+2025-11-05 21:02:42.407 WARNING (MainThread) [homeassistant.components.input_select] Current option: 10 KM no longer valid (possible options: —)
+2025-11-05 21:03:41.501 WARNING (MainThread) [homeassistant.helpers.entity] Update of sensor.runplanner_routes_count is taking over 10 seconds
+2025-11-05 21:03:41.501 WARNING (MainThread) [homeassistant.helpers.entity] Update of sensor.runplanner_routes_ids is taking over 10 seconds
+2025-11-05 21:03:41.502 WARNING (MainThread) [homeassistant.helpers.entity] Update of sensor.runplanner_routes_names is taking over 10 seconds
+2025-11-05 21:03:42.405 ERROR (MainThread) [homeassistant.components.rest.data] Timeout while fetching data: http://192.168.1.211:8089/api/routes
+2025-11-05 21:03:42.405 ERROR (MainThread) [homeassistant.components.rest.data] Timeout while fetching data: http://192.168.1.211:8089/api/routes
+2025-11-05 21:03:42.406 ERROR (MainThread) [homeassistant.components.rest.data] Timeout while fetching data: http://192.168.1.211:8089/api/routes
+2025-11-05 21:04:34.599 ERROR (MainThread) [homeassistant.components.rest.data] Error fetching data: http://192.168.1.211:8089/api/routes failed with Cannot connect to host 192.168.1.211:8089 ssl:default [Connect call failed ('192.168.1.211', 8089)]
+2025-11-05 21:04:34.600 ERROR (MainThread) [homeassistant.components.rest.data] Error fetching data: http://192.168.1.211:8089/api/routes failed with Cannot connect to host 192.168.1.211:8089 ssl:default [Connect call failed ('192.168.1.211', 8089)]
+2025-11-05 21:04:34.600 ERROR (MainThread) [homeassistant.components.rest.data] Error fetching data: http://192.168.1.211:8089/api/routes failed with Cannot connect to host 192.168.1.211:8089 ssl:default [Connect call failed ('192.168.1.211', 8089)]
+2025-11-05 21:05:10.326 WARNING (Recorder) [homeassistant.components.sensor.recorder] The unit of sensor.nordpool_kwh_dk1_dkk_3_10_025 (None) cannot be converted to the unit of previously compiled statistics (DKK/kWh). Generation of long term statistics will be suppressed unless the unit changes back to DKK/kWh or a compatible unit. Go to https://my.home-assistant.io/redirect/developer_statistics to fix this
+2025-11-05 21:05:31.509 WARNING (MainThread) [homeassistant.components.input_select] Current option: — no longer valid (possible options: 10 KM, 5 KM, 3-5 KM)
+2025-11-05 21:06:55.177 ERROR (SyncWorker_5) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 21:07:11.684 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{ trigger.payload_json.action is match('^button_[1-4]_press$') }}'
+2025-11-05 21:07:11.684 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{ trigger.payload_json.action is match('button_[1-4]_press_release') and states(counter_var) > '1' }}'
+2025-11-05 21:07:11.684 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{ trigger.payload_json.action is match('button_[1-4]_press_release') }}'
+2025-11-05 21:07:11.684 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{ states(input_text_var) == '2' and trigger.payload_json.action is match('^dial_rotate_') }}'
+2025-11-05 21:10:44.585 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{('hold' in trigger.payload_json.action) or ('release' in trigger.payload_json.action) or 'press' in trigger.payload_json.action}}'
+2025-11-05 21:10:44.585 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{('hold' in trigger.payload_json.action) or ('release' in trigger.payload_json.action) or 'press' in trigger.payload_json.action}}'
+2025-11-05 21:10:44.585 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{('hold' in trigger.payload_json.action) or ('release' in trigger.payload_json.action) or 'press' in trigger.payload_json.action}}'
+2025-11-05 21:11:57.195 ERROR (SyncWorker_0) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 21:16:59.355 ERROR (SyncWorker_4) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 21:22:01.308 ERROR (SyncWorker_4) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 21:27:03.178 ERROR (SyncWorker_3) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 21:32:00.405 ERROR (MainThread) [homeassistant.components.synology_dsm.coordinator] Error fetching synology SynologyDSMCentralUpdateCoordinator data: Error communicating with API: {'api': None, 'code': -1, 'reason': 'Unknown', 'details': 'ConnectionTimeoutError = Connection timeout to host http://192.168.1.160:5000/webapi/entry.cgi?api=SYNO.Storage.CGI.Storage&version=1&method=load_info&action=load_info&_sid=oMYH99uaKHuIbpimJQbaeXN1LXkQvCsRz2Vd0cEaGVw-T5_P65BIfw1LQO377f8UtP31SplQtOuihUXDpPpo4c&SynoToken=--------'}
+2025-11-05 21:32:05.046 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 21:37:07.220 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 21:38:47.358 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{ trigger.payload_json.action is match('^button_[1-4]_press$') }}'
+2025-11-05 21:38:47.359 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{ trigger.payload_json.action is match('button_[1-4]_press_release') and states(counter_var) > '1' }}'
+2025-11-05 21:38:47.359 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{ trigger.payload_json.action is match('button_[1-4]_press_release') }}'
+2025-11-05 21:38:47.359 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{ states(input_text_var) == '1' and trigger.payload_json.action is match('^dial_rotate_') }}'
+2025-11-05 21:42:09.084 ERROR (SyncWorker_6) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 21:47:11.127 ERROR (SyncWorker_4) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 21:52:13.069 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 21:57:15.707 ERROR (SyncWorker_6) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 22:00:00.393 WARNING (Recorder) [homeassistant.components.recorder.db_schema] State attributes for sensor.nordpool_kwh_dk1_dkk_3_10_025 exceed maximum size of 16384 bytes. This can cause database performance issues; Attributes will not be stored
+2025-11-05 22:02:18.239 ERROR (SyncWorker_3) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 22:06:40.976 WARNING (SyncWorker_6) [custom_components.eloverblik] Exception: HTTPSConnectionPool(host='api.eloverblik.dk', port=443): Max retries exceeded with url: /CustomerApi//api/MeterData/GetTimeSeries/2025-11-05/2025-11-05/Hour (Caused by ResponseError('too many 503 error responses'))
+2025-11-05 22:07:20.317 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 22:07:54.915 WARNING (MainThread) [homeassistant.components.light] Got `kelvin` argument in `turn_on` service, which is deprecated and will break in Home Assistant 2026.1, please use `color_temp_kelvin` argument
+2025-11-05 22:12:23.022 ERROR (SyncWorker_6) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 22:17:25.000 ERROR (SyncWorker_0) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 22:22:27.562 ERROR (SyncWorker_4) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 22:27:28.932 ERROR (SyncWorker_6) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 22:32:31.258 ERROR (SyncWorker_3) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 22:37:33.032 ERROR (SyncWorker_3) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 22:42:35.162 ERROR (SyncWorker_7) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 22:47:37.016 ERROR (SyncWorker_0) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 22:52:39.073 ERROR (SyncWorker_7) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 22:57:41.051 ERROR (SyncWorker_0) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 23:00:00.393 WARNING (Recorder) [homeassistant.components.recorder.db_schema] State attributes for sensor.nordpool_kwh_dk1_dkk_3_10_025 exceed maximum size of 16384 bytes. This can cause database performance issues; Attributes will not be stored
+2025-11-05 23:02:42.847 ERROR (SyncWorker_1) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 23:07:45.310 ERROR (SyncWorker_3) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 23:12:46.815 ERROR (SyncWorker_2) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 23:17:48.918 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 23:22:50.967 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 23:27:52.884 ERROR (SyncWorker_3) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 23:32:54.719 ERROR (SyncWorker_0) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 23:37:55.792 ERROR (SyncWorker_6) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 23:42:56.995 ERROR (SyncWorker_0) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 23:47:58.745 ERROR (SyncWorker_3) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 23:52:59.683 ERROR (SyncWorker_3) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-05 23:58:00.851 ERROR (SyncWorker_4) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 00:00:01.256 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 00:00:01.257 ERROR (MainThread) [homeassistant.helpers.event] Error while dispatching event for sensor.energi_data_service to <Job track state_changed event {'sensor.energi_data_service'} HassJobType.Callback <bound method TrackTemplateResultInfo._refresh of <TrackTemplateResultInfo {Template<template=({{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}) renders=38>: <RenderInfo Template<template=({{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}) renders=38> all_states=False all_states_lifecycle=False domains=frozenset() domains_lifecycle=frozenset() entities=frozenset({'sensor.energi_data_service'}) rate_limit=None has_time=False exception=None is_static=False>}>>>
+Traceback (most recent call last):
+  File "/usr/src/homeassistant/homeassistant/components/sensor/__init__.py", line 684, in state
+    numerical_value = int(value)
+ValueError: invalid literal for int() with base 10: ''
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/src/homeassistant/homeassistant/components/sensor/__init__.py", line 687, in state
+    numerical_value = float(value)
+ValueError: could not convert string to float: ''
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/src/homeassistant/homeassistant/helpers/event.py", line 360, in _async_dispatch_entity_id_event
+    hass.async_run_hass_job(job, event)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/core.py", line 937, in async_run_hass_job
+    hassjob.target(*args)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/helpers/event.py", line 1322, in _refresh
+    self.hass.async_run_hass_job(self._job, event, updates)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/core.py", line 937, in async_run_hass_job
+    hassjob.target(*args)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/components/template/template_entity.py", line 348, in _handle_results
+    self.async_write_ha_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1026, in async_write_ha_state
+    self._async_write_ha_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1151, in _async_write_ha_state
+    self.__async_calculate_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1088, in __async_calculate_state
+    state = self._stringify_state(available)
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1032, in _stringify_state
+    if (state := self.state) is None:
+                 ^^^^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/components/sensor/__init__.py", line 691, in state
+    raise ValueError(
+    ...<5 lines>...
+    ) from err
+ValueError: Sensor sensor.tomorrow_min_price has device class 'None', state class 'None' unit 'DKK/kWh' and suggested precision 'None' thus indicating it has a numeric value; however, it has the non-numeric value: '' (<class 'str'>)
+2025-11-06 00:03:01.742 ERROR (SyncWorker_7) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 00:03:43.789 WARNING (SyncWorker_1) [urllib3.connectionpool] Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='api.eloverblik.dk', port=443): Read timed out. (read timeout=5)")': /CustomerApi//api/MeterData/GetTimeSeries/2025-10-29/2025-11-06/Hour
+2025-11-06 00:03:48.714 WARNING (MainThread) [homeassistant.helpers.entity] Update of sensor.eloverblik_energy_total is taking over 10 seconds
+2025-11-06 00:04:08.714 WARNING (MainThread) [homeassistant.components.sensor] Updating eloverblik sensor took longer than the scheduled update interval 0:00:30
+2025-11-06 00:04:38.715 WARNING (MainThread) [homeassistant.components.sensor] Updating eloverblik sensor took longer than the scheduled update interval 0:00:30
+2025-11-06 00:05:08.715 WARNING (MainThread) [homeassistant.components.sensor] Updating eloverblik sensor took longer than the scheduled update interval 0:00:30
+2025-11-06 00:05:38.716 WARNING (MainThread) [homeassistant.components.sensor] Updating eloverblik sensor took longer than the scheduled update interval 0:00:30
+2025-11-06 00:06:08.717 WARNING (MainThread) [homeassistant.components.sensor] Updating eloverblik sensor took longer than the scheduled update interval 0:00:30
+2025-11-06 00:06:38.719 WARNING (MainThread) [homeassistant.components.sensor] Updating eloverblik sensor took longer than the scheduled update interval 0:00:30
+2025-11-06 00:07:08.721 WARNING (MainThread) [homeassistant.components.sensor] Updating eloverblik sensor took longer than the scheduled update interval 0:00:30
+2025-11-06 00:07:38.722 WARNING (MainThread) [homeassistant.components.sensor] Updating eloverblik sensor took longer than the scheduled update interval 0:00:30
+2025-11-06 00:07:50.860 WARNING (SyncWorker_1) [urllib3.connectionpool] Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='api.eloverblik.dk', port=443): Read timed out. (read timeout=5)")': /CustomerApi//api/MeterData/GetTimeSeries/2025-01-01/2025-11-06/Month
+2025-11-06 00:08:02.815 ERROR (SyncWorker_5) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 00:13:04.068 ERROR (SyncWorker_7) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 00:15:01.259 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 00:18:05.709 ERROR (SyncWorker_5) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 00:23:06.710 ERROR (SyncWorker_5) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 00:28:07.729 ERROR (SyncWorker_7) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 00:30:01.258 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 00:33:08.690 ERROR (SyncWorker_0) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 00:38:09.801 ERROR (SyncWorker_0) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 00:43:10.763 ERROR (SyncWorker_7) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 00:45:01.252 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 00:48:11.742 ERROR (SyncWorker_7) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 00:53:12.728 ERROR (SyncWorker_5) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 00:58:13.728 ERROR (SyncWorker_7) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 01:00:01.251 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 01:01:35.762 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 01:03:14.753 ERROR (SyncWorker_1) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 01:08:15.768 ERROR (SyncWorker_7) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 01:13:16.824 ERROR (SyncWorker_7) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 01:15:01.250 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 01:18:18.899 ERROR (SyncWorker_1) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 01:23:20.827 ERROR (SyncWorker_4) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 01:28:22.815 ERROR (SyncWorker_7) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 01:30:01.250 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 01:33:23.712 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 01:38:24.806 ERROR (SyncWorker_6) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 01:43:25.829 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 01:45:01.249 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 01:48:27.728 ERROR (SyncWorker_2) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 01:53:28.749 ERROR (SyncWorker_1) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 01:58:29.754 ERROR (SyncWorker_3) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 02:00:01.249 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 02:03:31.783 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 02:08:33.787 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 02:13:34.740 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 02:15:01.248 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 02:18:55.819 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 02:23:56.743 ERROR (SyncWorker_0) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 02:28:57.698 ERROR (SyncWorker_5) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 02:31:34.715 ERROR (Thread-11) [pychromecast.socket_client] [Køkken(192.168.1.146):8009] Error reading from socket: socket connection broken
+2025-11-06 02:31:34.723 ERROR (Thread-11) [pychromecast.socket_client] [Køkken(192.168.1.146):8009] Failed to connect to service HostServiceInfo(host='192.168.1.146', port=8009), retrying in 5.0s
+2025-11-06 02:33:58.728 ERROR (SyncWorker_6) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 02:38:59.766 ERROR (SyncWorker_3) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 02:44:00.772 ERROR (SyncWorker_2) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 02:45:01.256 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 02:49:01.715 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 02:54:02.733 ERROR (SyncWorker_2) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 02:59:03.747 ERROR (SyncWorker_6) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 03:00:01.245 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 03:04:06.333 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 03:09:07.757 ERROR (SyncWorker_5) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 03:14:09.212 ERROR (SyncWorker_5) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 03:19:10.794 ERROR (SyncWorker_5) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 03:24:11.782 ERROR (SyncWorker_5) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 03:29:12.699 ERROR (SyncWorker_5) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 03:31:40.906 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 03:34:13.728 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 03:39:14.793 ERROR (SyncWorker_1) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 03:44:15.816 ERROR (SyncWorker_3) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 03:45:01.248 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 03:49:17.804 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 03:54:19.761 ERROR (SyncWorker_1) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 03:59:20.786 ERROR (SyncWorker_1) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 04:00:01.249 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 04:01:40.965 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 04:04:21.856 ERROR (SyncWorker_5) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 04:09:23.778 ERROR (SyncWorker_2) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 04:14:26.754 ERROR (SyncWorker_2) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 04:15:01.251 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 04:19:28.843 ERROR (SyncWorker_3) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 04:24:30.796 ERROR (SyncWorker_3) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 04:29:05.135 ERROR (Thread-12) [pychromecast.socket_client] [Herman(192.168.1.234):8009] Error reading from socket: socket connection broken
+2025-11-06 04:29:05.137 ERROR (Thread-12) [pychromecast.socket_client] [Herman(192.168.1.234):8009] Failed to connect to service HostServiceInfo(host='192.168.1.234', port=8009), retrying in 5.0s
+2025-11-06 04:29:32.805 ERROR (SyncWorker_2) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 04:30:01.252 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 04:30:06.686 ERROR (Thread-10) [pychromecast.socket_client] [Soveværelse(192.168.1.244):8009] Failed to connect to service HostServiceInfo(host='192.168.1.244', port=8009), retrying in 5.0s
+2025-11-06 04:31:41.400 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 04:34:33.720 ERROR (SyncWorker_0) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 04:39:34.821 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 04:44:35.746 ERROR (SyncWorker_4) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 04:45:01.254 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 04:49:36.722 ERROR (SyncWorker_4) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 04:54:37.780 ERROR (SyncWorker_0) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 04:59:39.909 ERROR (SyncWorker_7) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 05:00:01.253 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 05:01:41.466 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 05:04:41.745 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 05:09:42.791 ERROR (SyncWorker_5) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 05:14:43.726 ERROR (SyncWorker_5) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 05:15:01.263 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 05:19:44.861 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 05:24:46.842 ERROR (SyncWorker_3) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 05:29:48.831 ERROR (SyncWorker_2) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 05:30:01.254 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 05:31:41.537 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 05:34:49.831 ERROR (SyncWorker_7) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 05:39:52.632 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 05:44:54.373 ERROR (SyncWorker_7) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 05:45:01.256 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 05:49:56.215 ERROR (SyncWorker_3) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 05:54:57.783 ERROR (SyncWorker_2) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 05:59:59.898 ERROR (SyncWorker_0) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 06:00:01.254 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 06:01:41.584 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 06:05:01.977 ERROR (SyncWorker_1) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 06:09:59.561 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{('hold' in trigger.payload_json.action) or ('release' in trigger.payload_json.action) or 'press' in trigger.payload_json.action}}'
+2025-11-06 06:09:59.561 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{('hold' in trigger.payload_json.action) or ('release' in trigger.payload_json.action) or 'press' in trigger.payload_json.action}}'
+2025-11-06 06:09:59.561 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'dict object' has no attribute 'action' when rendering '{{('hold' in trigger.payload_json.action) or ('release' in trigger.payload_json.action) or 'press' in trigger.payload_json.action}}'
+2025-11-06 06:10:04.173 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 06:15:01.254 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 06:15:06.794 ERROR (SyncWorker_4) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 06:20:09.498 ERROR (SyncWorker_7) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 06:25:11.387 ERROR (SyncWorker_7) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 06:30:01.256 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 06:30:12.969 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 06:31:41.642 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 06:35:15.199 ERROR (SyncWorker_4) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 06:40:17.522 ERROR (SyncWorker_2) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 06:45:01.255 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 06:45:19.572 ERROR (SyncWorker_0) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 06:50:21.370 ERROR (SyncWorker_1) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 06:55:23.423 ERROR (SyncWorker_5) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 07:00:01.253 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 07:00:25.773 ERROR (SyncWorker_3) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 07:01:41.712 WARNING (MainThread) [homeassistant.helpers.template] Template variable warning: 'None' has no attribute 'price' when rendering '{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}'
+2025-11-06 07:05:28.808 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 07:10:31.401 ERROR (SyncWorker_8) [custom_components.aula.client] You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula.
+2025-11-06 07:13:39.586 WARNING (MainThread) [homeassistant.helpers.script] Stopping scripts running too long after shutdown: Gangen Dag og Nat

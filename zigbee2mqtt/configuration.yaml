@@ -105,8 +105,6 @@ devices:
     friendly_name: storbad5
   '0x001788010e61913b':
     friendly_name: storbad6
-  '0x00178801083eda94':
-    friendly_name: storbad7
   '0x0017880106f6c778':
     friendly_name: SensorStorbad
   '0x001788010dbda59d':
@@ -149,10 +147,10 @@ devices:
     friendly_name: kokken9
   '0x001788010e5dd675':
     friendly_name: kokken10
-  '0x0017880106eb7f4f':
-    friendly_name: kontaktKontor
   '0x00158d000af064a3':
     friendly_name: aqarastorbad
+  '0x0017880106eb7f4f':
+    friendly_name: '0x0017880106eb7f4f'
 groups:
   '1':
     friendly_name: garage

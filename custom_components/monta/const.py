@@ -14,12 +14,21 @@ ATTR_CHARGE_POINTS = "charge_points"
 ATTR_WALLET = "wallet"
 ATTR_TRANSACTIONS = "transactions"
 
+# Separate scan intervals for different data types
+CONF_SCAN_INTERVAL_CHARGE_POINTS = "scan_interval_charge_points"
+CONF_SCAN_INTERVAL_WALLET = "scan_interval_wallet"
+CONF_SCAN_INTERVAL_TRANSACTIONS = "scan_interval_transactions"
+
+DEFAULT_SCAN_INTERVAL_CHARGE_POINTS = 120  # Charge points need frequent updates
+DEFAULT_SCAN_INTERVAL_WALLET = 600  # Wallet updates less frequently (10 minutes)
+DEFAULT_SCAN_INTERVAL_TRANSACTIONS = (
+    600  # Transactions update less frequently (10 minutes)
+)
+
 PREEMPTIVE_REFRESH_TTL_IN_SECONDS = 300
 STORAGE_KEY = "monta_auth"
 STORAGE_VERSION = 1
 STORAGE_ACCESS_EXPIRE_TIME = "access_expire_time"
-STORAGE_ACCESS_TOKEN = "access_token"
-STORAGE_REFRESH_TOKEN = "refresh_token"
 STORAGE_REFRESH_EXPIRE_TIME = "refresh_expire_time"
 
 

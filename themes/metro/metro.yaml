@@ -781,6 +781,11 @@ Metro Red:
           background-color: transparent; 
         }
       }
+  custom-button-gradient-1: "linear-gradient(135deg, #00cb6a, #00f17d)"
+  custom-button-infobox: "rgba(0, 0, 0, 0.5)"
+  icon-farve: "#ffffff"
+  icon-farve-2: "#00f17d"
+  border-radius-1: "12px"
   primary-color: "#C30052"
   rgb-primary-color: "195,0,82"
   rgb-primary-color-darker: "144, 0, 60"
@@ -795,6 +800,94 @@ Metro Red:
       <<: *metro-common-dark
     light:
       <<: *metro-common-light
+
+MyTheme:
+  <<: *common-card-mods
+  card-mod-theme: "MyTheme"
+  card-mod-root-yaml: |
+    .: |
+      .toolbar > ha-tab-group {
+        pointer-events: none;
+        opacity: 0;
+      }
+      /* Padding for navbar on desktop */
+      @media (min-width: 768px) {
+        :not(.edit-mode) > #view {
+          padding-left: 100px !important;
+        }
+      }
+      /* Bottom padding for navbar on mobile */
+      @media (max-width: 767px) {
+        :not(.edit-mode) > hui-view:after {
+          content: "";
+          display: block;
+          height: 80px;
+          width: 100%;
+          background-color: transparent;
+        }
+      }
+
+  # Base accent color (cold blue)
+  primary-color: "#a9d8ff"
+  rgb-primary-color: "169, 216, 255"
+  rgb-primary-color-darker: "70, 110, 150"
+  rgb-primary-color-lighter: "210, 240, 255"
+  hue-primary-color: "210deg"
+
+  accent-color: "#a9d8ff"
+  rgb-accent-color: "169, 216, 255"
+
+  modes:
+    dark:
+      <<: *fluent-common-dark
+
+      primary-background-color: "rgb(5,10,20)"
+      rgb-primary-background-color: "5,10,20"
+      secondary-background-color: "rgb(24,32,44)"
+      rgb-secondary-background-color: "24,32,44"
+      card-background-color: "rgba(30,38,50,0.95)"
+      rgb-card-background-color: "30,38,50"
+
+      lovelace-background: "center / cover no-repeat fixed url('/local/icons/background/background.jpg')"
+
+      # 🔹 Light teal gradient – like the active "Køkken / Spisestue / Stue"
+      custom-button-gradient-1: "linear-gradient(135deg, rgba(74,84,81,0.75), rgba(146,186,195,0.96))"
+      custom-button-gradient-2: "linear-gradient(135deg, rgba(92, 3, 3, 0.75), rgba(233, 103, 103, 0.96))"
+
+      # 🔹 Dark base card – like inactive tiles
+      custom-button-infobox: "rgba(52,60,72,0.95)"
+
+      # 🔹 Icon/text colors
+      icon-farve: "#ffffff" # icon on bright gradient
+      icon-farve-2: "#e9f4f8" # icon on dark cards
+      border-radius-1: "10px"
+      box-shadow-on: "0px 2px 5px rgba(0, 0, 0, 0.9)"
+
+      # 🔹 Bright green CTA button (Start rengøring)
+      cta-button-gradient: "linear-gradient(135deg, rgba(0,95,1,1), rgba(0,162,0,1))"
+      cta-button-text-color: "#ffffff"
+
+    light:
+      <<: *fluent-common-light
+
+      primary-background-color: "rgb(230,238,244)"
+      rgb-primary-background-color: "230,238,244"
+      secondary-background-color: "rgb(210,224,236)"
+      rgb-secondary-background-color: "210,224,236"
+      card-background-color: "rgba(255,255,255,0.95)"
+      rgb-card-background-color: "245,248,250"
+
+      lovelace-background: "center / cover no-repeat fixed url('/local/icons/background/background.jpg')"
+
+      custom-button-gradient-1: "linear-gradient(135deg, rgba(240,252,255,0.98), rgba(176,210,225,0.98))"
+      custom-button-infobox: "rgba(190,204,218,0.95)"
+
+      icon-farve: "#000000"
+      icon-farve-2: "#1d2936"
+      border-radius-1: "10px"
+
+      cta-button-gradient: "linear-gradient(135deg, #00b521, #2fe84a)"
+      cta-button-text-color: "#ffffff"
 
 Fluent Red:
   <<: *common-card-mods

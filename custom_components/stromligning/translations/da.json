@@ -1,0 +1,310 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Integration med samme navn eksisterer allerede"
+        },
+        "error": {
+            "too_many_requests": "For mange API-forespørgsler – prøv igen om 15 minutter"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "name": "Navn til integrationen",
+                    "company": "Elleverandør",
+                    "aggregation": "Dataopløsning på priser",
+                    "forecasts": "Inkluder prisudsigter for den næste uge? (kan være unøjagtige)"
+                }
+            }
+        }
+    },
+    "options": {
+        "abort": {
+            "already_configured": "Integration med samme navn eksisterer allerede"
+        },
+        "error": {
+            "too_many_requests": "For mange API-forespørgsler – prøv igen om 15 minutter"
+        },
+        "step": {
+            "init": {
+                "data": {
+                    "company": "Elleverandør",
+                    "aggregation": "Dataopløsning på priser",
+                    "forecasts": "Inkluder prisudsigter for den næste uge? (kan være unøjagtige)"
+                }
+            }
+        }
+    },
+    "selector": {
+        "aggregation": {
+            "options": {
+                "15m": "15 minutter",
+                "1h": "1 time (gennemsnit)"
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "current_price_vat": {
+                "name": "Aktuel inkl. moms",
+                "state_attributes": {
+                    "prices": {
+                        "name": "Priser i dag"
+                    }
+                }
+            },
+            "current_price_ex_vat": {
+                "name": "Aktuel ekskl. moms",
+                "state_attributes": {
+                    "prices": {
+                        "name": "Priser i dag"
+                    }
+                }
+            },
+            "distribution_vat": {
+                "name": "Transporttarif til netselskab inkl. moms"
+            },
+            "distribution_ex_vat": {
+                "name": "Transporttarif til netselskab ekskl. moms"
+            },
+            "electricity_tax_vat": {
+                "name": "Elafgift inkl. moms"
+            },
+            "electricity_tax_ex_vat": {
+                "name": "Elafgift ekskl. moms"
+            },
+            "forecasts_vat": {
+                "name": "Prisudsigt inkl. moms",
+                "state_attributes": {
+                    "prices": {
+                        "name": "Priser den næste uge"
+                    }
+                }
+            },
+            "forecasts_ex_vat": {
+                "name": "Prisudsigt ekskl. moms",
+                "state_attributes": {
+                    "prices": {
+                        "name": "Priser den næste uge"
+                    }
+                }
+            },
+            "net_owner": {
+                "name": "Elnetselskab"
+            },
+            "nettariff_vat": {
+                "name": "Nettarif inkl. moms"
+            },
+            "nettariff_ex_vat": {
+                "name": "Nettarif ekskl. moms"
+            },
+            "next_data_refresh": {
+                "name": "Næste dataopdatering"
+            },
+            "provider": {
+                "name": "Elaftale"
+            },
+            "spotprice_vat": {
+                "name": "Spotpris inkl. moms"
+            },
+            "spotprice_ex_vat": {
+                "name": "Spotpris ekskl. moms"
+            },
+            "surcharge_vat": {
+                "name": "Tillæg til spotpris inkl. moms"
+            },
+            "surcharge_ex_vat": {
+                "name": "Tillæg til spotpris ekskl. moms"
+            },
+            "systemtariff_vat": {
+                "name": "Systemtarif inkl. moms"
+            },
+            "systemtariff_ex_vat": {
+                "name": "Systemtarif ekskl. moms"
+            },
+            "today_min_vat": {
+                "name": "Laveste pris resten af dagen inkl. moms",
+                "state_attributes": {
+                    "at": {
+                        "name": "Tidspunkt"
+                    }
+                }
+            },
+            "today_min_ex_vat": {
+                "name": "Laveste pris resten af dagen ekskl. moms",
+                "state_attributes": {
+                    "at": {
+                        "name": "Tidspunkt"
+                    }
+                }
+            },
+            "today_max_vat": {
+                "name": "Højeste pris resten af dagen inkl. moms",
+                "state_attributes": {
+                    "at": {
+                        "name": "Tidspunkt"
+                    }
+                }
+            },
+            "today_max_ex_vat": {
+                "name": "Højeste pris resten af dagen ekskl. moms",
+                "state_attributes": {
+                    "at": {
+                        "name": "Tidspunkt"
+                    }
+                }
+            },
+            "today_mean_vat": {
+                "name": "Gennemsnitspris resten af dagen inkl. moms"
+            },
+            "today_mean_ex_vat": {
+                "name": "Gennemsnitspris resten af dagen ekskl. moms"
+            },
+            "tomorrow_min_vat": {
+                "name": "Laveste pris i morgen inkl. moms",
+                "state": {
+                    "unknown": "Ukendt"
+                },
+                "state_attributes": {
+                    "at": {
+                        "name": "Tidspunkt"
+                    }
+                }
+            },
+            "tomorrow_min_ex_vat": {
+                "name": "Laveste pris i morgen ekskl. moms",
+                "state": {
+                    "unknown": "Ukendt"
+                },
+                "state_attributes": {
+                    "at": {
+                        "name": "Tidspunkt"
+                    }
+                }
+            },
+            "tomorrow_max_vat": {
+                "name": "Højeste pris i morgen inkl. moms",
+                "state": {
+                    "unknown": "Ukendt"
+                },
+                "state_attributes": {
+                    "at": {
+                        "name": "Tidspunkt"
+                    }
+                }
+            },
+            "tomorrow_max_ex_vat": {
+                "name": "Højeste pris i morgen ekskl. moms",
+                "state": {
+                    "unknown": "Ukendt"
+                },
+                "state_attributes": {
+                    "at": {
+                        "name": "Tidspunkt"
+                    }
+                }
+            },
+            "tomorrow_mean_vat": {
+                "name": "Gennemsnitspris i morgen inkl. moms",
+                "state": {
+                    "unknown": "Ukendt"
+                }
+            },
+            "tomorrow_mean_ex_vat": {
+                "name": "Gennemsnitspris i morgen ekskl. moms",
+                "state": {
+                    "unknown": "Ukendt"
+                }
+            }
+        },
+        "binary_sensor": {
+            "tomorrow_available_vat": {
+                "name": "Priser for i morgen inkl. moms",
+                "state": {
+                    "on": "Klar",
+                    "off": "Endnu ikke klar"
+                },
+                "state_attributes": {
+                    "available_at": {
+                        "name": "Forventes klar"
+                    },
+                    "prices": {
+                        "name": "Priser for i morgen"
+                    },
+                    "forecast_data": {
+                        "name": "Priser stammer fra udsigter",
+                        "state": {
+                            "true": "Ja",
+                            "false": "Nej"
+                        }
+                    }
+                }
+            },
+            "tomorrow_available_ex_vat": {
+                "name": "Priser for i morgen ekskl. moms",
+                "state": {
+                    "on": "Klar",
+                    "off": "Endnu ikke klar"
+                },
+                "state_attributes": {
+                    "available_at": {
+                        "name": "Forventes klar"
+                    },
+                    "prices": {
+                        "name": "Priser for i morgen"
+                    },
+                    "forecast_data": {
+                        "name": "Priser stammer fra udsigter",
+                        "state": {
+                            "true": "Ja",
+                            "false": "Nej"
+                        }
+                    }
+                }
+            },
+            "tomorrow_spotprice_vat": {
+                "name": "Spotpriser for i morgen inkl. moms",
+                "state": {
+                    "on": "Klar",
+                    "off": "Endnu ikke klar"
+                },
+                "state_attributes": {
+                    "available_at": {
+                        "name": "Forventes klar"
+                    },
+                    "prices": {
+                        "name": "Spotpriser for i morgen"
+                    },
+                    "forecast_data": {
+                        "name": "Priser stammer fra udsigter",
+                        "state": {
+                            "true": "Ja",
+                            "false": "Nej"
+                        }
+                    }
+                }
+            },
+            "tomorrow_spotprice_ex_vat": {
+                "name": "Spotpriser for i morgen ekskl. moms",
+                "state": {
+                    "on": "Klar",
+                    "off": "Endnu ikke klar"
+                },
+                "state_attributes": {
+                    "available_at": {
+                        "name": "Forventes klar"
+                    },
+                    "prices": {
+                        "name": "Spotpriser for i morgen"
+                    },
+                    "forecast_data": {
+                        "name": "Priser stammer fra udsigter",
+                        "state": {
+                            "true": "Ja",
+                            "false": "Nej"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

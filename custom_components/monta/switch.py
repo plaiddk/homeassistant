@@ -2,20 +2,25 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
+
 from homeassistant.components.switch import (
     ENTITY_ID_FORMAT,
     SwitchEntity,
     SwitchEntityDescription,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import generate_entity_id
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import ATTR_CHARGE_POINTS, DOMAIN, ChargerStatus
-from .coordinator import MontaDataUpdateCoordinator
+from .const import DOMAIN, ChargerStatus
 from .entity import MontaEntity
 from .utils import snake_case
+
+if TYPE_CHECKING:
+    from homeassistant.config_entries import ConfigEntry
+    from homeassistant.helpers.entity_platform import AddEntitiesCallback
+
+    from .coordinator import MontaChargePointCoordinator
 
 ENTITY_DESCRIPTIONS = (
     SwitchEntityDescription(
@@ -26,30 +31,35 @@ ENTITY_DESCRIPTIONS = (
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_devices: AddEntitiesCallback
-):
-    """Set up the sensor platform."""
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_devices: AddEntitiesCallback,
+) -> None:
+    """Set up the switch platform."""
+    coordinators = hass.data[DOMAIN][entry.entry_id]
+    charge_point_coordinator = coordinators["charge_point"]
 
-    for charge_point_id in coordinator.data[ATTR_CHARGE_POINTS]:
+    for charge_point_id in charge_point_coordinator.data:
         async_add_devices(
             [
                 MontaSwitch(
-                    coordinator,
+                    charge_point_coordinator,
                     description,
                     charge_point_id,
                 )
                 for description in ENTITY_DESCRIPTIONS
-            ]
+            ],
         )
 
 
 class MontaSwitch(MontaEntity, SwitchEntity):
-    """monta switch class."""
+    """Monta switch class for controlling charge point charging."""
+
+    _local_state: bool | None
 
     def __init__(
         self,
-        coordinator: MontaDataUpdateCoordinator,
+        coordinator: MontaChargePointCoordinator,
         entity_description: SwitchEntityDescription,
         charge_point_id: int,
     ) -> None:
@@ -59,7 +69,7 @@ class MontaSwitch(MontaEntity, SwitchEntity):
         self._attr_unique_id = generate_entity_id(
             ENTITY_ID_FORMAT,
             f"{charge_point_id}_{snake_case(entity_description.key)}",
-            [charge_point_id],
+            [f"{charge_point_id}"],
         )
         self._local_state = None
 
@@ -72,9 +82,7 @@ class MontaSwitch(MontaEntity, SwitchEntity):
     @property
     def available(self) -> bool:
         """Return the availability of the switch."""
-        return self.coordinator.data[ATTR_CHARGE_POINTS][self.charge_point_id][
-            "state"
-        ] not in {
+        return self.coordinator.data[self.charge_point_id].state not in {
             ChargerStatus.DISCONNECTED,
             ChargerStatus.ERROR,
         }
@@ -84,21 +92,19 @@ class MontaSwitch(MontaEntity, SwitchEntity):
         """Return the status of pause/resume."""
         if self._local_state is not None:
             return self._local_state
-        return self.coordinator.data[ATTR_CHARGE_POINTS][self.charge_point_id][
-            "state"
-        ] in {
+        return self.coordinator.data[self.charge_point_id].state in {
             ChargerStatus.BUSY_CHARGING,
             ChargerStatus.BUSY,
             ChargerStatus.BUSY_SCHEDULED,
         }
 
-    async def async_turn_on(self, **_: any) -> None:
+    async def async_turn_on(self, **_: Any) -> None:  # noqa: ANN401
         """Start charger."""
         await self.coordinator.async_start_charge(self.charge_point_id)
         self._local_state = True
         self.async_write_ha_state()
 
-    async def async_turn_off(self, **_: any) -> None:
+    async def async_turn_off(self, **_: Any) -> None:  # noqa: ANN401
         """Stop charger."""
         await self.coordinator.async_stop_charge(self.charge_point_id)
         self._local_state = False

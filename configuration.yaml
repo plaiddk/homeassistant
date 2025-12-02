@@ -149,6 +149,7 @@ input_select:
       - Metro Purple
       - Metro Red
       - Metro Slate
+      - MyTheme
     initial: Fluent Blue
 
 #───────────────────────────────────────────────────────────────────────────────

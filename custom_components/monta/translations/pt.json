@@ -5,7 +5,15 @@
         "description": "👉 A API Pública da Monta está atualmente em BETA.\nPara obter o ID do cliente/segredo do cliente, pode ser necessário aderir ao programa Beta. Isto pode ser feito nas configurações da sua conta de utilizador na aplicação ou no CPMS da Monta.\n\nO ID e o segredo do cliente são obtidos em https://portal2.monta.app/applications.",
         "data": {
           "client_id": "ID do cliente",
-          "client_secret": "Segredo do cliente"
+          "client_secret": "Segredo do cliente",
+          "scan_interval_charge_points": "Intervalo de Pontos de Carregamento (segundos)",
+          "scan_interval_wallet": "Intervalo de Carteira (segundos)",
+          "scan_interval_transactions": "Intervalo de Transações (segundos)"
+        },
+        "data_description": {
+          "scan_interval_charge_points": "Com que frequência buscar dados dos pontos de carregamento. Recomendado: 120 segundos (Monta tem limite de 10 solicitações/min)",
+          "scan_interval_wallet": "Com que frequência buscar dados da carteira. Recomendado: 600 segundos (10 minutos)",
+          "scan_interval_transactions": "Com que frequência buscar dados de transações. Recomendado: 600 segundos (10 minutos)"
         }
       }
     },
@@ -13,6 +21,27 @@
       "auth": "ID do cliente/segredo do cliente está incorreto.",
       "connection": "Não foi possível ligar ao servidor.",
       "unknown": "Ocorreu um erro desconhecido."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "description": "Configurar opções de integração Monta. Você pode atualizar suas credenciais ou ajustar os intervalos de varredura aqui.",
+        "data": {
+          "client_id": "ID do cliente",
+          "client_secret": "Segredo do cliente",
+          "scan_interval_charge_points": "Intervalo de Pontos de Carregamento (segundos)",
+          "scan_interval_wallet": "Intervalo de Carteira (segundos)",
+          "scan_interval_transactions": "Intervalo de Transações (segundos)"
+        },
+        "data_description": {
+          "client_id": "Seu ID de cliente da API Monta de https://portal2.monta.app/applications",
+          "client_secret": "Seu segredo de cliente da API Monta de https://portal2.monta.app/applications",
+          "scan_interval_charge_points": "Com que frequência buscar dados dos pontos de carregamento. Recomendado: 120 segundos (Monta tem limite de 10 solicitações/min)",
+          "scan_interval_wallet": "Com que frequência buscar dados da carteira. Recomendado: 600 segundos (10 minutos)",
+          "scan_interval_transactions": "Com que frequência buscar dados de transações. Recomendado: 600 segundos (10 minutos)"
+        }
+      }
     }
   },
   "services": {
@@ -33,6 +62,54 @@
         "charge_point_id": {
           "name": "ID do ponto de carregamento",
           "description": "O ID do carregador."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "charger_visibility": {
+        "name": "Visibilidade",
+        "state": {
+          "public": "Público",
+          "private": "Privado"
+        }
+      },
+      "charger_type": {
+        "name": "Tipo",
+        "state": {
+          "ac": "AC",
+          "dc": "DC"
+        }
+      },
+      "charger_state": {
+        "name": "Estado",
+        "state": {
+          "available": "Disponível",
+          "busy": "Ocupado",
+          "busy-blocked": "Ocupado - Bloqueado",
+          "busy-charging": "Ocupado - Carregando",
+          "busy-non-charging": "Ocupado - Sem Carregamento",
+          "busy-non-released": "Ocupado - Não Liberado",
+          "busy-reserved": "Ocupado - Reservado",
+          "busy-scheduled": "Ocupado - Agendado",
+          "error": "Erro",
+          "disconnected": "Desconectado",
+          "passive": "Passivo",
+          "other": "Outro"
+        }
+      },
+      "charger_lastmeterreadingkwh": {
+        "name": "Última Leitura do Medidor"
+      },
+      "charge_state": {
+        "name": "Último Carregamento",
+        "state": {
+          "pending": "Pendente",
+          "active": "Ativo",
+          "completed": "Concluído",
+          "failed": "Falhou",
+          "cancelled": "Cancelado"
         }
       }
     }

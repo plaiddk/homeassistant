@@ -25,3 +25,5 @@ home-assistant_v2.db-wal
 secrets.yaml
 .storage/
 .cloud/
+
+custom_components/nordnet_multi/

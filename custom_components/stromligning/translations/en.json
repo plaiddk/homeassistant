@@ -1,0 +1,310 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Integration with same name already existing"
+        },
+        "error": {
+            "too_many_requests": "Too many requests to the API - try again in 15 minutes"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "name": "Name for this integration",
+                    "company": "Electricity provider",
+                    "aggregation": "Resolution of prices",
+                    "forecasts": "Include price forecasts for the next week? (may be inaccurate)"
+                }
+            }
+        }
+    },
+    "options": {
+        "abort": {
+            "already_configured": "Integration with same name already existing"
+        },
+        "error": {
+            "too_many_requests": "Too many requests to the API - try again in 15 minutes"
+        },
+        "step": {
+            "init": {
+                "data": {
+                    "company": "Electricity provider",
+                    "aggregation": "Resolution of prices",
+                    "forecasts": "Include price forecasts for the next week? (may be inaccurate)"
+                }
+            }
+        }
+    },
+    "selector": {
+        "aggregation": {
+            "options": {
+                "15m": "15 minutes",
+                "1h": "Hourly"
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "current_price_vat": {
+                "name": "Current incl. VAT",
+                "state_attributes": {
+                    "prices": {
+                        "name": "Prices today"
+                    }
+                }
+            },
+            "current_price_ex_vat": {
+                "name": "Current excl. VAT",
+                "state_attributes": {
+                    "prices": {
+                        "name": "Prices today"
+                    }
+                }
+            },
+            "distribution_vat": {
+                "name": "Provider transportexpenses incl. VAT"
+            },
+            "distribution_ex_vat": {
+                "name": "Provider transportexpenses excl. VAT"
+            },
+            "electricity_tax_vat": {
+                "name": "Electricity tax incl. VAT"
+            },
+            "electricity_tax_ex_vat": {
+                "name": "Electricity tax excl. VAT"
+            },
+            "forecasts_vat": {
+                "name": "Price forecasts incl. VAT",
+                "state_attributes": {
+                    "prices": {
+                        "name": "Prices next week"
+                    }
+                }
+            },
+            "forecasts_ex_vat": {
+                "name": "Price forecasts excl. VAT",
+                "state_attributes": {
+                    "prices": {
+                        "name": "Prices next week"
+                    }
+                }
+            },
+            "net_owner": {
+                "name": "Net operator"
+            },
+            "nettariff_vat": {
+                "name": "Nettariff incl. VAT"
+            },
+            "nettariff_ex_vat": {
+                "name": "Nettariff excl. VAT"
+            },
+            "next_data_refresh": {
+                "name": "Next data update"
+            },
+            "provider": {
+                "name": "Provider agreement"
+            },
+            "spotprice_vat": {
+                "name": "Spotprice incl. VAT"
+            },
+            "spotprice_ex_vat": {
+                "name": "Spotprice excl. VAT"
+            },
+            "surcharge_vat": {
+                "name": "Spotprice surcharge incl. VAT"
+            },
+            "surcharge_ex_vat": {
+                "name": "Spotprice surcharge excl. VAT"
+            },
+            "systemtariff_vat": {
+                "name": "Systemtariff incl. VAT"
+            },
+            "systemtariff_ex_vat": {
+                "name": "Systemtariff excl. VAT"
+            },
+            "today_min_vat": {
+                "name": "Minimum price rest of the day incl. VAT",
+                "state_attributes": {
+                    "at": {
+                        "name": "At"
+                    }
+                }
+            },
+            "today_min_ex_vat": {
+                "name": "Minimum price rest of the day excl. VAT",
+                "state_attributes": {
+                    "at": {
+                        "name": "At"
+                    }
+                }
+            },
+            "today_max_vat": {
+                "name": "Maximum price rest of the day incl. VAT",
+                "state_attributes": {
+                    "at": {
+                        "name": "At"
+                    }
+                }
+            },
+            "today_max_ex_vat": {
+                "name": "Maximum price rest of the day excl. VAT",
+                "state_attributes": {
+                    "at": {
+                        "name": "At"
+                    }
+                }
+            },
+            "today_mean_vat": {
+                "name": "Mean price rest of the day incl. VAT"
+            },
+            "today_mean_ex_vat": {
+                "name": "Mean price rest of the day excl. VAT"
+            },
+            "tomorrow_min_vat": {
+                "name": "Minimum price tomorrow incl. VAT",
+                "state": {
+                    "unknown": "Unknown"
+                },
+                "state_attributes": {
+                    "at": {
+                        "name": "At"
+                    }
+                }
+            },
+            "tomorrow_min_ex_vat": {
+                "name": "Minimum price tomorrow excl. VAT",
+                "state": {
+                    "unknown": "Unknown"
+                },
+                "state_attributes": {
+                    "at": {
+                        "name": "At"
+                    }
+                }
+            },
+            "tomorrow_max_vat": {
+                "name": "Maximum price tomorrow incl. VAT",
+                "state": {
+                    "unknown": "Unknown"
+                },
+                "state_attributes": {
+                    "at": {
+                        "name": "At"
+                    }
+                }
+            },
+            "tomorrow_max_ex_vat": {
+                "name": "Maximum price tomorrow excl. VAT",
+                "state": {
+                    "unknown": "Unknown"
+                },
+                "state_attributes": {
+                    "at": {
+                        "name": "At"
+                    }
+                }
+            },
+            "tomorrow_mean_vat": {
+                "name": "Mean price tomorrow incl. VAT",
+                "state": {
+                    "unknown": "Unknown"
+                }
+            },
+            "tomorrow_mean_ex_vat": {
+                "name": "Mean price tomorrow excl. VAT",
+                "state": {
+                    "unknown": "Unknown"
+                }
+            }
+        },
+        "binary_sensor": {
+            "tomorrow_available_vat": {
+                "name": "Prices for tomorrow incl. VAT",
+                "state": {
+                    "on": "Available",
+                    "off": "Not available yet"
+                },
+                "state_attributes": {
+                    "available_at": {
+                        "name": "Available at"
+                    },
+                    "prices": {
+                        "name": "Prices tomorrow"
+                    },
+                    "forecast_data": {
+                        "name": "Origins from forecast data",
+                        "state": {
+                            "true": "Yes",
+                            "false": "No"
+                        }
+                    }
+                }
+            },
+            "tomorrow_available_ex_vat": {
+                "name": "Prices for tomorrow excl. VAT",
+                "state": {
+                    "on": "Available",
+                    "off": "Not available yet"
+                },
+                "state_attributes": {
+                    "available_at": {
+                        "name": "Available at"
+                    },
+                    "prices": {
+                        "name": "Prices tomorrow"
+                    },
+                    "forecast_data": {
+                        "name": "Origins from forecast data",
+                        "state": {
+                            "true": "Yes",
+                            "false": "No"
+                        }
+                    }
+                }
+            },
+            "tomorrow_spotprice_vat": {
+                "name": "Tomorrow spotprices incl. VAT",
+                "state": {
+                    "on": "Available",
+                    "off": "Not available yet"
+                },
+                "state_attributes": {
+                    "available_at": {
+                        "name": "Available at"
+                    },
+                    "prices": {
+                        "name": "Spotprices tomorrow"
+                    },
+                    "forecast_data": {
+                        "name": "Origins from forecast data",
+                        "state": {
+                            "true": "Yes",
+                            "false": "No"
+                        }
+                    }
+                }
+            },
+            "tomorrow_spotprice_ex_vat": {
+                "name": "Tomorrow spotprices excl. VAT",
+                "state": {
+                    "on": "Available",
+                    "off": "Not available yet"
+                },
+                "state_attributes": {
+                    "available_at": {
+                        "name": "Available at"
+                    },
+                    "prices": {
+                        "name": "Spotprices tomorrow"
+                    },
+                    "forecast_data": {
+                        "name": "Origins from forecast data",
+                        "state": {
+                            "true": "Yes",
+                            "false": "No"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
