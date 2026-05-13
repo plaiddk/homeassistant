@@ -1,6 +1,8 @@
 """Sensors for the MySkoda integration."""
 
 from datetime import UTC, datetime
+from math import isnan
+from typing import Any
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -54,6 +56,7 @@ async def async_setup_entry(
             ElectricRange,
             FuelLevel,
             GasRange,
+            GasLevel,
             InspectionInterval,
             InspectionIntervalKM,
             LastUpdated,
@@ -69,6 +72,15 @@ async def async_setup_entry(
             TargetBatteryPercentage,
             ClimatisationTimeLeft,
             AuxHeaterTimeLeft,
+            OverallMileage,
+            OverallTravelTime,
+            OverallAverageSpeed,
+            OverallAverageElectricConsumption,
+            OverallAverageFuelConsumption,
+            LastTripMileage,
+            LastTripTravelTime,
+            LastTripAverageSpeed,
+            LastTripAverageFuelConsumption,
         ],
         coordinators=hass.data[DOMAIN][config.entry_id][COORDINATORS],
         async_add_entities=async_add_entities,
@@ -106,7 +118,7 @@ class Operation(MySkodaSensor):
             return last_operation.status.lower()
 
     @property
-    def extra_state_attributes(self) -> dict:
+    def extra_state_attributes(self) -> dict[str, Any]:
         """Returns additional attributes for the operation sensor.
 
         - request_id, operation name, error_code and timestamp of the last seen operation.
@@ -152,7 +164,7 @@ class ServiceEvent(MySkodaSensor):
             return last_service_event.timestamp
 
     @property
-    def extra_state_attributes(self) -> dict:
+    def extra_state_attributes(self) -> dict[str, Any]:
         """Returns additional attributes for the service event sensor.
 
         - history: a list of dicts with the same fields for the previously seen event.
@@ -165,7 +177,7 @@ class ServiceEvent(MySkodaSensor):
             {
                 "name": event.name.value,
                 "timestamp": event.timestamp,
-                "data": event.data,
+                "data": event.data.to_dict(),
             }
             for event in self.service_events
         ]
@@ -215,8 +227,8 @@ class BatteryPercentage(ChargingSensor):
     @property
     def native_value(self) -> int | None:  # noqa: D102
         if status := self._status():
-            if status.battery.state_of_charge_in_percent:
-                return status.battery.state_of_charge_in_percent
+            if status.battery.state_of_charge_in_percent is not None:
+                return min(status.battery.state_of_charge_in_percent, 100)
 
     @property
     def icon(self) -> str:  # noqa: D102
@@ -549,11 +561,22 @@ class Mileage(MySkodaSensor):
             except (ValueError, TypeError):
                 pass  # value may initially be 'unavailable' or 'None'
 
+        def _valid_km(value):
+            return isinstance(value, int) and not isnan(value)
+
         mileage_in_km = None
-        if maint_report := self.vehicle.maintenance.maintenance_report:
-            mileage_in_km = maint_report.mileage_in_km
+        if (maintenance := self.vehicle.maintenance) and (
+            report := maintenance.maintenance_report
+        ):
+            if _valid_km(report.mileage_in_km):
+                mileage_in_km = report.mileage_in_km
+
         # If the maint report does not have mileage, use vehicle health as fallback
-        elif health := self.vehicle.health:
+        if (
+            mileage_in_km is None
+            and (health := self.vehicle.health)
+            and _valid_km(health.mileage_in_km)
+        ):
             mileage_in_km = health.mileage_in_km
 
         if mileage_in_km and mileage_in_km < 400_000_000:
@@ -665,6 +688,7 @@ class ChargingState(ChargingSensor):
         "ready_for_charging",
         "conserving",
         "charging",
+        "charging_interrupted",
     ]
 
     @property
@@ -802,3 +826,171 @@ class AuxHeaterTimeLeft(MySkodaSensor):
 
     def required_capabilities(self) -> list[CapabilityId]:
         return [CapabilityId.AUXILIARY_HEATING]
+
+
+class TripStatisticSensor(MySkodaSensor):
+    def required_capabilities(self) -> list[CapabilityId]:
+        return [CapabilityId.TRIP_STATISTICS]
+
+
+class OverallMileage(TripStatisticSensor):
+    """Overall mileage from trip statistics."""
+
+    entity_description = SensorEntityDescription(
+        key="overall_mileage",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfLength.KILOMETERS,
+        device_class=SensorDeviceClass.DISTANCE,
+        translation_key="overall_mileage",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
+
+    @property
+    def native_value(self) -> int | None:  # noqa: D102
+        if stats := self.vehicle.trip_statistics:
+            return stats.overall_mileage_in_km
+
+
+class OverallTravelTime(TripStatisticSensor):
+    """Overall travel time from trip statistics."""
+
+    entity_description = SensorEntityDescription(
+        key="overall_travel_time",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTime.MINUTES,
+        device_class=SensorDeviceClass.DURATION,
+        translation_key="overall_travel_time",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
+
+    @property
+    def native_value(self) -> int | None:  # noqa: D102
+        if stats := self.vehicle.trip_statistics:
+            return stats.overall_travel_time_in_min
+
+
+class OverallAverageSpeed(TripStatisticSensor):
+    """Overall average speed from trip statistics."""
+
+    entity_description = SensorEntityDescription(
+        key="overall_average_speed",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfSpeed.KILOMETERS_PER_HOUR,
+        device_class=SensorDeviceClass.SPEED,
+        translation_key="overall_average_speed",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
+
+    @property
+    def native_value(self) -> int | None:  # noqa: D102
+        if stats := self.vehicle.trip_statistics:
+            return stats.overall_average_speed_in_kmph
+
+
+class OverallAverageElectricConsumption(TripStatisticSensor):
+    """Overall average electric consumption."""
+
+    entity_description = SensorEntityDescription(
+        key="overall_average_electric_consumption",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement="kWh/100km",
+        translation_key="overall_average_electric_consumption",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
+
+    @property
+    def native_value(self) -> float | None:  # noqa: D102
+        if stats := self.vehicle.trip_statistics:
+            return stats.overall_average_electric_consumption
+
+
+class OverallAverageFuelConsumption(TripStatisticSensor):
+    """Overall average fuel consumption."""
+
+    entity_description = SensorEntityDescription(
+        key="overall_average_fuel_consumption",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement="l/100km",
+        translation_key="overall_average_fuel_consumption",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
+
+    @property
+    def native_value(self) -> float | None:  # noqa: D102
+        if stats := self.vehicle.trip_statistics:
+            return stats.overall_average_fuel_consumption
+
+
+class LastTripMileage(TripStatisticSensor):
+    """Mileage of the last trip."""
+
+    entity_description = SensorEntityDescription(
+        key="last_trip_mileage",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfLength.KILOMETERS,
+        device_class=SensorDeviceClass.DISTANCE,
+        translation_key="last_trip_mileage",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
+
+    @property
+    def native_value(self) -> int | None:  # noqa: D102
+        if stats := self.vehicle.single_trip_statistics:
+            if stats.daily_trips and stats.daily_trips[0].trips:
+                return stats.daily_trips[0].trips[0].mileage_in_km
+
+
+class LastTripTravelTime(TripStatisticSensor):
+    """Travel time of the last trip."""
+
+    entity_description = SensorEntityDescription(
+        key="last_trip_travel_time",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTime.MINUTES,
+        device_class=SensorDeviceClass.DURATION,
+        translation_key="last_trip_travel_time",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
+
+    @property
+    def native_value(self) -> int | None:  # noqa: D102
+        if stats := self.vehicle.single_trip_statistics:
+            if stats.daily_trips and stats.daily_trips[0].trips:
+                return stats.daily_trips[0].trips[0].travel_time_in_min
+
+
+class LastTripAverageSpeed(TripStatisticSensor):
+    """Average speed of the last trip."""
+
+    entity_description = SensorEntityDescription(
+        key="last_trip_average_speed",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfSpeed.KILOMETERS_PER_HOUR,
+        device_class=SensorDeviceClass.SPEED,
+        translation_key="last_trip_average_speed",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
+
+    @property
+    def native_value(self) -> int | None:  # noqa: D102
+        if stats := self.vehicle.single_trip_statistics:
+            if stats.daily_trips and stats.daily_trips[0].trips:
+                return stats.daily_trips[0].trips[0].average_speed_in_kmph
+
+
+class LastTripAverageFuelConsumption(TripStatisticSensor):
+    """Average fuel consumption of the last trip."""
+
+    entity_description = SensorEntityDescription(
+        key="last_trip_average_fuel_consumption",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement="l/100km",
+        translation_key="last_trip_average_fuel_consumption",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
+
+    @property
+    def native_value(self) -> float | None:  # noqa: D102
+        if stats := self.vehicle.single_trip_statistics:
+            if stats.daily_trips and stats.daily_trips[0].trips:
+                return stats.daily_trips[0].trips[0].average_fuel_consumption

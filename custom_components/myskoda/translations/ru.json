@@ -8,9 +8,10 @@
         "error": {
             "cannot_connect": "Не удалось подключиться",
             "invalid_auth": "Неверная аутентификация",
-            "relogin_in_app": "Произошла ошибка во время входа. Может потребоваться повторная авторизация в вашем приложении MySkoda.",
+            "relogin_in_app": "Произошла ошибка во время входа. Может потребоваться повторная авторизация в вашем приложении MySkoda. {login_url}",
             "unknown": "Произошла непредвиденная ошибка. Пожалуйста, проверьте журналы HomeAssistant.",
-            "no_spin": "В конфигурации отсутствует S-PIN-код. Пожалуйста, перенастройте интеграцию и повторите попытку."
+            "no_spin": "В конфигурации отсутствует S-PIN-код. Пожалуйста, перенастройте интеграцию и повторите попытку.",
+            "readonly_mode": "Режим \"Только чтение\" включен. Операции с командами управления отключены."
         },
         "step": {
             "reauth_confirm": {
@@ -38,16 +39,16 @@
             "charger_connected": {
                 "name": "Зарядное устройство подключено"
             },
-            "charger_locked": {
+            "charger_lock": {
                 "name": "Блокировка зарядки"
             },
-            "doors_locked": {
+            "doors_lock": {
                 "name": "Двери заблокированы"
             },
             "doors_open": {
                 "name": "Двери"
             },
-            "locked": {
+            "vehicle_lock": {
                 "name": "Автомобиль заблокирован"
             },
             "parkinglights_on": {
@@ -165,7 +166,8 @@
                     "charging": "Заряжается",
                     "connect_cable": "Нет питания",
                     "conserving": "Сохранение заряда",
-                    "ready_for_charging": "Готово к зарядке"
+                    "ready_for_charging": "Готово к зарядке",
+                    "charging_interrupted": "Зарядка прервана"
                 }
             },
             "estimated_time_left_to_reach_target_temperature": {
@@ -230,6 +232,33 @@
             },
             "outside_temperature": {
                 "name": "Наружная температура"
+            },
+            "overall_mileage": {
+                "name": "Пробег"
+            },
+            "overall_travel_time": {
+                "name": "Время поездки"
+            },
+            "overall_average_speed": {
+                "name": "Средняя скорость"
+            },
+            "overall_average_electric_consumption": {
+                "name": "Средний расход электроэнергии"
+            },
+            "overall_average_fuel_consumption": {
+                "name": "Средний расход топлива"
+            },
+            "last_trip_mileage": {
+                "name": "Пробег последней поездки"
+            },
+            "last_trip_travel_time": {
+                "name": "Время последней поездки"
+            },
+            "last_trip_average_speed": {
+                "name": "Средняя скорость последней поездки"
+            },
+            "last_trip_average_fuel_consumption": {
+                "name": "Средний расход топлива последней поездки"
             }
         },
         "switch": {
@@ -326,6 +355,11 @@
                     "readonly": "Вы не можете вносить изменения в автомобиль, вы можете только считывать данные"
                 }
             }
+        }
+    },
+    "exceptions": {
+        "readonly_mode": {
+            "message": "Режим \"Только чтение\" включен. Операции с командами управления отключены."
         }
     }
 }

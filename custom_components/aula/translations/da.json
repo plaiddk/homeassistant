@@ -18,19 +18,37 @@
   "config": {
     "error": {
       "1": "Unknown error",
-      "2": "Unknown error"
+      "2": "Unknown error",
+      "auth_failed": "MitID godkendelse mislykkedes",
+      "api_error": "Kunne ikke forbinde til Aula API"
+    },
+    "abort": {
+      "reauth_successful": "Genautentificering lykkedes!"
     },
     "step": {
       "user": {
         "data": {
-          "username": "Unilogin brugernavn",
-          "password": "Unilogin password",
-          "schoolschedule": "Skoleskemaer som kalender entiteter",
-          "ugeplan": "Ugeplaner som sensor attributter",
-          "mu_opgaver": "Opgaver fra Min Uddannelse som sensor attribut"
+          "mitid_username": "MitID Brugernavn",
+          "mitid_use_token": "Brug MitID kodeviser",
+          "schoolschedule": "Aktiver skoleskema kalender",
+          "ugeplan": "Aktiver ugeplaner",
+          "mu_opgaver": "Aktiver opgaver fra Min Uddannelse",
+          "teacher_full_name": "Vis lærerens fulde navn (i stedet for initialer)"
         },
-        "description": "Indtast dine Unilogin oplysninger",
-        "title": "Login"
+        "description": "Konfigurer din Aula integration med MitID",
+        "title": "Aula MitID Login"
+      },
+      "token_credentials": {
+        "title": "MitID Kodeviser",
+        "description": "Indtast dine MitID kodeviser oplysninger.",
+        "data": {
+          "mitid_password": "MitID Password (til kodeviser)",
+          "mitid_token": "MitID Token (til kodeviser)"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Genautentificer Aula",
+        "description": "Din Aula session skal genautentificeres. Brugernavn: {username}\n\nKlik på Send for at fortsætte med MitID godkendelse."
       }
     }
   },
@@ -51,7 +69,8 @@
         "data": {
           "schoolschedule": "Skoleskemaer som kalender entiteter",
           "ugeplan": "Ugeplaner som sensor attributter",
-          "mu_opgaver": "Opgaver fra Min Uddannelse som sensor attribut"
+          "mu_opgaver": "Opgaver fra Min Uddannelse som sensor attribut",
+          "teacher_full_name": "Vis lærerens fulde navn (i stedet for initialer)"
         },
         "description": "",
         "title": "Login"

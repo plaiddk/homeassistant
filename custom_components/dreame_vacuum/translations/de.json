@@ -121,7 +121,7 @@
         "state": {
           "quiet": "Leise",
           "standard": "Standard",
-          "strong": "Stark",
+          "strong": "Max",
           "turbo": "Turbo"
         }
       },
@@ -205,7 +205,10 @@
         "state": {
           "none": "Kein Material",
           "tile": "Bodenfliese",
-          "wood": "Holzboden"
+          "wood": "Holzboden",
+          "low_pile_carpet": "Niedrigfloriger Teppich",
+          "medium_pile_carpet": "Mittelfloriger Teppich",
+          "carpet": "Teppich"
         }
       },
       "voice_assistant_language": {
@@ -213,7 +216,43 @@
           "default": "Standard",
           "english": "Englisch",
           "german": "Deutsch",
-          "chinese": "Chinesisch"
+          "chinese": "Chinesisch",
+          "russian": "Russisch",
+          "italian": "Italienisch",
+          "french": "Französisch",
+          "korean": "Koreanisch"
+        }
+      },
+      "mop_pressure": {
+        "state": {
+          "light": "Leicht",
+          "normal": "Normal"
+        }
+      },
+      "mop_temperature": {
+        "state": {
+          "normal": "Normal",
+          "warm": "Warm"
+        }
+      },
+      "low_lying_area_frequency": {
+        "state": {
+          "weekly": "Wöchentlich",
+          "daily": "Täglich"
+        }
+      },
+      "scraper_frequency": {
+        "state": {
+          "off": "Aus",
+          "weekly": "Wöchentlich",
+          "daily": "Täglich"
+        }
+      },
+      "auto_lds_coverage": {
+        "state": {
+          "off": "Aus",
+          "security": "Sicherheit",
+          "extreme": "Extrem"
         }
       },
       "order": {
@@ -225,7 +264,8 @@
         "state": {
           "by_area": "Nach Gebiet",
           "by_time": "Zum Zeitpunkt",
-          "by_room": "Nach Zimmer"
+          "by_room": "Nach Zimmer",
+          "intelligent": "Intelligent"
         }
       },
       "mop_clean_frequency": {
@@ -238,7 +278,9 @@
           "off": "Aus",
           "standard": "Standard",
           "high_frequency": "Hochfrequenz",
-          "low_frequency": "Niederfrequenz"
+          "low_frequency": "Niederfrequenz",
+          "custom_frequency": "Benutzerdefinierte Häufigkeit",
+          "intelligent": "Intelligent"
         }
       },
       "floor_material_direction": {
@@ -256,30 +298,31 @@
       "cleangenius": {
         "state": {
           "off": "Aus",
-          "routine_cleaning": "Routinereinigung",
-          "deep_cleaning": "Gründliche Reinigung"
+          "routine_cleaning": "An",
+          "deep_cleaning": "An & Gründliche Reinigung"
         }
       },
       "cleangenius_mode": {
         "state": {
-          "vacuum_and_mop": "Vakuum und Mopp",
-          "mop_after_vacuum": "Mop nach Vakuum"
+          "vacuum_and_mop": "Staubsaugen und Wischen",
+          "mop_after_vacuum": "Wischen nach dem Saugen"
         }
       },
       "washing_mode": {
         "state": {
-          "light": "Licht",
+          "light": "Leicht",
           "standard": "Standard",
-          "deep": "Tief",
-          "ultra_washing": "Ultra -Waschen"
+          "deep": "Tiefenreinigung",
+          "ultra_washing": "Ultra - Waschen"
         }
       },
       "water_temperature": {
         "state": {
           "normal": "Normal",
-          "mild": "Leicht",
+          "mild": "Lauwarm",
           "warm": "Warm",
-          "hot": "Heiß"
+          "hot": "Heiß",
+          "max": "Maximal"
         }
       },
       "auto_recleaning": {
@@ -350,9 +393,24 @@
           "returning_to_drain": "Rückkehr zum Abfluss",
           "draining": "Entleeren",
           "auto_water_draining": "Automatische Wasserentleerung",
+          "emptying": "Leeren",
+          "dust_bag_drying": "Staubbeutel trocknen",
+          "dust_bag_drying_paused": "Staubbeutel‑Trocknung pausiert",
+          "heading_to_extra_cleaning": "Auf dem Weg zur Zusatzreinigung",
+          "extra_cleaning": "Zusatzreinigung",
+          "finding_pet_paused": "Haustier finden pausiert",
+          "finding_pet": "Haustier suchen",
           "shortcut": "Verknüpfung",
           "monitoring": "Überwachung",
-          "monitoring_paused": "Überwachung pausiert"
+          "monitoring_paused": "Überwachung pausiert",
+          "initial_deep_cleaning": "Initiale Tiefenreinigung",
+          "initial_deep_cleaning_paused": "Initiale Tiefenreinigung pausiert",
+          "sanitizing": "Desinfizieren",
+          "sanitizing_with_dry": "Desinfizieren mit Trocknung",
+          "changing_mop": "Mopp wird gewechselt",
+          "changing_mop_paused": "Moppwechsel pausiert",
+          "floor_maintaining": "Bodenpflege",
+          "floor_maintaining_paused": "Bodenpflege pausiert"
         }
       },
       "status": {
@@ -372,7 +430,7 @@
           "factory": "Factory",
           "error": "Fehler",
           "remote_control": "Ferngesteuert",
-          "sleeping": "schlafend",
+          "sleeping": "Schlafend",
           "self_test": "Selbsttest",
           "factory_test": "Werkstest",
           "standby": "Standby",
@@ -412,9 +470,9 @@
           "cruising_point": "Auf dem Weg zum Zielpunkt",
           "cruising_point_paused": "Die Fahrt zum Zielpunkt wurde unterbrochen",
           "summon_clean_paused": "Zur Reinigung rufen wurde angehalten",
-          "returning_to_install_mop": "Zurückkehren zum anbringen des Wischpads",
-          "returning_to_remove_mop": "Zurückkehren zum entfernen des Wischpads",
-          "station_cleaning": "Stationreinigung",
+          "returning_to_install_mop": "Zurückkehren zum Anbringen des Wischpads",
+          "returning_to_remove_mop": "Zurückkehren zum Entfernen des Wischpads",
+          "station_cleaning": "Stationsreinigung",
           "pet_finding": "Haustierfindung",
           "auto_cleaning_washing_paused": "Automatisch Reinigung waschen im Pause",
           "area_cleaning_washing_paused": "Reinigungsreinigung waschen pausieren",
@@ -542,7 +600,40 @@
           "dirty_tank_not_installed": "Der Schmutzwassertank des Roboters ist nicht installiert.",
           "robot_in_hidden_room": "Roboter im versteckten Bereich. Bitte aus dem Bereich entfernen und erneut versuchen.",
           "washboard_not_working": "Waschbrett funktioniert nicht mehr.",
-          "return_to_charge_failed": "Rückkehr zum Laden fehlgeschlagen."
+          "return_to_charge_failed": "Rückkehr zum Laden fehlgeschlagen.",
+          "lds_failed_to_lift": "LDS-Modul konnte nicht angehoben werden.",
+          "robot_stuck": "LDS kann hier zur Positionierung nicht angehoben werden.",
+          "robot_stuck_repeat": "Bringen Sie den Roboter in einen offenen Bereich und setzen Sie die Aufgabe fort.",
+          "slippery_floor": "Rutschiger Boden. Bitte versuchen Sie es später erneut.",
+          "check_mop_install": "Bitte prüfen Sie, ob der Mopp richtig installiert ist.",
+          "dirty_water_tank_full": "Abnormaler Wasserstand im Schmutzwassertank des Roboters.",
+          "retractable_leg_stuck": "Bitte prüfen Sie, ob die einziehbaren Beine verheddert sind.",
+          "internal_error": "Fehlfunktion aufgrund eines internen Fehlers. Versuchen Sie, den Roboter neu zu starten.",
+          "robot_stuck_on_tables": "Roboter steckt zwischen Tischen und Stühlen fest.",
+          "robot_stuck_on_passage": "Roboter steckt im engen Durchgang fest.",
+          "robot_stuck_on_threshold": "Roboter steckt an der Stufe/Schwelle fest.",
+          "robot_stuck_on_low_lying_area": "Roboter steckt in einem Bereich mit geringer Höhe fest.",
+          "robot_stuck_on_ramp": "Roboter hat Rampen mit Absturzgefahr auf dem Weg erkannt.",
+          "robot_stuck_on_obstacle": "Roboter hat Hindernisse auf dem Weg erkannt.",
+          "robot_stuck_on_pet": "Roboter hat Personen oder Haustiere auf dem Weg erkannt.",
+          "robot_stuck_on_slippery_surface": "Roboter steckt aufgrund von Rutschen fest.",
+          "robot_stuck_on_carpet": "Roboter rutscht auf dem Teppich",
+          "drainage_failed": "Abnormaler Wasserablauf aus dem Schmutzwassertank",
+          "mop_not_detected": "Mopp nicht erkannt.",
+          "mop_holder_error": "Fehler bei Menge/Platzierung der Mopphalter in der Station.",
+          "dock_error": "Stationsfehler.",
+          "wash_failed": "Reinigung des schmutzigen Mopps fehlgeschlagen.",
+          "robot_stuck_on_curtain": "Roboter rutscht im Vorhangbereich",
+          "edge_mop_stop_rotate": "Kantenmopp dreht sich nicht mehr.",
+          "edge_mop_detached": "Kantenmopp hat sich gelöst.",
+          "chassis_lift_malfunction": "Fehlfunktion der Fahrgestell-Anhebung.",
+          "mop_cover_error": "Prüfen Sie auf Fremdkörper in der Nähe der Mopprolle und der Abdeckung.",
+          "roller_mop_error": "Prüfen Sie auf Fremdkörper in der Nähe der Mopprolle und der Abdeckung.",
+          "onboard_water_tank_empty": "Niedriger Wasserstand im Frischwassertank des Roboters.",
+          "onboard_dirty_water_tank_full": "Der Schmutzwassertank des Roboters ist voll.",
+          "mop_not_installed": "Mopp nicht installiert.",
+          "fluffing_roller_error": "Fehler bei der Auflockerungsrolle.",
+          "blocked_by_obstacle": "Roboter durch Hindernis blockiert."
         }
       },
       "charging_status": {
@@ -579,7 +670,7 @@
         "state": {
           "no_warning": "Keine Warnung",
           "no_water_left_dismiss": "Bitte den Frischwassertank überprüfen.",
-          "no_water_left": "Das Wasser im Frischwassertank ist bald aufgebraucht.",
+          "no_water_left": "Der Wischmopp wird gereinigt. Das Wasser im Reinwassertank ist nicht ausreichend. Füllen Sie bitte den Reinwassertank und leeren Sie den Schmutzwassertank",
           "no_water_left_after_clean": "Wischpad wurde gereinigt.",
           "no_water_for_clean": "Niedriger Wasserstand im Frischwassertank.",
           "low_water": "Der Wasserstand ist niedrig. Bitte den Frischwassertank auffüllen",
@@ -669,7 +760,27 @@
           "water_stain": "Reinigung von Wasserflecken",
           "water_stain_paused": "Die Reinigung von Wasserflecken wurde angehalten",
           "boosted_edge_cleaning": "Steigende Kantenreinigung",
-          "hair_compressing": "Haarkomprimierung"
+          "hair_compressing": "Haarkomprimierung",
+          "large_particle_cleaning": "Grobteilreinigung",
+          "intensive_stain_cleaning": "Intensiv‑Fleckenreinigung",
+          "stain_cleaning": "Fleckenreinigung",
+          "initial_deep_cleaning": "Initiale Tiefenreinigung",
+          "initial_deep_cleaning_paused": "Initiale Tiefenreinigung pausiert",
+          "mop_pad_heating": "Aufheizen der Mop‑Pads",
+          "cleaning_after_mapping": "Reinigung nach Kartierung",
+          "small_particle_cleaning": "Feinstaubreinigung",
+          "changing_mop": "Mopp wird gewechselt",
+          "changing_mop_paused": "Moppwechsel pausiert",
+          "floor_maintaining": "Bodenpflege",
+          "floor_maintaining_paused": "Bodenpflege pausiert",
+          "wood_floor_maintaining": "Holzbodenpflege"
+        }
+      },
+      "dust_bag_drying_status": {
+        "state": {
+          "idle": "Leerlauf",
+          "drying": "Trocknen",
+          "paused": "Pausiert"
         }
       }
     }
@@ -1003,7 +1114,7 @@
           "name": "Teppichreinigung",
           "description": "Benutzerdefinierte Teppichreinigungseinstellung für jeden Teppich."
         },
-        "carpet_settings": {
+        "carpet_preferences": {
           "name": "Teppicheinstellungen",
           "description": "Benutzerdefinierte Teppicheinstellungen für jeden Teppich mit einem Array aktivierter Einstellungen."
         }
@@ -1051,6 +1162,16 @@
         }
       }
     },
+    "vacuum_delete_shortcut": {
+      "name": "Verknüpfung löschen",
+      "description": "Eine Verknüpfung löschen. (Nur auf unterstützten Geräten)",
+      "fields": {
+        "shortcut_id": {
+          "name": "Verknüpfungs-ID",
+          "description": "ID der Verknüpfung."
+        }
+      }
+    },
     "vacuum_set_carpet_area": {
       "name": "Teppichbereich festlegen",
       "description": "Teppiche und ignorierte Teppiche definieren (nur bei unterstützten Geräten).",
@@ -1059,7 +1180,7 @@
           "name": "Teppiche",
           "description": "Teppichbereiche."
         },
-        "ignored_carpets": {
+        "deleted_carpets": {
           "name": "Ignorierte Teppiche",
           "description": "Bereiche von ignorierten Teppichen zum Löschen der automatisch erkannten Teppiche."
         }

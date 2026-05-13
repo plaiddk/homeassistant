@@ -1,4 +1,4 @@
-"""Config flow for Dremae Vacuum."""
+"""Config flow for Dreame Vacuum."""
 
 from __future__ import annotations
 from typing import Any, Final
@@ -53,12 +53,14 @@ from .const import (
 ACCOUNT_TYPE_DREAME = "dreame"
 ACCOUNT_TYPE_MOVA = "mova"
 ACCOUNT_TYPE_MI = "mi"
+ACCOUNT_TYPE_TROUVER = "trouver"
 ACCOUNT_TYPE_LOCAL = "local"
 
 ACCOUNT_TYPE: Final = {
     "Dreamehome Account": ACCOUNT_TYPE_DREAME,
     "Xiaomi Home Account": ACCOUNT_TYPE_MI,
     "Movahome Account": ACCOUNT_TYPE_MOVA,
+    "Trouver Account": ACCOUNT_TYPE_TROUVER,
     "Manual Connection (Without map)": ACCOUNT_TYPE_LOCAL,
 }
 
@@ -110,7 +112,7 @@ class DreameVacuumOptionsFlowHandler(OptionsFlow):
                     {
                         vol.Required(
                             CONF_PREFER_CLOUD,
-                            default=self._config_entry.options.get(CONF_PREFER_CLOUD, True),
+                            default=self._config_entry.options.get(CONF_PREFER_CLOUD, False),
                         ): bool,
                     }
                 )
@@ -119,7 +121,7 @@ class DreameVacuumOptionsFlowHandler(OptionsFlow):
                 {
                     vol.Required(
                         CONF_DONATED,
-                        default=False,
+                        default=self._config_entry.options.get(CONF_DONATED, False),
                     ): bool
                 }
             )
@@ -210,7 +212,11 @@ class DreameVacuumFlowHandler(ConfigFlow, domain=DOMAIN):
         error = None
         if self.prefer_cloud or (self.token and len(self.token) == 32):
             try:
-                if self.account_type != ACCOUNT_TYPE_DREAME and self.account_type != ACCOUNT_TYPE_MOVA:
+                if (
+                    self.account_type != ACCOUNT_TYPE_DREAME
+                    and self.account_type != ACCOUNT_TYPE_MOVA
+                    and self.account_type != ACCOUNT_TYPE_TROUVER
+                ):
                     if self.protocol is not None:
                         self.protocol.disconnect()
 
@@ -311,6 +317,8 @@ class DreameVacuumFlowHandler(ConfigFlow, domain=DOMAIN):
             return await self.async_step_dreame(error=error)
         if self.account_type == ACCOUNT_TYPE_MOVA:
             return await self.async_step_mova(error=error)
+        if self.account_type == ACCOUNT_TYPE_TROUVER:
+            return await self.async_step_trouver(error=error)
         return await self.async_step_local(error=error)
 
     async def async_step_mi(
@@ -318,6 +326,7 @@ class DreameVacuumFlowHandler(ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         """Configure a dreame vacuum device through the Miio Cloud."""
 
+        description_placeholders = {}
         if user_input is not None:
             username = user_input.get(CONF_USERNAME)
             password = user_input.get(CONF_PASSWORD)
@@ -354,13 +363,19 @@ class DreameVacuumFlowHandler(ConfigFlow, domain=DOMAIN):
                 errors["base"] = "credentials_incomplete"
         elif error:
             errors["base"] = error
+            devices = ""
+            if error == "no_devices" and self.unsupported_devices and not self.reauth:
+                for device in self.unsupported_devices:
+                    devices = f"{devices} ({device.get("model", "unknown")})"
+
+            description_placeholders = {"devices": devices}
         else:
             errors = {}
 
         return self.async_show_form(
             step_id=self.account_type,
             data_schema=self.login_schema,
-            description_placeholders={"devices": ""},
+            description_placeholders=description_placeholders,
             errors=errors,
         )
 
@@ -461,8 +476,8 @@ class DreameVacuumFlowHandler(ConfigFlow, domain=DOMAIN):
         elif error:
             errors["base"] = error
             devices = ""
-            if error == "no_devices" and self.unsupported_devices:
-                for device in self.unsupported_devices.values():
+            if error == "no_devices" and self.unsupported_devices and not self.reauth:
+                for device in self.unsupported_devices:
                     devices = f"{devices} ({device.get("model", "unknown")})"
 
             description_placeholders = {"devices": devices}
@@ -486,6 +501,16 @@ class DreameVacuumFlowHandler(ConfigFlow, domain=DOMAIN):
 
         return await self.async_step_dreame(user_input, errors, error)
 
+    async def async_step_trouver(
+        self,
+        user_input: dict[str, Any] | None = None,
+        errors: dict[str, Any] | None = {},
+        error: str | None = None,
+    ) -> FlowResult:
+        """Configure a dreame vacuum device through the Trouver Cloud."""
+
+        return await self.async_step_dreame(user_input, errors, error)
+
     async def async_step_devices(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle Dreame Vacuum devices found."""
 
@@ -493,20 +518,29 @@ class DreameVacuumFlowHandler(ConfigFlow, domain=DOMAIN):
             if not self.devices:
                 self.load_devices()
                 supported_devices, self.unsupported_devices = await self.hass.async_add_executor_job(
-                    self.protocol.cloud.get_supported_devices, self.models, self.host, self.mac
+                    self.protocol.cloud.get_supported_devices, self.models, self.host, self.mac, self.device_id
                 )
                 if not supported_devices:
                     return await self.async_step_login(error="no_devices")
 
                 self.devices = {}
-                for k, v in supported_devices.items():
-                    if self.reauth or not self.hass.config_entries.async_entry_for_domain_unique_id(
-                        self.handler, format_mac(v["mac"])
+                for device in supported_devices:
+                    key = f"{device.get("name", device["model"])} - {device["mac"]}"
+                    if self.reauth:
+                        if (
+                            (self.mac and device["mac"].lower() == self.mac.lower())
+                            or (self.device_id and device["did"] == self.device_id)
+                            or (self.host and "localip" in device and device["localip"] == self.host)
+                        ):
+                            self.devices[key] = device
+                            break
+                    elif not self.hass.config_entries.async_entry_for_domain_unique_id(
+                        self.handler, format_mac(device["mac"])
                     ):
-                        self.devices[k] = v
+                        self.devices[key] = device
 
                 if not self.devices:
-                    if self.unsupported_devices:
+                    if self.unsupported_devices or self.reauth:
                         return await self.async_step_login(error="no_devices")
                     raise AbortFlow("already_configured")
 
@@ -558,7 +592,7 @@ class DreameVacuumFlowHandler(ConfigFlow, domain=DOMAIN):
             default_color_scheme = "Dreame Light"
             default_icon_set = "Dreame"
             model = re.sub(r"[^0-9]", "", self.model)
-            if not (model.isnumeric() and int(model) >= 2215):
+            if (not (model.isnumeric() and int(model) >= 2215)) or self.models[self.model] == 3:
                 hidden_map_objects.append("name_background")
                 hidden_map_objects.append("name")
 
@@ -626,7 +660,11 @@ class DreameVacuumFlowHandler(ConfigFlow, domain=DOMAIN):
                 self.name = device_info["name"]
             self.token = device_info["token"]
             self.device_id = device_info["did"]
-        elif self.account_type == ACCOUNT_TYPE_DREAME or self.account_type == ACCOUNT_TYPE_MOVA:
+        elif (
+            self.account_type == ACCOUNT_TYPE_DREAME
+            or self.account_type == ACCOUNT_TYPE_MOVA
+            or self.account_type == ACCOUNT_TYPE_TROUVER
+        ):
             if self.token is None:
                 self.token = " "
             if self.host is None:
@@ -651,7 +689,7 @@ class DreameVacuumFlowHandler(ConfigFlow, domain=DOMAIN):
                 info = device_info[0][device_info[3][k]]
                 if info:
                     self.models[
-                        f"{"xiaomi" if info[0] == 1 else ACCOUNT_TYPE_MOVA if info[0] == 2 else ACCOUNT_TYPE_DREAME}.vacuum.{k}"
+                        f"{"xiaomi" if info[0] == 1 else ACCOUNT_TYPE_MOVA if info[0] == 2 else ACCOUNT_TYPE_TROUVER if info[0] == 3 else ACCOUNT_TYPE_DREAME}.vacuum.{k}"
                     ] = info[1]
 
     @property
@@ -676,10 +714,18 @@ class DreameVacuumFlowHandler(ConfigFlow, domain=DOMAIN):
                 }
             )
 
+        country_list = ["eu", "cn", "us", "ru", "sg"]
+        if self.account_type == ACCOUNT_TYPE_MOVA:
+            country_list.pop(3)
+        elif self.account_type == ACCOUNT_TYPE_TROUVER:
+            country_list.pop(1)
+        elif self.account_type == ACCOUNT_TYPE_DREAME:
+            country_list.append("kr")
+
         return vol.Schema(
             {
                 vol.Required(CONF_USERNAME, default=self.username): str,
                 vol.Required(CONF_PASSWORD, default=self.password): str,
-                vol.Required(CONF_COUNTRY, default=self.country): vol.In(["eu", "cn", "us", "ru", "sg"]),
+                vol.Required(CONF_COUNTRY, default=self.country): vol.In(country_list),
             }
         )

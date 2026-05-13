@@ -142,7 +142,7 @@ ATTR_IS_EMPTY: Final = "is_empty"
 ATTR_NO_GO_AREAS: Final = "no_go_areas"
 ATTR_NO_MOPPING_AREAS: Final = "no_mopping_areas"
 ATTR_CARPETS: Final = "carpets"
-ATTR_IGNORED_CARPETS: Final = "ignored_carpets"
+ATTR_DELETED_CARPETS: Final = "deleted_carpets"
 ATTR_DETECTED_CARPETS: Final = "detected_carpets"
 ATTR_PREDEFINED_POINTS: Final = "predefined_points"
 ATTR_VIRTUAL_WALLS: Final = "virtual_walls"
@@ -167,11 +167,15 @@ ATTR_ACTIVE_SEGMENTS: Final = "active_segments"
 ATTR_FRAME_ID: Final = "frame_id"
 ATTR_MAP_INDEX: Final = "map_index"
 ATTR_ROOM_ID: Final = "room_id"
+ATTR_FURNITURE_ID: Final = "furniture_id"
 ATTR_ROOM_ICON: Final = "room_icon"
 ATTR_UNIQUE_ID: Final = "unique_id"
 ATTR_FLOOR_MATERIAL: Final = "floor_material"
 ATTR_FLOOR_MATERIAL_DIRECTION: Final = "floor_material_direction"
 ATTR_VISIBILITY: Final = "visibility"
+ATTR_MOP_TEMPERATURE: Final = "mop_temperature"
+ATTR_MOP_PRESSURE: Final = "mop_pressure"
+ATTR_MOP_TYPE: Final = "mop_type"
 ATTR_NAME: Final = "name"
 ATTR_CUSTOM_NAME: Final = "custom_name"
 ATTR_OUTLINE: Final = "outline"
@@ -193,6 +197,7 @@ ATTR_POSSIBILTY: Final = "possibility"
 ATTR_PICTURE_STATUS: Final = "picture_status"
 ATTR_IGNORE_STATUS: Final = "ignore_status"
 ATTR_ROOM: Final = "room"
+ATTR_REASON: Final = "reason"
 ATTR_ROUTER_POSITION: Final = "router_position"
 ATTR_FURNITURES: Final = "furnitures"
 ATTR_STARTUP_METHOD: Final = "startup_method"
@@ -295,6 +300,25 @@ class DreameVacuumErrorCode(IntEnum):
     LOW_BATTERY_TURN_OFF = 75
     DIRTY_TANK_NOT_INSTALLED = 76
     ROBOT_IN_HIDDEN_ROOM = 78
+    LDS_FAILED_TO_LIFT = 79
+    ROBOT_STUCK = 80
+    ROBOT_STUCK_REPEAT = 81
+    SLIPPERY_FLOOR = 82
+    UNKNOWN_ERROR = 84
+    CHECK_MOP_INSTALL = 85
+    DIRTY_WATER_TANK_FULL = 86
+    RETRACTABLE_LEG_STUCK = 88
+    INTERNAL_ERROR = 89
+    ROBOT_STUCK_2 = 90
+    ROBOT_STUCK_ON_TABLES = 91
+    ROBOT_STUCK_ON_PASSAGE = 92
+    ROBOT_STUCK_ON_THRESHOLD = 93
+    ROBOT_STUCK_ON_LOW_LYING_AREA = 94
+    ROBOT_STUCK_ON_RAMP = 95
+    ROBOT_STUCK_ON_OBSTACLE = 96
+    ROBOT_STUCK_ON_PET = 97
+    ROBOT_STUCK_ON_SLIPPERY_SURFACE = 98
+    ROBOT_STUCK_ON_CARPET = 99
     BIN_FULL = 101
     BIN_OPEN = 102
     BIN_OPEN_2 = 103
@@ -314,9 +338,28 @@ class DreameVacuumErrorCode(IntEnum):
     WASHBOARD_LEVEL = 119
     NO_MOP_IN_STATION = 120
     DUST_BAG_FULL = 121
-    UNKNOWN_WARNING_2 = 122
+    UNKNOWN_WARNING = 122
     SELF_TEST_FAILED = 123
     WASHBOARD_NOT_WORKING = 124
+    DRAINAGE_FAILED = 125
+    MOP_NOT_DETECTED = 126
+    MOP_HOLDER_ERROR = 127
+    DOCK_ERROR = 128
+    WASH_FAILED = 129
+    ROBOT_STUCK_ON_CURTAIN = 200
+    EDGE_MOP_STOP_ROTATE = 201
+    EDGE_MOP_DETACHED = 202
+    CHASSIS_LIFT_MALFUNCTION = 203
+    INTERNAL_ERROR_2 = 207
+    MOP_COVER_ERROR = 209
+    ROLLER_MOP_ERROR = 210
+    ONBOARD_WATER_TANK_EMPTY = 213
+    ONBOARD_DIRTY_WATER_TANK_FULL = 214
+    MOP_NOT_INSTALLED = 215
+    ROLLER_MOP_ERROR_2 = 218
+    FLUFFING_ROLLER_ERROR = 222
+    MOP_COVER_ERROR_2 = 223
+    BLOCKED_BY_OBSTACLE = 226
     RETURN_TO_CHARGE_FAILED = 1000
 
 
@@ -357,9 +400,24 @@ class DreameVacuumState(IntEnum):
     RETURNING_TO_DRAIN = 31
     DRAINING = 32
     AUTO_WATER_DRAINING = 33
+    EMPTYING = 34
+    DUST_BAG_DRYING = 35
+    DUST_BAG_DRYING_PAUSED = 36
+    HEADING_TO_EXTRA_CLEANING = 37
+    EXTRA_CLEANING = 38
+    FINDING_PET_PAUSED = 95
+    FINDING_PET = 96
     SHORTCUT = 97
     MONITORING = 98
     MONITORING_PAUSED = 99
+    INITIAL_DEEP_CLEANING = 101
+    INITIAL_DEEP_CLEANING_PAUSED = 102
+    SANITIZING = 103
+    SANITIZING_WITH_DRY = 104
+    CHANGING_MOP = 105
+    CHANGING_MOP_PAUSED = 106
+    FLOOR_MAINTAINING = 107
+    FLOOR_MAINTAINING_PAUSED = 108
 
 
 class DreameVacuumStateOld(IntEnum):
@@ -631,25 +689,6 @@ class DreameVacuumCustomMoppingRoute(IntEnum):
     DEEP = 2
 
 
-class DreameVacuumSegmentMoppingMode(IntEnum):
-    """Dreame Vacuum Segment mopping effect"""
-
-    UNKNOWN = -1
-    AUTO = 0
-    DAILY_DRY = 1
-    ACCURATE_DRY = 2
-    DEEP_DRY = 3
-    DAILY_STANDARD = 4
-    ACCURATE_STANDARD = 5
-    DEEP_STANDARD = 6
-    DAILY_WET = 7
-    ACCURATE_WET = 8
-    DEEP_WET = 9
-    QUICK_DRY = 10
-    QUICK_STANDARD = 11
-    QUICK_WET = 12
-
-
 class DreameVacuumWiderCornerCoverage(IntEnum):
     """Dreame Vacuum wider corner coverage"""
 
@@ -682,9 +721,10 @@ class DreameVacuumSelfCleanFrequency(IntEnum):
     """Dreame Vacuum self clean frequency"""
 
     UNKNOWN = -1
-    BY_ROOM = 0
     BY_AREA = 1
     BY_TIME = 2
+    BY_ROOM = 3
+    INTELLIGENT = 4
 
 
 class DreameVacuumAutoEmptyMode(IntEnum):
@@ -695,6 +735,18 @@ class DreameVacuumAutoEmptyMode(IntEnum):
     STANDARD = 1
     HIGH_FREQUENCY = 2
     LOW_FREQUENCY = 3
+
+
+class DreameVacuumAutoEmptyModeV2(IntEnum):
+    """Dreame Vacuum auto empty mode"""
+
+    UNKNOWN = -1
+    OFF = 0
+    STANDARD = 1
+    INTELLIGENT = 2
+    LOW_FREQUENCY = 3
+    CUSTOM_FREQUENCY = 4
+    HIGH_FREQUENCY = 5
 
 
 class DreameVacuumCleanGenius(IntEnum):
@@ -756,7 +808,44 @@ class DreameVacuumVoiceAssistantLanguage(str, Enum):
     DEFAULT = ""
     ENGLISH = "EN"
     GERMAN = "DE"
+    RUSSIAN = "RU"
+    ITALIAN = "IT"
+    FRENCH = "FR"
+    KOREAN = "KO"
     CHINESE = "ZH"
+
+
+class DreameVacuumMopPressure(IntEnum):
+    """Dreame Vacuum mop pressure"""
+
+    UNKNOWN = -1
+    LIGHT = 0
+    NORMAL = 2
+
+
+class DreameVacuumMopTemperature(IntEnum):
+    """Dreame Vacuum mop temperature"""
+
+    UNKNOWN = -1
+    NORMAL = 0
+    WARM = 1
+
+
+class DreameVacuumLowLyingAreaFrequency(IntEnum):
+    """Dreame Vacuum low lying area frequency"""
+
+    UNKNOWN = -1
+    WEEKLY = 0
+    DAILY = 1
+
+
+class DreameVacuumScraperFrequency(IntEnum):
+    """Dreame Vacuum scraper frequency"""
+
+    UNKNOWN = -1
+    OFF = 0
+    WEEKLY = 1
+    DAILY = 2
 
 
 class DreameVacuumStreamStatus(IntEnum):
@@ -815,6 +904,19 @@ class DreameVacuumTaskType(IntEnum):
     WATER_STAIN_PAUSED = 16
     BOOSTED_EDGE_CLEANING = 17
     HAIR_COMPRESSING = 18
+    LARGE_PARTICLE_CLEANING = 19
+    INTENSIVE_STAIN_CLEANING = 20
+    STAIN_CLEANING = 21
+    INITIAL_DEEP_CLEANING = 22
+    INITIAL_DEEP_CLEANING_PAUSED = 23
+    MOP_PAD_HEATING = 24
+    CLEANING_AFTER_MAPPING = 25
+    SMALL_PARTICLE_CLEANING = 26
+    CHANGING_MOP = 30
+    CHANGING_MOP_PAUSED = 31
+    FLOOR_MAINTAINING = 32
+    FLOOR_MAINTAINING_PAUSED = 33
+    WOOD_FLOOR_MAINTAINING = 36
 
 
 class DreameVacuumMapRecoveryStatus(IntEnum):
@@ -845,7 +947,7 @@ class DreameVacuumCleanWaterTankStatus(IntEnum):
     INSTALLED = 0
     NOT_INSTALLED = 1
     LOW_WATER = 2
-    ACTIVE = 3
+    CHECKING = 3
 
 
 class DreameVacuumDirtyWaterTankStatus(IntEnum):
@@ -908,6 +1010,33 @@ class DreameVacuumWaterTemperature(IntEnum):
     MILD = 1
     WARM = 2
     HOT = 3
+    MAX = 4
+
+
+class DreameVacuumDustBagDryingStatus(IntEnum):
+    """Dreame Vacuum dust bag drying status"""
+
+    UNKNOWN = -1
+    IDLE = 0
+    DRYING = 1
+    PAUSED = 2
+
+
+class DreameVacuumAutoLDSCoverage(IntEnum):
+    """Dreame Vacuum auto lds coverage"""
+
+    UNKNOWN = -1
+    OFF = 0
+    SECURITY = 1
+    EXTREME = 2
+
+
+class DreameVacuumShortcutTaskType(IntEnum):
+    UNKNOWN = -1
+    ALL = 0
+    SEGMENT = 1
+    ZONE = 2
+    CUSTOMIZED_CLEANING = 3
 
 
 class DreameVacuumProperty(IntEnum):
@@ -1035,7 +1164,7 @@ class DreameVacuumProperty(IntEnum):
     TOTAL_RUNTIME = 119
     TOTAL_CRUISE_TIME = 120
     MAP_SAVING = 121
-    ROBOT_CONFIG = 122
+    KEEP_ALIVE = 122
     AUTO_DUST_COLLECTING = 123
     AUTO_EMPTY_FREQUENCY = 124
     DUST_COLLECTION = 125
@@ -1053,10 +1182,10 @@ class DreameVacuumProperty(IntEnum):
     DETERGENT_TIME_LEFT = 137
     SQUEEGEE_LEFT = 138
     SQUEEGEE_TIME_LEFT = 139
-    ONBOARD_DIRTY_WATER_TANK_LEFT = 140
-    ONBOARD_DIRTY_WATER_TANK_TIME_LEFT = 141
-    DIRTY_WATER_TANK_LEFT = 142
-    DIRTY_WATER_TANK_TIME_LEFT = 143
+    DIRTY_WATER_CHANNEL_DIRTY_TIME_LEFT = 140
+    DIRTY_WATER_CHANNEL_DIRTY_LEFT = 141
+    ONBOARD_DIRTY_WATER_TANK_TIME_LEFT = 142
+    ONBOARD_DIRTY_WATER_TANK_LEFT = 143
     CLEAN_WATER_TANK_STATUS = 144
     DIRTY_WATER_TANK_STATUS = 145
     DUST_BAG_STATUS = 146
@@ -1071,96 +1200,141 @@ class DreameVacuumProperty(IntEnum):
     HAND_DUST_STATUS = 155
     HAND_DUST_CONNECT_STATUS = 156
     HOT_WATER_STATUS = 157
-    WETNESS_LEVEL = 158
-    CLEAN_CARPETS_FIRST = 159
-    AUTO_LDS_LIFTING = 160
-    LDS_STATE = 161
-    CLEANGENIUS_MODE = 162
-    QUICK_WASH_MODE = 163
-    WATER_TEMPERATURE = 164
-    CLEAN_EFFICIENCY = 165
-    IMPACT_INJECTION_PUMP = 166
-    OBSTACLE_VIDEOS = 167
-    DND_DISABLE_RESUME_CLEANING = 168
-    DND_DISABLE_AUTO_EMPTY = 169
-    DND_REDUCE_VOLUME = 170
-    HAND_VACUUM_AUTO_DUSTING = 171
-    DYNAMIC_OBSTACLE_CLEAN = 172
-    HUMAN_NOISE_REDUCTION = 173
-    PET_CARE = 174
-    LOWER_HATCH_CONTROL = 175
-    SMART_MOP_WASHING = 176
-    BLOCK_HEALTH_CHECKS = 177
-    MOP_AFTER_VACUUM = 178
-    SMALL_AREA_FAST_CLEAN = 179
-    SHIELD_ULTRASONIC_SIGNALS = 180
-    SILENT_DRYING = 181
-    HAIR_COMPRESSION = 182
-    SIDE_BRUSH_CARPET_ROTATE = 183
-    ERP_LOW_POWER = 184
-    SHIELD_WASHBOARD_IN_PLACE = 185
-    SELF_CLEANING_PROBLEM = 186
-    WASHING_TEST = 187
-    FEEDBACK_SWITCH = 188
-    CARPET_AI_SEGMENT = 189
-    OBSTACLE_CROSSING = 190
-    VISUAL_RESUME = 191
-    FAN_ABNORMAL_NOISE = 192
-    LARGE_MEMORY_RESET = 193
-    BOW_BEFORE_EDGE = 194
-    VOLTAGE = 195
-    DETERGENT_A = 196
-    DETERGENT_B = 197
-    MOP_TEMPERATURE = 198
-    BATTERY_CHARGE_LEVEL = 199
-    DUST_BAG_DRYING = 200
-    SWEEP_DISTANCE = 201
-    LDS_LIFTING_FREQUENCY = 202
-    MOP_WASHING_WITH_DETERGENT = 203
-    PRESSURIZED_CLEANING = 204
-    SCRAPER_FREQUENCY = 205
-    DEODORIZER_TIME_LEFT = 206
-    DEODORIZER_LEFT = 207
-    WHEEL_DIRTY_TIME_LEFT = 208
-    WHEEL_DIRTY_LEFT = 209
-    SCALE_INHIBITOR_TIME_LEFT = 210
-    SCALE_INHIBITOR_LEFT = 211
-    FACTORY_TEST_STATUS = 212
-    FACTORY_TEST_RESULT = 213
-    SELF_TEST_STATUS = 214
-    LSD_TEST_STATUS = 215
-    DEBUG_SWITCH = 216
-    SERIAL = 217
-    CALIBRATION_STATUS = 218
-    VERSION = 219
-    PERFORMANCE_SWITCH = 220
-    AI_TEST_STATUS = 221
-    PUBLIC_KEY = 222
-    AUTO_PAIR = 223
-    MCU_VERSION = 224
-    MOP_TEST_STATUS = 225
-    PLATFORM_NETWORK = 226
-    STREAM_STATUS = 227
-    STREAM_AUDIO = 228
-    STREAM_RECORD = 229
-    TAKE_PHOTO = 230
-    STREAM_KEEP_ALIVE = 231
-    STREAM_FAULT = 232
-    CAMERA_LIGHT_BRIGHTNESS = 233
-    CAMERA_LIGHT = 234
-    STREAM_VENDOR = 235
-    STREAM_PROPERTY = 236
-    STREAM_CRUISE_POINT = 237
-    STREAM_TASK = 238
-    STEAM_HUMAN_FOLLOW = 239
-    OBSTACLE_VIDEO_STATUS = 240
-    OBSTACLE_VIDEO_DATA = 241
-    STREAM_UPLOAD = 242
-    STREAM_CODE = 243
-    STREAM_SET_CODE = 244
-    STREAM_VERIFY_CODE = 245
-    STREAM_RESET_CODE = 246
-    STREAM_SPACE = 247
+    THRESHOLD_CONFIRMATION_STATUS = 158
+    DUST_BAG_DRYING_LEFT = 159
+    DUST_BAG_DRYING_STATUS = 160
+    DUST_BOX_STATUS = 161
+    ROLLER_COVER = 162
+    CABIN_DOOR_DRYING_LEFT_TIME = 163
+    MOP_TRANSPORT_CARRIER_RESET = 164
+    MOP_TRANSPORT_CARRIER_STATUS = 165
+    ROLLER_COVER_STATUS = 166
+    WASHBOARD_CLEANING_STATUS = 167
+    MECHANICAL_FOOT_STATUS = 168
+    STATION_OTA_STATUS = 169
+    WETNESS_LEVEL = 170
+    CLEAN_CARPETS_FIRST = 171
+    AUTO_LDS_COVERAGE = 172
+    LDS_STATE = 173
+    CLEANGENIUS_MODE = 174
+    QUICK_WASH_MODE = 175
+    WATER_TEMPERATURE = 176
+    CLEAN_EFFICIENCY = 177
+    IMPACT_INJECTION_PUMP = 178
+    OBSTACLE_VIDEOS = 179
+    DND_DISABLE_RESUME_CLEANING = 180
+    DND_DISABLE_AUTO_EMPTY = 181
+    DND_REDUCE_VOLUME = 182
+    HAND_VACUUM_AUTO_DUSTING = 183
+    DYNAMIC_OBSTACLE_CLEANING = 185
+    HUMAN_NOISE_REDUCTION = 186
+    PET_CARE = 187
+    LOWER_HATCH_CONTROL = 188
+    SMART_MOP_WASHING = 189
+    BLOCK_HEALTH_CHECKS = 190
+    MOP_AFTER_VACUUM = 191
+    SMALL_AREA_FAST_CLEAN = 192
+    SHIELD_ULTRASONIC_SIGNALS = 193
+    SILENT_DRYING = 194
+    HAIR_COMPRESSION = 195
+    SIDE_BRUSH_CARPET_ROTATE = 196
+    ERP_LOW_POWER = 197
+    SHIELD_WASHBOARD_IN_PLACE = 198
+    SELF_CLEANING_PROBLEM = 199
+    WASHING_TEST = 200
+    FEEDBACK_SWITCH = 201
+    CARPET_AI_SEGMENT = 202
+    OBSTACLE_CROSSING = 203
+    VISUAL_RESUME = 204
+    FAN_ABNORMAL_NOISE = 205
+    LARGE_MEMORY_RESET = 206
+    BOW_BEFORE_EDGE = 207
+    VOLTAGE = 208
+    DETERGENT_A = 209
+    DETERGENT_B = 210
+    MOP_TEMPERATURE = 211
+    BATTERY_CHARGE_LEVEL = 212
+    DUST_BAG_DRYING = 213
+    SWEEP_DISTANCE = 214
+    LOW_LYING_AREA_FREQUENCY = 215
+    MOPPING_WITH_DETERGENT = 216
+    PRESSURIZED_CLEANING = 217
+    SCRAPER_FREQUENCY = 218
+    REALTIME_PARTICLE_DETECT = 219
+    IGNORE_STAIRS = 220
+    LIFT_CHASSIS_ON_CARPET = 221
+    RING_LIGHT_ALWAYS_ON = 222
+    AUTO_CHANGE_MOP = 223
+    POWER_SAVING = 224
+    WHEEL_LIFT_BOOST_MOPPING = 225
+    CABIN_DOOR_DRYING_TIME = 226
+    CABIN_DOOR_SILENT_DRYING = 227
+    CABIN_DOOR_DRYING = 228
+    CLOSE_ROLLER_COVER_ON_CARPET = 229
+    FLOOR_MAINTAINING = 230
+    DETERGENT_C = 231
+    STORE_MODE = 232
+    INTEGRATED_POWER = 233
+    INTELLIGENT_STAIN_CLEANING = 234
+    ACTIVE_SUSPENSION_CROSSING = 235
+    SHIELD_ROLLER_ACTIVE = 236
+    MOP_PRESSURE = 237
+    PET_AI_MODEL = 238
+    LOWER_LDS_WHILE_DOCKING = 239
+    RL_NAVIGATION_MESSAGE = 240
+    DUST_LIGHT = 241
+    QUICK_MOP_SWITCHING = 242
+    BLOCK_AGENCY_ALARM = 243
+    EXHIBITION_MODE = 244
+    AUTO_EMPTY_AREA = 245
+    DEODORIZER_TIME_LEFT = 246
+    DEODORIZER_LEFT = 247
+    WHEEL_DIRTY_TIME_LEFT = 248
+    WHEEL_DIRTY_LEFT = 249
+    SCALE_INHIBITOR_TIME_LEFT = 250
+    SCALE_INHIBITOR_LEFT = 251
+    FLUFFING_ROLLER_DIRTY_LEFT = 252
+    FLUFFING_ROLLER_DIRTY_TIME_LEFT = 253
+    ROLLER_MOP_FILTER_DIRTY_TIME_LEFT = 254
+    ROLLER_MOP_FILTER_DIRTY_LEFT = 255
+    WATER_OUTLET_FILTER_DIRTY_TIME_LEFT = 256
+    WATER_OUTLET_FILTER_DIRTY_LEFT = 257
+    FACTORY_TEST_STATUS = 258
+    FACTORY_TEST_RESULT = 259
+    SELF_TEST_STATUS = 260
+    LSD_TEST_STATUS = 261
+    DEBUG_SWITCH = 262
+    SERIAL = 263
+    CALIBRATION_STATUS = 264
+    VERSION = 265
+    PERFORMANCE_SWITCH = 266
+    AI_TEST_STATUS = 267
+    PUBLIC_KEY = 268
+    AUTO_PAIR = 269
+    MCU_VERSION = 270
+    MOP_TEST_STATUS = 271
+    PLATFORM_NETWORK = 272
+    STREAM_STATUS = 273
+    STREAM_AUDIO = 274
+    STREAM_RECORD = 275
+    TAKE_PHOTO = 276
+    STREAM_KEEP_ALIVE = 277
+    STREAM_FAULT = 278
+    CAMERA_LIGHT_BRIGHTNESS = 279
+    CAMERA_LIGHT = 280
+    STREAM_VENDOR = 281
+    STREAM_PROPERTY = 282
+    STREAM_CRUISE_POINT = 283
+    STREAM_TASK = 284
+    STEAM_HUMAN_FOLLOW = 285
+    OBSTACLE_VIDEO_STATUS = 286
+    OBSTACLE_VIDEO_DATA = 287
+    STREAM_UPLOAD = 288
+    STREAM_CODE = 289
+    STREAM_SET_CODE = 290
+    STREAM_VERIFY_CODE = 291
+    STREAM_RESET_CODE = 292
+    STREAM_SPACE = 293
 
 
 class DreameVacuumAutoSwitchProperty(str, Enum):
@@ -1199,6 +1373,7 @@ class DreameVacuumAutoSwitchProperty(str, Enum):
     MOP_EXTEND = "MopExtrSwitch"
     MOP_EXTEND_FREQUENCY = "ExtrFreq"
     SIDE_REACH = "SbrushExtrSwitch"
+    INTELLIGENT_STAIN_CLEANING = "HeavyStainSmart"
 
 
 class DreameVacuumStrAIProperty(str, Enum):
@@ -1241,33 +1416,37 @@ class DreameVacuumAction(IntEnum):
     START_WASHING = 7
     GET_PHOTO_INFO = 8
     SHORTCUTS = 9
-    REQUEST_MAP = 10
-    UPDATE_MAP_DATA = 11
-    BACKUP_MAP = 12
-    WIFI_MAP = 13
-    LOCATE = 14
-    TEST_SOUND = 15
-    DELETE_SCHEDULE = 16
-    DELETE_CRUISE_SCHEDULE = 17
-    RESET_MAIN_BRUSH = 18
-    RESET_SIDE_BRUSH = 19
-    RESET_FILTER = 20
-    RESET_SENSOR = 21
-    START_AUTO_EMPTY = 22
-    RESET_TANK_FILTER = 23
-    RESET_MOP_PAD = 24
-    RESET_SILVER_ION = 25
-    RESET_DETERGENT = 26
-    RESET_SQUEEGEE = 27
-    RESET_ONBOARD_DIRTY_WATER_TANK = 28
-    RESET_DIRTY_WATER_TANK = 29
-    RESET_DEODORIZER = 30
-    RESET_WHEEL = 31
-    RESET_SCALE_INHIBITOR = 32
-    STREAM_VIDEO = 33
-    STREAM_AUDIO = 34
-    STREAM_PROPERTY = 35
-    STREAM_CODE = 36
+    DELETE_DND_TASK = 10
+    REQUEST_MAP = 11
+    UPDATE_MAP_DATA = 12
+    BACKUP_MAP = 13
+    WIFI_MAP = 14
+    LOCATE = 15
+    TEST_SOUND = 16
+    DELETE_SCHEDULED_TASK = 17
+    DELETE_CRUISE_SCHEDULE = 18
+    RESET_MAIN_BRUSH = 19
+    RESET_SIDE_BRUSH = 20
+    RESET_FILTER = 21
+    RESET_SENSOR = 22
+    START_AUTO_EMPTY = 23
+    RESET_TANK_FILTER = 24
+    RESET_MOP_PAD = 25
+    RESET_SILVER_ION = 26
+    RESET_DETERGENT = 27
+    RESET_SQUEEGEE = 28
+    RESET_DIRTY_WATER_CHANNEL = 29
+    RESET_ONBOARD_DIRTY_WATER_TANK = 30
+    RESET_DEODORIZER = 31
+    RESET_WHEEL = 32
+    RESET_SCALE_INHIBITOR = 33
+    RESET_FLUFFING_ROLLER = 34
+    RESET_ROLLER_MOP_FILTER = 35
+    RESET_WATER_OUTLET_FILTER = 36
+    STREAM_VIDEO = 37
+    STREAM_AUDIO = 38
+    STREAM_PROPERTY = 39
+    STREAM_CODE = 40
 
 
 # Dreame Vacuum property mapping
@@ -1395,7 +1574,7 @@ DreameVacuumPropertyMapping = {
     DreameVacuumProperty.TOTAL_RUNTIME: {siid: 12, piid: 5},
     DreameVacuumProperty.TOTAL_CRUISE_TIME: {siid: 12, piid: 6},
     DreameVacuumProperty.MAP_SAVING: {siid: 13, piid: 1},
-    DreameVacuumProperty.ROBOT_CONFIG: {siid: 14, piid: 1},
+    DreameVacuumProperty.KEEP_ALIVE: {siid: 14, piid: 4},
     DreameVacuumProperty.AUTO_DUST_COLLECTING: {siid: 15, piid: 1},
     DreameVacuumProperty.AUTO_EMPTY_FREQUENCY: {siid: 15, piid: 2},
     DreameVacuumProperty.DUST_COLLECTION: {siid: 15, piid: 3},
@@ -1413,10 +1592,10 @@ DreameVacuumPropertyMapping = {
     DreameVacuumProperty.DETERGENT_TIME_LEFT: {siid: 20, piid: 2},
     DreameVacuumProperty.SQUEEGEE_LEFT: {siid: 24, piid: 1},
     DreameVacuumProperty.SQUEEGEE_TIME_LEFT: {siid: 24, piid: 2},
-    DreameVacuumProperty.ONBOARD_DIRTY_WATER_TANK_LEFT: {siid: 25, piid: 1},
-    DreameVacuumProperty.ONBOARD_DIRTY_WATER_TANK_TIME_LEFT: {siid: 25, piid: 2},
-    DreameVacuumProperty.DIRTY_WATER_TANK_LEFT: {siid: 26, piid: 1},
-    DreameVacuumProperty.DIRTY_WATER_TANK_TIME_LEFT: {siid: 26, piid: 2},
+    DreameVacuumProperty.DIRTY_WATER_CHANNEL_DIRTY_TIME_LEFT: {siid: 25, piid: 1},
+    DreameVacuumProperty.DIRTY_WATER_CHANNEL_DIRTY_LEFT: {siid: 25, piid: 2},
+    DreameVacuumProperty.ONBOARD_DIRTY_WATER_TANK_TIME_LEFT: {siid: 26, piid: 1},
+    DreameVacuumProperty.ONBOARD_DIRTY_WATER_TANK_LEFT: {siid: 26, piid: 2},
     DreameVacuumProperty.CLEAN_WATER_TANK_STATUS: {siid: 27, piid: 1},
     DreameVacuumProperty.DIRTY_WATER_TANK_STATUS: {siid: 27, piid: 2},
     DreameVacuumProperty.DUST_BAG_STATUS: {siid: 27, piid: 3},
@@ -1431,9 +1610,21 @@ DreameVacuumPropertyMapping = {
     DreameVacuumProperty.HAND_DUST_STATUS: {siid: 27, piid: 13},
     DreameVacuumProperty.HAND_DUST_CONNECT_STATUS: {siid: 27, piid: 14},
     DreameVacuumProperty.HOT_WATER_STATUS: {siid: 27, piid: 15},
+    DreameVacuumProperty.THRESHOLD_CONFIRMATION_STATUS: {siid: 27, piid: 16},
+    DreameVacuumProperty.DUST_BAG_DRYING_LEFT: {siid: 27, piid: 17},
+    DreameVacuumProperty.DUST_BAG_DRYING_STATUS: {siid: 27, piid: 18},
+    DreameVacuumProperty.DUST_BOX_STATUS: {siid: 27, piid: 19},
+    DreameVacuumProperty.ROLLER_COVER: {siid: 27, piid: 20},
+    DreameVacuumProperty.CABIN_DOOR_DRYING_LEFT_TIME: {siid: 27, piid: 21},
+    DreameVacuumProperty.MOP_TRANSPORT_CARRIER_RESET: {siid: 27, piid: 24},
+    DreameVacuumProperty.MOP_TRANSPORT_CARRIER_STATUS: {siid: 27, piid: 25},
+    DreameVacuumProperty.ROLLER_COVER_STATUS: {siid: 27, piid: 26},
+    DreameVacuumProperty.WASHBOARD_CLEANING_STATUS: {siid: 27, piid: 27},
+    DreameVacuumProperty.MECHANICAL_FOOT_STATUS: {siid: 27, piid: 28},
+    DreameVacuumProperty.STATION_OTA_STATUS: {siid: 27, piid: 30},
     DreameVacuumProperty.WETNESS_LEVEL: {siid: 28, piid: 1},
     DreameVacuumProperty.CLEAN_CARPETS_FIRST: {siid: 28, piid: 2},
-    DreameVacuumProperty.AUTO_LDS_LIFTING: {siid: 28, piid: 3},
+    DreameVacuumProperty.AUTO_LDS_COVERAGE: {siid: 28, piid: 3},
     DreameVacuumProperty.LDS_STATE: {siid: 28, piid: 4},
     DreameVacuumProperty.CLEANGENIUS_MODE: {siid: 28, piid: 5},
     DreameVacuumProperty.QUICK_WASH_MODE: {siid: 28, piid: 6},
@@ -1445,7 +1636,7 @@ DreameVacuumPropertyMapping = {
     DreameVacuumProperty.DND_DISABLE_AUTO_EMPTY: {siid: 28, piid: 15},
     DreameVacuumProperty.DND_REDUCE_VOLUME: {siid: 28, piid: 16},
     DreameVacuumProperty.HAND_VACUUM_AUTO_DUSTING: {siid: 28, piid: 17},
-    DreameVacuumProperty.DYNAMIC_OBSTACLE_CLEAN: {siid: 28, piid: 18},
+    DreameVacuumProperty.DYNAMIC_OBSTACLE_CLEANING: {siid: 28, piid: 18},
     DreameVacuumProperty.HUMAN_NOISE_REDUCTION: {siid: 28, piid: 19},
     DreameVacuumProperty.PET_CARE: {siid: 28, piid: 20},
     DreameVacuumProperty.LOWER_HATCH_CONTROL: {siid: 28, piid: 21},
@@ -1475,16 +1666,49 @@ DreameVacuumPropertyMapping = {
     DreameVacuumProperty.BATTERY_CHARGE_LEVEL: {siid: 28, piid: 47},
     DreameVacuumProperty.DUST_BAG_DRYING: {siid: 28, piid: 48},
     DreameVacuumProperty.SWEEP_DISTANCE: {siid: 28, piid: 49},
-    DreameVacuumProperty.LDS_LIFTING_FREQUENCY: {siid: 28, piid: 51},
-    DreameVacuumProperty.MOP_WASHING_WITH_DETERGENT: {siid: 28, piid: 52},
+    DreameVacuumProperty.LOW_LYING_AREA_FREQUENCY: {siid: 28, piid: 51},
+    DreameVacuumProperty.MOPPING_WITH_DETERGENT: {siid: 28, piid: 52},
     DreameVacuumProperty.PRESSURIZED_CLEANING: {siid: 28, piid: 53},
     DreameVacuumProperty.SCRAPER_FREQUENCY: {siid: 28, piid: 54},
+    DreameVacuumProperty.REALTIME_PARTICLE_DETECT: {siid: 28, piid: 58},
+    DreameVacuumProperty.IGNORE_STAIRS: {siid: 28, piid: 59},
+    DreameVacuumProperty.LIFT_CHASSIS_ON_CARPET: {siid: 28, piid: 60},
+    DreameVacuumProperty.RING_LIGHT_ALWAYS_ON: {siid: 28, piid: 61},
+    DreameVacuumProperty.AUTO_CHANGE_MOP: {siid: 28, piid: 62},
+    DreameVacuumProperty.POWER_SAVING: {siid: 28, piid: 63},
+    DreameVacuumProperty.WHEEL_LIFT_BOOST_MOPPING: {siid: 28, piid: 64},
+    DreameVacuumProperty.CABIN_DOOR_DRYING_TIME: {siid: 28, piid: 66},
+    DreameVacuumProperty.CABIN_DOOR_SILENT_DRYING: {siid: 28, piid: 67},
+    DreameVacuumProperty.CABIN_DOOR_DRYING: {siid: 28, piid: 68},
+    DreameVacuumProperty.CLOSE_ROLLER_COVER_ON_CARPET: {siid: 28, piid: 69},
+    DreameVacuumProperty.FLOOR_MAINTAINING: {siid: 28, piid: 75},
+    DreameVacuumProperty.DETERGENT_C: {siid: 28, piid: 76},
+    DreameVacuumProperty.STORE_MODE: {siid: 28, piid: 79},
+    DreameVacuumProperty.INTEGRATED_POWER: {siid: 28, piid: 81},
+    DreameVacuumProperty.INTELLIGENT_STAIN_CLEANING: {siid: 28, piid: 83},
+    DreameVacuumProperty.ACTIVE_SUSPENSION_CROSSING: {siid: 28, piid: 84},
+    DreameVacuumProperty.SHIELD_ROLLER_ACTIVE: {siid: 28, piid: 85},
+    DreameVacuumProperty.MOP_PRESSURE: {siid: 28, piid: 86},
+    DreameVacuumProperty.PET_AI_MODEL: {siid: 28, piid: 87},
+    DreameVacuumProperty.LOWER_LDS_WHILE_DOCKING: {siid: 28, piid: 88},
+    DreameVacuumProperty.RL_NAVIGATION_MESSAGE: {siid: 28, piid: 89},
+    DreameVacuumProperty.DUST_LIGHT: {siid: 28, piid: 90},
+    DreameVacuumProperty.QUICK_MOP_SWITCHING: {siid: 28, piid: 92},
+    DreameVacuumProperty.BLOCK_AGENCY_ALARM: {siid: 28, piid: 93},
+    DreameVacuumProperty.EXHIBITION_MODE: {siid: 28, piid: 94},
+    DreameVacuumProperty.AUTO_EMPTY_AREA: {siid: 28, piid: 95},
     DreameVacuumProperty.DEODORIZER_TIME_LEFT: {siid: 29, piid: 1},
     DreameVacuumProperty.DEODORIZER_LEFT: {siid: 29, piid: 2},
     DreameVacuumProperty.WHEEL_DIRTY_TIME_LEFT: {siid: 30, piid: 1},
     DreameVacuumProperty.WHEEL_DIRTY_LEFT: {siid: 30, piid: 2},
     DreameVacuumProperty.SCALE_INHIBITOR_TIME_LEFT: {siid: 31, piid: 1},
     DreameVacuumProperty.SCALE_INHIBITOR_LEFT: {siid: 31, piid: 2},
+    DreameVacuumProperty.FLUFFING_ROLLER_DIRTY_LEFT: {siid: 32, piid: 1},
+    DreameVacuumProperty.FLUFFING_ROLLER_DIRTY_TIME_LEFT: {siid: 32, piid: 2},
+    DreameVacuumProperty.ROLLER_MOP_FILTER_DIRTY_TIME_LEFT: {siid: 33, piid: 1},
+    DreameVacuumProperty.ROLLER_MOP_FILTER_DIRTY_LEFT: {siid: 33, piid: 2},
+    DreameVacuumProperty.WATER_OUTLET_FILTER_DIRTY_TIME_LEFT: {siid: 35, piid: 1},
+    DreameVacuumProperty.WATER_OUTLET_FILTER_DIRTY_LEFT: {siid: 35, piid: 2},
     DreameVacuumProperty.FACTORY_TEST_STATUS: {siid: 99, piid: 1},
     DreameVacuumProperty.FACTORY_TEST_RESULT: {siid: 99, piid: 3},
     DreameVacuumProperty.SELF_TEST_STATUS: {siid: 99, piid: 8},
@@ -1523,6 +1747,7 @@ DreameVacuumPropertyMapping = {
     DreameVacuumProperty.STREAM_SPACE: {siid: 10001, piid: 2003},
 }
 
+
 # Dreame Vacuum action mapping
 DreameVacuumActionMapping = {
     DreameVacuumAction.START: {siid: 2, aiid: 1},
@@ -1534,13 +1759,14 @@ DreameVacuumActionMapping = {
     DreameVacuumAction.START_WASHING: {siid: 4, aiid: 4},
     DreameVacuumAction.GET_PHOTO_INFO: {siid: 4, aiid: 6},
     DreameVacuumAction.SHORTCUTS: {siid: 4, aiid: 8},
+    DreameVacuumAction.DELETE_DND_TASK: {siid: 5, aiid: 1},
     DreameVacuumAction.REQUEST_MAP: {siid: 6, aiid: 1},
     DreameVacuumAction.UPDATE_MAP_DATA: {siid: 6, aiid: 2},
     DreameVacuumAction.BACKUP_MAP: {siid: 6, aiid: 3},
     DreameVacuumAction.WIFI_MAP: {siid: 6, aiid: 4},
     DreameVacuumAction.LOCATE: {siid: 7, aiid: 1},
     DreameVacuumAction.TEST_SOUND: {siid: 7, aiid: 2},
-    DreameVacuumAction.DELETE_SCHEDULE: {siid: 8, aiid: 1},
+    DreameVacuumAction.DELETE_SCHEDULED_TASK: {siid: 8, aiid: 1},
     DreameVacuumAction.DELETE_CRUISE_SCHEDULE: {siid: 8, aiid: 2},
     DreameVacuumAction.RESET_MAIN_BRUSH: {siid: 9, aiid: 1},
     DreameVacuumAction.RESET_SIDE_BRUSH: {siid: 10, aiid: 1},
@@ -1552,16 +1778,20 @@ DreameVacuumActionMapping = {
     DreameVacuumAction.RESET_SILVER_ION: {siid: 19, aiid: 1},
     DreameVacuumAction.RESET_DETERGENT: {siid: 20, aiid: 1},
     DreameVacuumAction.RESET_SQUEEGEE: {siid: 24, aiid: 1},
-    DreameVacuumAction.RESET_ONBOARD_DIRTY_WATER_TANK: {siid: 25, aiid: 1},
-    DreameVacuumAction.RESET_DIRTY_WATER_TANK: {siid: 26, aiid: 1},
+    DreameVacuumAction.RESET_DIRTY_WATER_CHANNEL: {siid: 25, aiid: 1},
+    DreameVacuumAction.RESET_ONBOARD_DIRTY_WATER_TANK: {siid: 26, aiid: 1},
     DreameVacuumAction.RESET_DEODORIZER: {siid: 29, aiid: 1},
     DreameVacuumAction.RESET_WHEEL: {siid: 30, aiid: 1},
     DreameVacuumAction.RESET_SCALE_INHIBITOR: {siid: 31, aiid: 1},
+    DreameVacuumAction.RESET_FLUFFING_ROLLER: {siid: 32, aiid: 1},
+    DreameVacuumAction.RESET_ROLLER_MOP_FILTER: {siid: 33, aiid: 1},
+    DreameVacuumAction.RESET_WATER_OUTLET_FILTER: {siid: 35, aiid: 1},
     DreameVacuumAction.STREAM_VIDEO: {siid: 10001, aiid: 1},
     DreameVacuumAction.STREAM_AUDIO: {siid: 10001, aiid: 2},
     DreameVacuumAction.STREAM_PROPERTY: {siid: 10001, aiid: 3},
     DreameVacuumAction.STREAM_CODE: {siid: 10001, aiid: 4},
 }
+
 
 PROPERTY_AVAILABILITY: Final = {
     DreameVacuumProperty.CUSTOMIZED_CLEANING.name: lambda device: not device.status.started
@@ -1609,14 +1839,13 @@ PROPERTY_AVAILABILITY: Final = {
     and not device.status.cruising
     and (not device.status.customized_cleaning or not device.capability.custom_cleaning_mode)
     and not device.status.cleangenius_cleaning
-    and not device.status.returning
-    and not device.status.draining
+    and not device.status.returning_to_wash
     and not device.status.shortcut_task,
     DreameVacuumProperty.CARPET_SENSITIVITY.name: lambda device: bool(
         device.get_property(DreameVacuumProperty.CARPET_BOOST)
     ),
     DreameVacuumProperty.CARPET_BOOST.name: lambda device: not device.capability.carpet_recognition
-    or not (not device.status.carpet_recognition or device.status.carpet_avoidance),
+    or (device.status.carpet_recognition and not device.status.carpet_avoidance),
     DreameVacuumProperty.CARPET_CLEANING.name: lambda device: device.status.carpet_recognition
     or device.capability.mop_pad_lifting_plus
     or device.capability.auto_carpet_cleaning,
@@ -1644,16 +1873,31 @@ PROPERTY_AVAILABILITY: Final = {
         and device.status.camera_light_brightness != 101
         and device.status.stream_session is not None
     ),
-    DreameVacuumProperty.DRYING_TIME.name: lambda device: bool(not device.status.smart_drying),
+    DreameVacuumProperty.DRYING_TIME.name: lambda device: not device.status.smart_drying and device.status.auto_drying,
     DreameVacuumProperty.MOP_WASH_LEVEL.name: lambda device: device.status.self_clean,
     DreameVacuumProperty.TASK_TYPE.name: lambda device: device.status.task_type.value > 0,
     DreameVacuumProperty.CLEANING_PROGRESS.name: lambda device: bool(
         device.status.started and not device.status.cruising
     ),
-    DreameVacuumProperty.DRYING_PROGRESS.name: lambda device: bool(device.status.drying),
+    DreameVacuumProperty.DRYING_PROGRESS.name: lambda device: device.status.drying,
+    DreameVacuumProperty.DUST_BAG_DRYING_LEFT.name: lambda device: device.status.dust_bag_drying,
     DreameVacuumProperty.CLEAN_CARPETS_FIRST.name: lambda device: not (
         not device.status.carpet_recognition or device.status.carpet_avoidance
     ),
+    DreameVacuumProperty.MOP_PRESSURE.name: lambda device: (device.status.water_tank_or_mop_installed)
+    and not device.status.sweeping
+    and not device.status.fast_mapping
+    and not device.status.scheduled_clean
+    and not device.status.cruising
+    and not device.status.cleangenius_cleaning
+    and not (device.status.customized_cleaning and not (device.status.zone_cleaning or device.status.spot_cleaning)),
+    DreameVacuumProperty.MOP_TEMPERATURE.name: lambda device: (device.status.water_tank_or_mop_installed)
+    and not device.status.sweeping
+    and not device.status.fast_mapping
+    and not device.status.scheduled_clean
+    and not device.status.cruising
+    and not device.status.cleangenius_cleaning
+    and not (device.status.customized_cleaning and not (device.status.zone_cleaning or device.status.spot_cleaning)),
     DreameVacuumAutoSwitchProperty.WIDER_CORNER_COVERAGE.name: lambda device: not device.status.started
     and not device.status.fast_mapping
     and not device.status.washing
@@ -1700,9 +1944,6 @@ PROPERTY_AVAILABILITY: Final = {
     and device.status.ai_pet_detection,
     DreameVacuumAIProperty.PET_FOCUSED_DETECTION.name: lambda device: device.status.ai_obstacle_detection
     and device.status.ai_pet_detection,
-    DreameVacuumAutoSwitchProperty.INTENSIVE_CARPET_CLEANING.name: lambda device: not (
-        not device.status.carpet_recognition or device.status.carpet_avoidance
-    ),
     DreameVacuumAutoSwitchProperty.GAP_CLEANING_EXTENSION.name: lambda device: (
         device.status.mop_extend if device.capability.mop_extend else device.status.mop_pad_swing.value > 0
     ),
@@ -1710,39 +1951,67 @@ PROPERTY_AVAILABILITY: Final = {
         device.status.mop_extend if device.capability.mop_extend else device.status.mop_pad_swing.value > 0
     ),
     DreameVacuumAutoSwitchProperty.AUTO_RECLEANING.name: lambda device: not device.status.has_temporary_map
-    and device.status.segments
+    and device.status.has_saved_map
     and not device.status.fast_mapping
     and not device.status.started,
     DreameVacuumAutoSwitchProperty.AUTO_REWASHING.name: lambda device: not device.status.has_temporary_map
-    and device.status.segments
+    and device.status.has_saved_map
     and not device.status.fast_mapping
     and not device.status.started,
     DreameVacuumAutoSwitchProperty.CLEANING_ROUTE.name: lambda device: not device.status.has_temporary_map
-    and device.status.segments
+    and device.status.has_saved_map
     and device.status.cleaning_route.value > 0
     and not device.status.fast_mapping
     and not device.status.started
     and (not device.status.customized_cleaning or not device.capability.custom_cleaning_mode)
-    and not device.status.cleangenius_cleaning
-    and device.status.custom_mopping_mode,
-    DreameVacuumAutoSwitchProperty.ULTRA_CLEAN_MODE.name: lambda device: device.status.self_clean,
+    and not device.status.cleangenius_cleaning,
+    DreameVacuumAutoSwitchProperty.ULTRA_CLEAN_MODE.name: lambda device: device.status.self_clean
+    and device.status.auto_water_refilling_enabled,
+    DreameVacuumAutoSwitchProperty.INTENSIVE_CARPET_CLEANING.name: lambda device: not device.status.started
+    and device.status.carpet_recognition
+    and not device.status.carpet_avoidance,
     DreameVacuumProperty.FIRST_CLEANING_DATE.name: lambda device: device.get_property(
         DreameVacuumProperty.FIRST_CLEANING_DATE
     ),
     DreameVacuumProperty.WATER_TEMPERATURE.name: lambda device: not device.status.smart_mop_washing
     and device.status.self_clean,
     DreameVacuumProperty.SILENT_DRYING.name: lambda device: not device.status.drying,
-    DreameVacuumProperty.SIDE_BRUSH_CARPET_ROTATE.name: lambda device: device.status.carpet_recognition
-    and not device.status.carpet_avoidance
-    and device.status.carpet_cleaning.value != 6,
-    DreameVacuumProperty.DND_DISABLE_RESUME_CLEANING: lambda device: device.status.dnd,
-    DreameVacuumProperty.DND_DISABLE_AUTO_EMPTY: lambda device: device.status.dnd,
-    DreameVacuumProperty.DND_REDUCE_VOLUME: lambda device: device.status.dnd,
-    DreameVacuumProperty.SMART_MOP_WASHING: lambda device: device.status.self_clean,
+    DreameVacuumProperty.SIDE_BRUSH_CARPET_ROTATE.name: lambda device: not device.status.started
+    and device.status.carpet_recognition
+    and not device.status.carpet_avoidance,
+    DreameVacuumProperty.CLEAN_CARPETS_FIRST.name: lambda device: not device.status.started
+    and device.status.carpet_recognition
+    and not device.status.carpet_avoidance,
+    DreameVacuumProperty.LIFT_CHASSIS_ON_CARPET.name: lambda device: not device.status.started
+    and device.status.carpet_recognition
+    and not device.status.carpet_avoidance,
+    DreameVacuumProperty.CLOSE_ROLLER_COVER_ON_CARPET.name: lambda device: not device.status.started
+    and device.status.carpet_recognition
+    and not device.status.carpet_avoidance,
+    DreameVacuumProperty.AUTO_CHANGE_MOP.name: lambda device: device.status.has_saved_map,
+    DreameVacuumProperty.DND_DISABLE_RESUME_CLEANING.name: lambda device: device.status.dnd,
+    DreameVacuumProperty.DND_DISABLE_AUTO_EMPTY.name: lambda device: device.status.dnd,
+    DreameVacuumProperty.DND_REDUCE_VOLUME.name: lambda device: device.status.dnd,
+    DreameVacuumProperty.SMART_MOP_WASHING.name: lambda device: device.status.self_clean,
+    DreameVacuumProperty.AUTO_EMPTY_AREA.name: lambda device: device.get_property(
+        DreameVacuumProperty.AUTO_DUST_COLLECTING
+    )
+    == 4,
+    DreameVacuumProperty.AUTO_LDS_COVERAGE.name: lambda device: not device.status.started
+    and not device.status.washing
+    and not device.status.washing_paused
+    and not device.status.returning,
+    DreameVacuumProperty.LDS_STATE.name: lambda device: not device.status.started
+    and not device.status.washing_paused
+    and not device.status.returning,
+    DreameVacuumProperty.MOPPING_WITH_DETERGENT: lambda device: device.status.detergent_status
+    is not DreameVacuumDetergentStatus.DISABLED
+    and not device.status.washing,
     "self_clean_area": lambda device: device.status.self_clean
     and not device.status.cleangenius_cleaning
     and not device.status.fast_mapping
     and not device.status.self_clean_by_time
+    and not device.status.self_clean_intelligent
     and (device.status.self_clean_value or (device.status.current_map and not device.status.has_saved_map)),
     "self_clean_time": lambda device: device.status.self_clean
     and not device.status.cleangenius_cleaning
@@ -1798,7 +2067,17 @@ PROPERTY_AVAILABILITY: Final = {
     "custom_mopping_route": lambda device: not device.status.started
     and not device.status.cleangenius_cleaning
     and not device.status.customized_cleaning,
+    "self_clean": lambda device: (
+        device.status.washing_available
+        or device.status.washing
+        or device.status.returning_to_wash_paused
+        or device.status.washing_paused
+    )
+    and not device.status.draining
+    and not device.status.self_repairing,
+    "mapping_time": lambda device: device.status.fast_mapping,
 }
+
 
 ACTION_AVAILABILITY: Final = {
     DreameVacuumAction.RESET_MAIN_BRUSH.name: lambda device: bool(device.status.main_brush_life < 100),
@@ -1813,8 +2092,8 @@ ACTION_AVAILABILITY: Final = {
     DreameVacuumAction.RESET_ONBOARD_DIRTY_WATER_TANK.name: lambda device: bool(
         device.status.onboard_dirty_water_tank_life is not None and device.status.onboard_dirty_water_tank_life < 100
     ),
-    DreameVacuumAction.RESET_DIRTY_WATER_TANK.name: lambda device: bool(
-        device.status.dirty_water_tank_life is not None and device.status.dirty_water_tank_life < 100
+    DreameVacuumAction.RESET_DIRTY_WATER_CHANNEL.name: lambda device: bool(
+        device.status.dirty_water_channel_dirty_life is not None and device.status.dirty_water_channel_dirty_life < 100
     ),
     DreameVacuumAction.RESET_DEODORIZER.name: lambda device: device.status.deodorizer_life is not None
     and bool(device.status.deodorizer_life < 100),
@@ -1822,10 +2101,15 @@ ACTION_AVAILABILITY: Final = {
     and bool(device.status.wheel_dirty_life < 100),
     DreameVacuumAction.RESET_SCALE_INHIBITOR.name: lambda device: device.status.scale_inhibitor_life is not None
     and bool(device.status.scale_inhibitor_life < 100),
+    DreameVacuumAction.RESET_FLUFFING_ROLLER.name: lambda device: device.status.fluffing_roller_dirty_life is not None
+    and bool(device.status.fluffing_roller_dirty_life < 100),
+    DreameVacuumAction.RESET_ROLLER_MOP_FILTER.name: lambda device: device.status.roller_mop_filter_dirty_life
+    is not None
+    and bool(device.status.roller_mop_filter_dirty_life < 100),
+    DreameVacuumAction.RESET_WATER_OUTLET_FILTER.name: lambda device: device.status.water_outlet_filter_dirty_life
+    is not None
+    and bool(device.status.water_outlet_filter_dirty_life < 100),
     DreameVacuumAction.START_AUTO_EMPTY.name: lambda device: device.status.dust_collection_available,
-    DreameVacuumAction.CLEAR_WARNING.name: lambda device: device.status.has_warning
-    or device.status.low_water
-    or device.status.draining_complete,
     DreameVacuumAction.START.name: lambda device: not (
         device.status.started or device.status.draining or device.status.self_repairing
     )
@@ -1833,7 +2117,6 @@ ACTION_AVAILABILITY: Final = {
     or device.status.returning
     or device.status.returning_paused,
     DreameVacuumAction.START_CUSTOM.name: lambda device: not (device.status.draining or device.status.self_repairing),
-    # DreameVacuumAction.START_CUSTOM.name: lambda device: not (device.status.started or device.status.returning or device.status.returning_paused or device.status.draining or device.status.self_repairing),
     DreameVacuumAction.CHARGE.name: lambda device: not device.status.docked and not device.status.returning,
     DreameVacuumAction.PAUSE.name: lambda device: device.status.started
     and not (
@@ -1859,10 +2142,9 @@ ACTION_AVAILABILITY: Final = {
     "start_mapping": lambda device: device.status.mapping_available
     and not device.status.draining
     and not device.status.self_repairing,
-    "manual_drying": lambda device: device.status.drying_available
-    and not device.status.draining
-    and not device.status.self_repairing,
-    "water_tank_draining": lambda device: device.status.water_draining_available and not device.status.self_repairing,
+    "manual_drying": lambda device: device.status.drying_available,
+    "manual_dust_bag_drying": lambda device: device.status.dust_bag_drying_available,
+    "water_tank_draining": lambda device: device.status.water_tank_draining_available,
     "base_station_self_repair": lambda device: not device.status.draining
     and not device.status.self_repairing
     and not device.status.started
@@ -1874,7 +2156,7 @@ ACTION_AVAILABILITY: Final = {
     and not device.status.washing_paused
     and not device.status.drying,
     "base_station_cleaning": lambda device: device.status.docked
-    and not device.status.station_cleaning
+    and (not device.status.station_cleaning or device.capability.washboard_cleaning_status)
     and device.status.water_tank_or_mop_installed
     and not device.status.draining
     and not device.status.self_repairing
@@ -1884,12 +2166,203 @@ ACTION_AVAILABILITY: Final = {
     and not device.status.washing_paused
     and not device.status.drying
     and not device.status.auto_emptying,
-    "start_recleaning": lambda device: not device.status.started and device.status.second_cleaning_available,
-    "empty_water_tank": lambda device: not device.draining
-    and device.docked
-    and not device.status.self_repairing
-    and not device.status.washing,
+    "start_recleaning": lambda device: device.status.second_cleaning_available,
+    "empty_water_tank": lambda device: device.status.water_tank_emptying_available,
 }
+
+
+CONSUMABLE_PROPERTIES: Final = [
+    DreameVacuumProperty.MAIN_BRUSH_TIME_LEFT,
+    DreameVacuumProperty.MAIN_BRUSH_LEFT,
+    DreameVacuumProperty.SIDE_BRUSH_TIME_LEFT,
+    DreameVacuumProperty.SIDE_BRUSH_LEFT,
+    DreameVacuumProperty.FILTER_LEFT,
+    DreameVacuumProperty.FILTER_TIME_LEFT,
+    DreameVacuumProperty.TANK_FILTER_LEFT,
+    DreameVacuumProperty.TANK_FILTER_TIME_LEFT,
+    DreameVacuumProperty.SILVER_ION_TIME_LEFT,
+    DreameVacuumProperty.SILVER_ION_LEFT,
+    DreameVacuumProperty.DETERGENT_TIME_LEFT,
+    DreameVacuumProperty.DETERGENT_LEFT,
+    DreameVacuumProperty.SQUEEGEE_TIME_LEFT,
+    DreameVacuumProperty.SQUEEGEE_LEFT,
+    DreameVacuumProperty.ONBOARD_DIRTY_WATER_TANK_TIME_LEFT,
+    DreameVacuumProperty.ONBOARD_DIRTY_WATER_TANK_LEFT,
+    DreameVacuumProperty.DIRTY_WATER_CHANNEL_DIRTY_TIME_LEFT,
+    DreameVacuumProperty.DIRTY_WATER_CHANNEL_DIRTY_LEFT,
+    DreameVacuumProperty.DEODORIZER_TIME_LEFT,
+    DreameVacuumProperty.DEODORIZER_LEFT,
+    DreameVacuumProperty.WHEEL_DIRTY_TIME_LEFT,
+    DreameVacuumProperty.WHEEL_DIRTY_LEFT,
+    DreameVacuumProperty.SCALE_INHIBITOR_TIME_LEFT,
+    DreameVacuumProperty.SCALE_INHIBITOR_LEFT,
+    DreameVacuumProperty.FLUFFING_ROLLER_DIRTY_TIME_LEFT,
+    DreameVacuumProperty.FLUFFING_ROLLER_DIRTY_LEFT,
+    DreameVacuumProperty.ROLLER_MOP_FILTER_DIRTY_TIME_LEFT,
+    DreameVacuumProperty.ROLLER_MOP_FILTER_DIRTY_LEFT,
+    DreameVacuumProperty.WATER_OUTLET_FILTER_DIRTY_TIME_LEFT,
+    DreameVacuumProperty.WATER_OUTLET_FILTER_DIRTY_LEFT,
+]
+
+
+DISCARDED_PROPERTIES: Final = [
+    DreameVacuumProperty.ERROR,
+    DreameVacuumProperty.STATE,
+    DreameVacuumProperty.STATUS,
+    DreameVacuumProperty.TASK_STATUS,
+    DreameVacuumProperty.AUTO_EMPTY_STATUS,
+    DreameVacuumProperty.FAULTS,
+    DreameVacuumProperty.SELF_WASH_BASE_STATUS,
+    DreameVacuumProperty.AUTO_SWITCH_SETTINGS,
+    DreameVacuumProperty.CAMERA_LIGHT_BRIGHTNESS,
+    DreameVacuumProperty.AI_DETECTION,
+    DreameVacuumProperty.SHORTCUTS,
+    DreameVacuumProperty.MAP_BACKUP_STATUS,
+    DreameVacuumProperty.MAP_RECOVERY_STATUS,
+    DreameVacuumProperty.OFF_PEAK_CHARGING,
+    DreameVacuumProperty.SCHEDULE,
+    DreameVacuumProperty.DND_TASK,
+    DreameVacuumProperty.KEEP_ALIVE,
+]
+
+
+READ_ONLY_PROPERTIES: Final = [
+    DreameVacuumProperty.STATE,
+    DreameVacuumProperty.ERROR,
+    DreameVacuumProperty.FAULTS,
+    DreameVacuumProperty.BATTERY_LEVEL,
+    DreameVacuumProperty.CHARGING_STATUS,
+    DreameVacuumProperty.STATUS,
+    DreameVacuumProperty.WATER_TANK,
+    DreameVacuumProperty.TASK_STATUS,
+    DreameVacuumProperty.WARN_STATUS,
+    DreameVacuumProperty.RELOCATION_STATUS,
+    DreameVacuumProperty.SELF_WASH_BASE_STATUS,
+    DreameVacuumProperty.DUST_COLLECTION,
+    DreameVacuumProperty.AUTO_EMPTY_STATUS,
+    DreameVacuumProperty.CLEANING_PAUSED,
+    DreameVacuumProperty.CLEANING_CANCEL,
+    DreameVacuumProperty.SCHEDULED_CLEAN,
+    DreameVacuumProperty.MOP_IN_STATION,
+    DreameVacuumProperty.MOP_PAD_INSTALLED,
+    DreameVacuumProperty.LOW_WATER_WARNING,
+    DreameVacuumProperty.DRAINAGE_STATUS,
+    DreameVacuumProperty.TASK_TYPE,
+    DreameVacuumProperty.WATER_CHECK,
+    DreameVacuumProperty.MAP_RECOVERY_STATUS,
+    DreameVacuumProperty.CLEAN_WATER_TANK_STATUS,
+    DreameVacuumProperty.DIRTY_WATER_TANK_STATUS,
+    DreameVacuumProperty.DUST_BAG_STATUS,
+    DreameVacuumProperty.DETERGENT_STATUS,
+    DreameVacuumProperty.STATION_DRAINAGE_STATUS,
+    DreameVacuumProperty.HOT_WATER_STATUS,
+    DreameVacuumProperty.ROLLER_COVER_STATUS,
+    DreameVacuumProperty.DUST_BAG_DRYING_STATUS,
+    DreameVacuumProperty.DUST_BAG_DRYING_LEFT,
+]
+
+
+READ_WRITE_PROPERTIES: Final = [
+    DreameVacuumProperty.WATER_VOLUME,
+    DreameVacuumProperty.SUCTION_LEVEL,
+    DreameVacuumProperty.RESUME_CLEANING,
+    DreameVacuumProperty.CARPET_BOOST,
+    DreameVacuumProperty.MOP_CLEANING_REMAINDER,
+    DreameVacuumProperty.OBSTACLE_AVOIDANCE,
+    DreameVacuumProperty.AI_DETECTION,
+    DreameVacuumProperty.DRYING_TIME,
+    DreameVacuumProperty.AUTO_ADD_DETERGENT,
+    DreameVacuumProperty.CARPET_CLEANING,
+    DreameVacuumProperty.CLEANING_MODE,
+    DreameVacuumProperty.WATER_ELECTROLYSIS,
+    DreameVacuumProperty.INTELLIGENT_RECOGNITION,
+    DreameVacuumProperty.AUTO_WATER_REFILLING,
+    DreameVacuumProperty.AUTO_MOUNT_MOP,
+    DreameVacuumProperty.MOP_WASH_LEVEL,
+    DreameVacuumProperty.CUSTOMIZED_CLEANING,
+    DreameVacuumProperty.CHILD_LOCK,
+    DreameVacuumProperty.CARPET_SENSITIVITY,
+    DreameVacuumProperty.TIGHT_MOPPING,
+    DreameVacuumProperty.CARPET_RECOGNITION,
+    DreameVacuumProperty.SELF_CLEAN,
+    DreameVacuumProperty.DND_TASK,
+    DreameVacuumProperty.SCHEDULE,
+    DreameVacuumProperty.MULTI_FLOOR_MAP,
+    DreameVacuumProperty.VOLUME,
+    DreameVacuumProperty.AUTO_DUST_COLLECTING,
+    DreameVacuumProperty.AUTO_EMPTY_FREQUENCY,
+    DreameVacuumProperty.VOICE_PACKET_ID,
+    DreameVacuumProperty.TIMEZONE,
+    DreameVacuumProperty.MAP_SAVING,
+    DreameVacuumProperty.AUTO_SWITCH_SETTINGS,
+    DreameVacuumProperty.SHORTCUTS,
+    DreameVacuumProperty.VOICE_ASSISTANT,
+    DreameVacuumProperty.CRUISE_SCHEDULE,
+    DreameVacuumProperty.CAMERA_LIGHT_BRIGHTNESS,
+    DreameVacuumProperty.STREAM_PROPERTY,
+    DreameVacuumProperty.STREAM_SPACE,
+    DreameVacuumProperty.VOICE_ASSISTANT_LANGUAGE,
+    DreameVacuumProperty.OFF_PEAK_CHARGING,
+    DreameVacuumProperty.WETNESS_LEVEL,
+    DreameVacuumProperty.CLEAN_CARPETS_FIRST,
+    DreameVacuumProperty.QUICK_WASH_MODE,
+    DreameVacuumProperty.DND,
+    DreameVacuumProperty.DND_START,
+    DreameVacuumProperty.DND_END,
+    DreameVacuumProperty.CLEANGENIUS_MODE,
+    DreameVacuumProperty.SMART_MOP_WASHING,
+    DreameVacuumProperty.WATER_TEMPERATURE,
+    DreameVacuumProperty.DND_DISABLE_RESUME_CLEANING,
+    DreameVacuumProperty.DND_DISABLE_AUTO_EMPTY,
+    DreameVacuumProperty.DND_REDUCE_VOLUME,
+    DreameVacuumProperty.SILENT_DRYING,
+    DreameVacuumProperty.HAIR_COMPRESSION,
+    DreameVacuumProperty.SIDE_BRUSH_CARPET_ROTATE,
+    DreameVacuumProperty.AUTO_LDS_COVERAGE,
+    DreameVacuumProperty.MOPPING_WITH_DETERGENT,
+    DreameVacuumProperty.LIFT_CHASSIS_ON_CARPET,
+    DreameVacuumProperty.CLOSE_ROLLER_COVER_ON_CARPET,
+    DreameVacuumProperty.MOP_PRESSURE,
+    DreameVacuumProperty.MOP_TEMPERATURE,
+    DreameVacuumProperty.LOW_LYING_AREA_FREQUENCY,
+    DreameVacuumProperty.SCRAPER_FREQUENCY,
+    DreameVacuumProperty.AUTO_CHANGE_MOP,
+    DreameVacuumProperty.DUST_BAG_DRYING,
+    DreameVacuumProperty.RING_LIGHT_ALWAYS_ON,
+    DreameVacuumProperty.OBSTACLE_CROSSING,
+    DreameVacuumProperty.ACTIVE_SUSPENSION_CROSSING,
+    DreameVacuumProperty.DYNAMIC_OBSTACLE_CLEANING,
+    DreameVacuumProperty.PRESSURIZED_CLEANING,
+    DreameVacuumProperty.BATTERY_CHARGE_LEVEL,
+    DreameVacuumProperty.AUTO_EMPTY_AREA,
+    DreameVacuumProperty.LDS_STATE,
+    DreameVacuumProperty.ROLLER_COVER,
+]
+
+
+WARNING_ERROR_CODE: Final = [
+    DreameVacuumErrorCode.REMOVE_MOP,
+    DreameVacuumErrorCode.MOP_REMOVED_2,
+    DreameVacuumErrorCode.CLEAN_MOP_PAD,
+    DreameVacuumErrorCode.BLOCKED,
+    DreameVacuumErrorCode.WATER_TANK_DRY,
+    DreameVacuumErrorCode.MOP_PAD_STOP_ROTATE,
+    DreameVacuumErrorCode.MOP_PAD_STOP_ROTATE_2,
+    DreameVacuumErrorCode.STATION_DISCONNECTED,
+    DreameVacuumErrorCode.DUST_BAG_FULL,
+    DreameVacuumErrorCode.SELF_TEST_FAILED,
+    DreameVacuumErrorCode.LOW_BATTERY_TURN_OFF,
+    DreameVacuumErrorCode.TANKBOX,
+    DreameVacuumErrorCode.WATERBOX_EMPTY,
+    DreameVacuumErrorCode.FILTER_BLOCKED,
+    DreameVacuumErrorCode.CHECK_MOP_INSTALL,
+    DreameVacuumErrorCode.WASH_FAILED,
+    DreameVacuumErrorCode.LASER,
+    DreameVacuumErrorCode.BATTERY_LOW,
+    DreameVacuumErrorCode.SLIPPERY_FLOOR,
+    DreameVacuumErrorCode.ONBOARD_WATER_TANK_EMPTY,
+    DreameVacuumErrorCode.ONBOARD_DIRTY_WATER_TANK_FULL,
+]
 
 
 def PIID(property: DreameVacuumProperty, mapping=DreameVacuumPropertyMapping) -> int | None:
@@ -1933,7 +2406,7 @@ class ObstacleType(IntEnum):
     TOY = 132
     SHOES = 133
     SOCK = 134
-    POO = 135
+    FECE = 135
     TRASH_CAN = 136
     FABRIC = 137
     POWER_STRIP = 138
@@ -1942,13 +2415,21 @@ class ObstacleType(IntEnum):
     PET = 158
     # ??? = 160
     # ??? = 166
-    DETECTED_STAIN = 169
     CLEANING_TOOLS = 163
-    NEGLECTED_ROOM = 200
+    DETECTED_STAIN = 169
+    BLOCKED_ROOM = 200
     EASY_TO_STUCK_FURNITURE = 201
-    MIXED_STAIN = 202
+    UNCLEANABLE_STAIN = 202
+    LEG = 204
     LARGE_PARTICLES = 205
     DRIED_STAIN = 206
+    FOOD_BOWL = 209
+    PET_BED = 210
+    CLEANED_STAIN = 214
+    SKIPPED_UNCLEANABLE_STAIN = 215
+    CLEANED_DRIED_STAIN = 216
+    CLEANED_LARGE_PARTICLES = 217
+    PEN = 228
 
 
 class ObstacleIgnoreStatus(IntEnum):
@@ -1956,6 +2437,8 @@ class ObstacleIgnoreStatus(IntEnum):
     NOT_IGNORED = 0
     MANUALLY_IGNORED = 1
     AUTOMATICALLY_IGNORED = 2
+    ERROR = 3
+    HIDDEN = 4
 
 
 class ObstaclePictureStatus(IntEnum):
@@ -1966,7 +2449,7 @@ class ObstaclePictureStatus(IntEnum):
     UPLOAD_FAILED = 3
 
 
-class SegmentNeglectReason(IntEnum):
+class SegmentSkipReason(IntEnum):
     BLOCKED_BY_VIRTUAL_WALL = 2
     BLOCKED_BY_DOOR = 3
     BLOCKED_BY_THRESHOLD = 4
@@ -1977,10 +2460,10 @@ class SegmentNeglectReason(IntEnum):
     BLOCKED_BY_DYNAMIC_OBSTACLE = 9
     PASSAGE_TOO_LOW = 10
     STEP_TOO_LOW = 27
+    FAILED_TO_CROSS_THRESHOLD = 33
 
 
 class TaskInterruptReason(IntEnum):
-    UNKNOWN = -1
     TASK_COMPLETED = 0
     ROBOT_LIFTED = 11
     ROBOT_FALLEN = 12
@@ -2030,6 +2513,8 @@ class FurnitureType(IntEnum):
     L_SHAPED_SOFA = 24
     ROUND_COFFEE_TABLE = 25
     TABLE = 26
+    # ??? = 27
+    # ??? = 28
     ARM_CHAIR_NARROW = 29
     THREE_SEAT_SOFA_NARROW = 30
     L_SHAPED_SOFA_RIGHT = 31
@@ -2065,7 +2550,6 @@ class DeviceCapability(IntEnum):
     CLEANING_ROUTE = 17
     MOPPING_SETTINGS = 18
     SEGMENT_SLOW_CLEAN_ROUTE = 19
-    SMALL_SELF_CLEAN_AREA = 20
     TASK_TYPE = 21
     ULTRA_CLEAN_MODE = 22
     EXTENDED_FURNITURES = 23
@@ -2080,7 +2564,7 @@ class DeviceCapability(IntEnum):
     DISABLE_SENSOR_CLEANING = 32
     FLOOR_MATERIAL = 33
     GEN5 = 34
-    NEW_FURNITURES = 35
+    FURNITURES_V2 = 35
     SAVED_FURNITURES = 36
     OBSTACLES = 37
     WATER_CHECK = 38
@@ -2110,14 +2594,14 @@ class DeviceCapability(IntEnum):
     AUTO_LDS_LIFTING = 62
     AREA_ROTATION = 63
     MOP_PAD_LIFTING = 64
-    MOP_WASHING_WITH_DETERGENT = 65
+    MOPPING_WITH_DETERGENT = 65
     CARPET_CROSSING = 66
-    DYNAMIC_OBSTACLE_CLEAN = 67
+    DYNAMIC_OBSTACLE_CLEANING = 67
     OBSTACLE_CROSSING = 68
     DOUBLE_DETERGENT = 69
     MOP_TEMPERATURE = 70
     DUST_BAG_DRYING = 71
-    LDS_LIFTING_FREQUENCY = 72
+    LOW_LYING_AREA_FREQUENCY = 72
     PRESSURIZED_CLEANING = 73
     SCRAPER_FREQUENCY = 74
     CARPET_MATERIAL = 75
@@ -2126,7 +2610,65 @@ class DeviceCapability(IntEnum):
     CARPET_CLEANSET_V3 = 78
     LOW_LYING_AREAS = 79
     LOW_LYING_AREA_DELETE = 80
-    LASER_OBSTACLE = 81
+    CARPET_SHAPE = 81
+    CARPET_ID = 82
+    AUTO_EMPTYING = 83
+    WASHLESS_BASE = 84
+    WATER_TANK_DRAINING = 85
+    AUTO_ADD_DETERGENT = 86
+    FILL_LIGHT = 87
+    LOCAL_STORAGE = 88
+    LASER_OBSTACLE = 89
+    LIFT_CHASSIS_ON_CARPET = 90
+    ROLLER_COVER = 91
+    MOP_PRESSURE = 92
+    FLOOR_MAINTAINING = 93
+    INTELLIGENT_AUTO_EMPTY = 95
+    AUTO_EMPTY_AREA = 96
+    HOT_WATER_WASHING = 97
+    PET_AI_MODEL = 98
+    MECHANICAL_FOOT = 99
+    WASHBOARD_CLEANING_STATUS = 100
+    ACTIVE_SUSPENSION = 101
+    DISABLE_MOP_CONSUMABLE = 102
+    DETERGENT_STATUS = 103
+    FLUFFING_ROLLER = 104
+    ROLLER_MOP_FILTER = 105
+    ROLLER_MOP = 106
+    WATER_OUTLET_FILTER = 107
+    SQUEEGEE = 108
+    ONBOARD_DIRTY_WATER_TANK = 109
+    CARPET_TASSEL = 110
+    FLOOR_MATS = 111
+    MANUAL_DUST_BAG_DRYING = 112
+    INTELLIGENT_SELF_CLEAN_FREQUENCY = 113
+    DUST_COLLECTION_DURING_DRYING = 114
+    POWER_SAVING = 115
+    AUTO_CHANGE_MOP = 116
+    BATTERY_CHARGE_LEVEL = 117
+    DEODORIZER_MODULE = 118
+    MAP_V2 = 119
+    QUICK_DRY = 120
+    DRYING_TIME_V3 = 121
+    DRYING_TIME_V2 = 122
+    RESOURCES_AES_IV = 123
+    CLEANING_SEQUENCE_V2 = 124
+    CLEANING_ROUTE_V2 = 125
+    LOWER_LDS_WHILE_DOCKING = 126
+    CUSTOM_DRYING_TIME = 127
+    DRYING_TIME_LIST = 128
+    DIRTY_WATER_CHANNEL = 129
+    DISABLE_SILENT_DRYING = 130
+    SILENT_DRYING_TIME = 131
+    SELF_CLEAN_TIME_MIN = 132
+    SELF_CLEAN_TIME_MAX = 133
+    SELF_CLEAN_TIME_DEFAULT = 134
+    SELF_CLEAN_TIME_FIXED_DEFAULT = 135
+    SELF_CLEAN_AREA_MIN = 136
+    SELF_CLEAN_AREA_MAX = 137
+    SELF_CLEAN_AREA_DEFAULT = 138
+    SELF_CLEAN_AREA_FIXED_DEFAULT = 139
+    SMALL_WATER_TANK = 140
 
 
 class DreameVacuumDeviceCapability:
@@ -2164,7 +2706,7 @@ class DreameVacuumDeviceCapability:
         self.uv_sterilization = False
         self.self_clean_frequency = False
         self.auto_empty_mode = False
-        self.map_object_offset = False
+        self.object_shift = False
         self.robot_type = RobotType.LIDAR
         self.tight_mopping = False
         self.floor_material = False
@@ -2181,16 +2723,15 @@ class DreameVacuumDeviceCapability:
         self.segment_slow_clean_route = True
         self.pet_furniture = False
         self.task_type = False
-        self.empty_water_tank = False
+        self.water_tank_draining = False
         self.disable_sensor_cleaning = False
         self.auto_rename_segment = False
         self.ultra_clean_mode = False
         self.clean_carpets_first = False
         self.mop_clean_frequency = False
-        self.small_self_clean_area = False
         self.saved_furnitures = False
         self.extended_furnitures = False
-        self.new_furnitures = False
+        self.furnitures_v2 = False
         self.wetness = False
         self.wetness_level = False
         self.obstacles = False
@@ -2223,20 +2764,23 @@ class DreameVacuumDeviceCapability:
         self.silent_drying = False
         self.hair_compression = False
         self.side_brush_carpet_rotate = False
+        self.lift_chassis_on_carpet = False
         self.auto_lds_lifting = False
         self.station_cleaning = False
         self.mijia = False
         self.area_rotation = False
-        self.mop_washing_with_detergent = False
+        self.mopping_with_detergent = False
         self.carpet_crossing = False
-        self.dynamic_obstacle_clean = False
+        self.dynamic_obstacle_cleaning = False
         self.obstacle_crossing = False
         self.double_detergent = False
         self.mop_temperature = False
         self.dust_bag_drying = False
-        self.lds_lifting_frequency = False
+        self.low_lying_area_frequency = False
         self.pressurized_cleaning = False
         self.scraper_frequency = False
+        self.auto_add_detergent = False
+        self.local_storage = False
         self.laser_obstacle = False
         self.battery_charge_level = False
         self.carpet_material = False
@@ -2245,6 +2789,59 @@ class DreameVacuumDeviceCapability:
         self.carpet_cleanset_v3 = False
         self.low_lying_areas = False
         self.low_lying_area_delete = False
+        self.carpet_shape = False
+        self.carpet_id = False
+        self.auto_emptying = False
+        self.washless_base = False
+        self.roller_cover = False
+        self.mop_pressure = False
+        self.floor_maintaining = False
+        self.intelligent_auto_empty = False
+        self.auto_empty_area = False
+        self.hot_water_washing = False
+        self.pet_ai_model = False
+        self.mechanical_foot = False
+        self.washboard_cleaning_status = False
+        self.active_suspension = False
+        self.disable_mop_consumable = False
+        self.detergent_status = False
+        self.fluffing_roller = False
+        self.roller_mop_filter = False
+        self.roller_mop = False
+        self.water_outlet_filter = False
+        self.squeegee = False
+        self.onboard_dirty_water_tank = False
+        self.carpet_tassel = False
+        self.floor_mats = False
+        self.manual_dust_bag_drying = False
+        self.intelligent_self_clean_frequency = False
+        self.dust_collection_during_drying = False
+        self.power_saving = False
+        self.auto_change_mop = False
+        self.battery_charge_level = False
+        self.deodorizer_module = False
+        self.map_v2 = False
+        self.quick_dry = False
+        self.drying_time_v3 = False
+        self.drying_time_v2 = False
+        self.resources_aes_iv = "YWViZjhjNTJlMjZhNDc2Nw=="
+        self.cleaning_sequence_v2 = False
+        self.cleaning_route_v2 = False
+        self.lower_lds_while_docking = False
+        self.custom_drying_time = False
+        self.drying_time_list = None
+        self.disable_silent_drying = False
+        self.silent_drying_time = 5
+        self.self_clean_time_min = 10
+        self.self_clean_time_max = 50
+        self.self_clean_time_default = 25
+        self.self_clean_time_fixed_default = 0
+        self.self_clean_area_min = 10
+        self.self_clean_area_max = 35
+        self.self_clean_area_default = 20
+        self.self_clean_area_fixed_default = 0
+        self.small_water_tank = False
+        self.furnitures_v3 = False
         self._custom_cleaning_mode = False
         self._capability = None
         self._device = device
@@ -2290,7 +2887,6 @@ class DreameVacuumDeviceCapability:
         self.dnd = bool(self.dnd_task or self._device.get_property(DreameVacuumProperty.DND) is not None)
         self.shortcuts = bool(self._device.get_property(DreameVacuumProperty.SHORTCUTS) is not None)
         self.off_peak_charging = bool(self._device.get_property(DreameVacuumProperty.OFF_PEAK_CHARGING) is not None)
-        camera_light = self._device.get_property(DreameVacuumProperty.CAMERA_LIGHT_BRIGHTNESS)
         self.voice_assistant = bool(self._device.get_property(DreameVacuumProperty.VOICE_ASSISTANT) is not None)
 
         if self._capability:
@@ -2301,21 +2897,51 @@ class DreameVacuumDeviceCapability:
                     capability = DeviceCapability(capability)
                     param = capability.name.lower()
                     if param and hasattr(self, param):
-                        setattr(self, param, bool(version >= v[1]))
+                        setattr(
+                            self,
+                            param,
+                            (
+                                bool(version >= v[1])
+                                if not isinstance(v[1], str)
+                                else int(v[1]) if v[1].isnumeric() else v[1]
+                            ),
+                        )
 
-        # self.camera_streaming = bool(
-        #    self.camera_streaming and (camera_light is not None or self._device.get_property(DreameVacuumProperty.CRUISE_SCHEDULE) is not None)
-        # )
-        self.detergent = bool(self.detergent or self._device.get_property(DreameVacuumProperty.DETERGENT_LEFT))
-        self.fill_light = bool(
-            self.camera_streaming
-            and camera_light is not None
-            and len(camera_light) < 5
-            and str(camera_light).isnumeric()
+        if not self.gen5 and (
+            "mova.vacuum." in self._device.info.model or "trouver.vacuum." in self._device.info.model
+        ):
+            self.gen5 = True
+
+        if self.gen5:
+            if self.self_wash_base and self.washless_base:
+                self.self_wash_base = False
+            if self.auto_empty_base and (
+                not self.auto_emptying
+                or self._device.get_property(DreameVacuumProperty.DUST_COLLECTION)
+                == DreameVacuumDustCollection.NEVER.value
+            ):
+                self.auto_empty_base = False
+
+        self.detergent = bool(
+            self.self_wash_base
+            and (self.detergent or self._device.get_property(DreameVacuumProperty.DETERGENT_LEFT) != None)
         )
+
+        if not self.self_wash_base:
+            self.cleangenius = False
+            self.station_cleaning = False
+            self.washing_mode = False
+            self.scale_inhibitor = False
+            self.deodorizer = False
+            self.detergent = False
+            self.drainage = False
+            self.water_tank_draining = False
+
         self.mop_pad_swing = bool(self.mop_pad_swing or self.mop_pad_swing_plus)
         self.mop_pad_unmounting = bool(
-            self.mop_pad_unmounting and self._device.get_property(DreameVacuumProperty.AUTO_MOUNT_MOP) is not None
+            self.self_wash_base
+            and self.mop_pad_unmounting
+            and self._device.get_property(DreameVacuumProperty.AUTO_MOUNT_MOP) is not None
         )
         self.drainage = bool(
             self.drainage and self._device.get_property(DreameVacuumProperty.DRAINAGE_STATUS) is not None
@@ -2348,7 +2974,18 @@ class DreameVacuumDeviceCapability:
             or self.mop_pad_unmounting
             or (self.self_wash_base and self.auto_empty_base)
         )
-        self.map_object_offset = bool(self.lidar_navigation and "p20" not in self._device.info.model)
+
+        if self.drying_time_v3:
+            self.drying_time_v2 = True
+            self.silent_drying = False
+
+        if self.drying_time_v2:
+            self.custom_drying_time = True
+
+        if self.disable_silent_drying:
+            self.silent_drying = False
+
+        self.object_shift = bool(self.lidar_navigation and "p20" in self._device.info.model)
         self.floor_material = bool(self.mop_pad_lifting and self.carpet_recognition and not self.mop_clean_frequency)
         self.robot_type = (
             RobotType.SWEEPING_AND_MOPPING
@@ -2359,7 +2996,6 @@ class DreameVacuumDeviceCapability:
                 else RobotType.LIDAR if self.lidar_navigation else RobotType.VSLAM
             )
         )
-        self.station_cleaning = bool(self.self_wash_base and self.gen5)
         if "xiaomi.vacuum." in self._device.info.model:
             self.mijia = True
             self.wifi_map = False
@@ -2368,8 +3004,30 @@ class DreameVacuumDeviceCapability:
             self.floor_material = "d110" in self._device.info.model
             self.off_peak_charging = False
             self.camera_streaming = False
-            self.new_furnitures = False
+            self.furnitures_v2 = False
             self.fill_light = False
+            self.station_cleaning = self.self_wash_base
+        else:
+            self.station_cleaning = bool(self.self_wash_base and self.gen5)
+            if (
+                self.extended_furnitures
+                and "mova.vacuum." not in self._device.info.model
+                and "trouver.vacuum." not in self._device.info.model
+                and (
+                    self.roller_mop
+                    or self.roller_mop_filter
+                    or self.mop_pressure
+                    or self.mop_temperature
+                    or self.carpet_tassel
+                    or self.auto_change_mop
+                    or self.intelligent_auto_empty
+                    or self.auto_empty_area
+                    or self.pet_ai_model
+                    or self.low_lying_area_frequency
+                    or self.dust_bag_drying
+                )
+            ):
+                self.furnitures_v3 = True
 
         self.list = [
             key
@@ -2415,7 +3073,12 @@ class DreameVacuumDeviceCapability:
         )
 
     def mop_extend(self) -> bool:
-        return self.mop_pad_swing and self._device.mop_extend_frequency.value >= 0
+        return (
+            self.auto_switch_settings
+            and self.mop_pad_swing
+            and self._device.mop_extend_frequency is not None
+            and self._device.mop_extend_frequency.value >= 0
+        )
 
 
 class Point:
@@ -2440,11 +3103,11 @@ class Point:
             return {ATTR_X: self.x, ATTR_Y: self.y}
         return {ATTR_X: self.x, ATTR_Y: self.y, ATTR_A: self.a}
 
-    def to_img(self, image_dimensions, offset=True) -> Point:
-        return image_dimensions.to_img(self, offset)
+    def to_img(self, image_dimensions, original=False) -> Point:
+        return image_dimensions.to_img(self, original)
 
-    def to_coord(self, image_dimensions, offset=True) -> Point:
-        return image_dimensions.to_coord(self, offset)
+    def to_coord(self, image_dimensions) -> Point:
+        return image_dimensions.to_coord(self)
 
     def rotated(self, image_dimensions, degree) -> Point:
         w = int(
@@ -2507,7 +3170,7 @@ class Obstacle(Point):
         width: float = None,
         height: float = None,
         picture_status: int = 0,
-        ignore_status: int = 0,
+        ignore_status: int = None,
     ) -> None:
         super().__init__(x, y)
         self.type = ObstacleType(type) if type in ObstacleType._value2member_map_ else ObstacleType.UNKNOWN
@@ -2525,39 +3188,37 @@ class Obstacle(Point):
             if picture_status in ObstaclePictureStatus._value2member_map_
             else ObstaclePictureStatus.UNKNOWN
         )
-        self.ignore_status = (
-            ObstacleIgnoreStatus(ignore_status)
-            if ignore_status in ObstacleIgnoreStatus._value2member_map_
-            else ObstacleIgnoreStatus.UNKNOWN
-        )
+        if self.type == ObstacleType.BLOCKED_ROOM:
+            self.ignore_status = ObstacleIgnoreStatus.NOT_IGNORED
+        else:
+            self.ignore_status = (
+                ObstacleIgnoreStatus(ignore_status)
+                if ignore_status in ObstacleIgnoreStatus._value2member_map_
+                else ObstacleIgnoreStatus.UNKNOWN
+            )
         self.id = self.object_id if self.object_id else f"0{int(self.x)}0{int(self.y)}"
+
+        if self.type == ObstacleType.BLOCKED_ROOM:
+            self.segment_id = int(self.x)
+            self.x = 0
+            self.y = 0
+            self.possibility = None
+        else:
+            self.segment_id = None
 
         if file_name and "/" in file_name:
             self.object_name = file_name.split("/")[-1]
             if "-" in self.object_name:
                 self.object_name = self.object_name.split("-")[0]
-        if id:
-            self.object_name = f"{id}-{self.object_name}"
+
+            if self.object_id:
+                self.object_name = f"{self.id}-{self.object_name}"
+            else:
+                self.id = self.object_name
 
         self.segment = None
         self.color_index = None
-
-    def set_segment(self, map_data):
-        if map_data and map_data.segments and map_data.pixel_type is not None:
-            x = int((self.x - map_data.dimensions.left) / map_data.dimensions.grid_size)
-            y = int((self.y - map_data.dimensions.top) / map_data.dimensions.grid_size)
-            if x >= 0 and x < map_data.dimensions.width and y >= 0 and y < map_data.dimensions.height:
-                obstacle_pixel = map_data.pixel_type[x, y]
-
-                if obstacle_pixel not in map_data.segments:
-                    for k, v in map_data.segments.items():
-                        if v.check_point(self.x, self.y, map_data.dimensions.grid_size * 4):
-                            self.segment = v.name
-                            self.color_index = v.color_index
-                            break
-                else:
-                    self.segment = map_data.segments[obstacle_pixel].name
-                    self.color_index = map_data.segments[obstacle_pixel].color_index
+        self.reason = None
 
     def as_dict(self) -> Dict[str, Any]:
         attributes = super().as_dict()
@@ -2570,6 +3231,8 @@ class Obstacle(Point):
             attributes[ATTR_IGNORE_STATUS] = self.ignore_status.name.replace("_", " ").title()
         if self.segment is not None:
             attributes[ATTR_ROOM] = self.segment
+        if self.reason is not None:
+            attributes[ATTR_REASON] = self.reason.name.replace("_", " ").capitalize()
         return attributes
 
     def __eq__(self: Obstacle, other: Obstacle) -> bool:
@@ -2619,14 +3282,14 @@ class Zone:
     def as_area(self) -> Area:
         return Area(self.x0, self.y0, self.x0, self.y1, self.x1, self.y1, self.x1, self.y0)
 
-    def to_img(self, image_dimensions, offset=True) -> Zone:
-        p0 = Point(self.x0, self.y0).to_img(image_dimensions, offset)
-        p1 = Point(self.x1, self.y1).to_img(image_dimensions, offset)
+    def to_img(self, image_dimensions, original=False) -> Zone:
+        p0 = Point(self.x0, self.y0).to_img(image_dimensions, original)
+        p1 = Point(self.x1, self.y1).to_img(image_dimensions, original)
         return Zone(p0.x, p0.y, p1.x, p1.y)
 
-    def to_coord(self, image_dimensions, offset=True) -> Zone:
-        p0 = Point(self.x0, self.y0).to_coord(image_dimensions, offset)
-        p1 = Point(self.x1, self.y1).to_coord(image_dimensions, offset)
+    def to_coord(self, image_dimensions) -> Zone:
+        p0 = Point(self.x0, self.y0).to_coord(image_dimensions)
+        p1 = Point(self.x1, self.y1).to_coord(image_dimensions)
         return Zone(p0.x, p0.y, p1.x, p1.y)
 
     def check_point(self, x, y, size) -> bool:
@@ -2636,7 +3299,7 @@ class Zone:
 class Segment(Zone):
     def __init__(
         self,
-        segment_id: int,
+        id: int,
         x0: Optional[float] = None,
         y0: Optional[float] = None,
         x1: Optional[float] = None,
@@ -2657,7 +3320,8 @@ class Segment(Zone):
         order: int = None,
     ) -> None:
         super().__init__(x0, y0, x1, y1)
-        self.segment_id = segment_id
+        self.coords = [x0, y0, x1, y1]
+        self.id = id
         self.unique_id = None
         self.x = x
         self.y = y
@@ -2676,14 +3340,17 @@ class Segment(Zone):
         self.wetness_level = None
         self.cleaning_route = None
         self.custom_mopping_route = None
-        self.color_index = None
+        self.color_index = 0
         self.floor_material = None
         self.floor_material_direction = None
         self.floor_material_rotated_direction = None
         self.visibility = None
+        self.mop_temperature = None
+        self.mop_pressure = None
+        self.mop_type = None
         self.cleanset_type = CleansetType.NONE
         self.carpet_cleaning = None
-        self.carpet_settings = None
+        self.carpet_preferences = None
         self.set_name()
 
     @property
@@ -2706,11 +3373,17 @@ class Segment(Zone):
     @property
     def letter(self) -> str:
         letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        return (
-            f"{letters[((self.segment_id % 26) - 1)]}{math.floor(self.segment_id / 26)}"
-            if self.segment_id > 26
-            else letters[self.segment_id - 1]
-        )
+        return f"{letters[((self.id % 26) - 1)]}{math.floor(self.id / 26)}" if self.id > 26 else letters[self.id - 1]
+
+    def calculate_coords(self, dimensions) -> None:
+        grid_size = dimensions.grid_size
+        top = dimensions.top
+        left = dimensions.left
+
+        self.x0 = math.floor(left + (self.coords[0] * grid_size))
+        self.y0 = math.floor(top + (self.coords[1] * grid_size))
+        self.x1 = math.floor(left + (self.coords[2] * grid_size) + grid_size)
+        self.y1 = math.floor(top + (self.coords[3] * grid_size) + grid_size)
 
     def set_name(self) -> None:
         if self.type != 0 and SEGMENT_TYPE_CODE_TO_NAME.get(self.type):
@@ -2720,22 +3393,18 @@ class Segment(Zone):
         elif self.custom_name is not None:
             self.name = self.custom_name
         else:
-            self.name = f"Room {self.segment_id}"
+            self.name = f"Room {self.id}"
         self.icon = SEGMENT_TYPE_CODE_TO_HA_ICON.get(self.type, "mdi:home-outline")
 
-    def set_custom_carpet_settings(self, carpet_cleaning, carpet_settings=None):
+    def set_custom_carpet_settings(self, carpet_cleaning, carpet_preferences=None):
         self.carpet_cleaning = carpet_cleaning
-        self.carpet_settings = carpet_settings
+        self.carpet_preferences = carpet_preferences
 
     def next_type_index(self, type, segments) -> int:
         index = 0
         if type > 0:
             for segment_id in sorted(segments, key=lambda segment_id: segments[segment_id].index):
-                if (
-                    segment_id != self.segment_id
-                    and segments[segment_id].type == type
-                    and segments[segment_id].index == index
-                ):
+                if segment_id != self.id and segments[segment_id].type == type and segments[segment_id].index == index:
                     index = index + 1
         return index
 
@@ -2749,7 +3418,7 @@ class Segment(Zone):
 
             list[k] = name
 
-        name = f"Room {self.segment_id}"
+        name = f"Room {self.id}"
         if self.type == 0:
             name = f"{self.name}"
         list[0] = name
@@ -2760,8 +3429,8 @@ class Segment(Zone):
 
     def as_dict(self) -> Dict[str, Any]:
         attributes = {**super(Segment, self).as_dict()}
-        if self.segment_id:
-            attributes[ATTR_ROOM_ID] = self.segment_id
+        if self.id:
+            attributes[ATTR_ROOM_ID] = self.id
         if self.name is not None:
             attributes[ATTR_NAME] = self.name
         if self.custom_name is not None:
@@ -2795,13 +3464,20 @@ class Segment(Zone):
         if self.unique_id is not None:
             attributes[ATTR_UNIQUE_ID] = self.unique_id
         if self.floor_material is not None:
-            attributes[ATTR_FLOOR_MATERIAL] = self.floor_material
+            attributes[ATTR_FLOOR_MATERIAL] = DreameVacuumFloorMaterial(self.floor_material).name.title()
         if self.floor_material_rotated_direction is not None:
             attributes[ATTR_FLOOR_MATERIAL_DIRECTION] = DreameVacuumFloorMaterialDirection(
                 self.floor_material_rotated_direction
             ).name.title()
         if self.visibility is not None:
             attributes[ATTR_VISIBILITY] = DreameVacuumSegmentVisibility(int(self.visibility)).name.title()
+        if self.mop_temperature is not None:
+            attributes[ATTR_MOP_TEMPERATURE] = DreameVacuumMopTemperature(int(self.mop_temperature)).name.title()
+        if self.mop_pressure is not None:
+            attributes[ATTR_MOP_PRESSURE] = DreameVacuumMopPressure(int(self.mop_pressure)).name.title()
+        if self.mop_type is not None:
+            attributes[ATTR_MOP_TYPE] = self.mop_type
+
         if self.x is not None and self.y is not None:
             attributes[ATTR_X] = self.x
             attributes[ATTR_Y] = self.y
@@ -2835,11 +3511,14 @@ class Segment(Zone):
             or self.mopping_settings != other.mopping_settings
             or self.visibility != other.visibility
             or self.carpet_cleaning != other.carpet_cleaning
-            or self.carpet_settings != other.carpet_settings
+            or self.carpet_preferences != other.carpet_preferences
+            or self.mop_type != other.mop_type
+            or self.mop_temperature != other.mop_temperature
+            or self.mop_pressure != other.mop_pressure
         )
 
     def __str__(self) -> str:
-        return f"{{room_id: {self.segment_id}, outline: {self.outline}}}"
+        return f"{{room_id: {self.id}, outline: {self.outline}}}"
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -2870,14 +3549,14 @@ class Wall:
     def as_dict(self) -> Dict[str, Any]:
         return {ATTR_X0: self.x0, ATTR_Y0: self.y0, ATTR_X1: self.x1, ATTR_Y1: self.y1}
 
-    def to_img(self, image_dimensions, offset=True) -> Wall:
-        p0 = Point(self.x0, self.y0).to_img(image_dimensions, offset)
-        p1 = Point(self.x1, self.y1).to_img(image_dimensions, offset)
+    def to_img(self, image_dimensions, original=False) -> Wall:
+        p0 = Point(self.x0, self.y0).to_img(image_dimensions, original)
+        p1 = Point(self.x1, self.y1).to_img(image_dimensions, original)
         return Wall(p0.x, p0.y, p1.x, p1.y)
 
-    def to_coord(self, image_dimensions, offset=True) -> Wall:
-        p0 = Point(self.x0, self.y0).to_coord(image_dimensions, offset)
-        p1 = Point(self.x1, self.y1).to_coord(image_dimensions, offset)
+    def to_coord(self, image_dimensions) -> Wall:
+        p0 = Point(self.x0, self.y0).to_coord(image_dimensions)
+        p1 = Point(self.x1, self.y1).to_coord(image_dimensions)
         return Wall(p0.x, p0.y, p1.x, p1.y)
 
     def as_list(self) -> List[float]:
@@ -2897,6 +3576,7 @@ class Area:
         self.x3 = x3
         self.y3 = y3
         self.angle = angle
+        self.hidden = False
 
     def __eq__(self: Area, other: Area) -> bool:
         return (
@@ -2910,6 +3590,7 @@ class Area:
             and self.x3 == other.x3
             and self.y3 == other.y3
             and self.angle == other.angle
+            and self.hidden == other.hidden
         )
 
     def __str__(self) -> str:
@@ -2934,7 +3615,7 @@ class Area:
     def as_list(self) -> List[float]:
         return [self.x0, self.y0, self.x1, self.y1, self.x2, self.y2, self.x3, self.y3]
 
-    def to_img(self, image_dimensions, offset=True) -> Area:
+    def to_img(self, image_dimensions, original=False) -> Area:
         if self.angle:
             theta = -self.angle * math.pi / 180
             cosang = math.cos(theta)
@@ -2949,22 +3630,22 @@ class Area:
                 coords[i] = (tx * cosang + ty * sinang) + cx
                 coords[i + 1] = (-tx * sinang + ty * cosang) + cy
 
-            p0 = Point(coords[0], coords[1]).to_img(image_dimensions, offset)
-            p1 = Point(coords[2], coords[3]).to_img(image_dimensions, offset)
-            p2 = Point(coords[4], coords[5]).to_img(image_dimensions, offset)
-            p3 = Point(coords[6], coords[7]).to_img(image_dimensions, offset)
+            p0 = Point(coords[0], coords[1]).to_img(image_dimensions, original)
+            p1 = Point(coords[2], coords[3]).to_img(image_dimensions, original)
+            p2 = Point(coords[4], coords[5]).to_img(image_dimensions, original)
+            p3 = Point(coords[6], coords[7]).to_img(image_dimensions, original)
         else:
-            p0 = Point(self.x0, self.y0).to_img(image_dimensions, offset)
-            p1 = Point(self.x1, self.y1).to_img(image_dimensions, offset)
-            p2 = Point(self.x2, self.y2).to_img(image_dimensions, offset)
-            p3 = Point(self.x3, self.y3).to_img(image_dimensions, offset)
+            p0 = Point(self.x0, self.y0).to_img(image_dimensions, original)
+            p1 = Point(self.x1, self.y1).to_img(image_dimensions, original)
+            p2 = Point(self.x2, self.y2).to_img(image_dimensions, original)
+            p3 = Point(self.x3, self.y3).to_img(image_dimensions, original)
         return Area(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y)
 
-    def to_coord(self, image_dimensions, offset=True) -> Area:
-        p0 = Point(self.x0, self.y0).to_coord(image_dimensions, offset)
-        p1 = Point(self.x1, self.y1).to_coord(image_dimensions, offset)
-        p2 = Point(self.x2, self.y2).to_coord(image_dimensions, offset)
-        p3 = Point(self.x3, self.y3).to_coord(image_dimensions, offset)
+    def to_coord(self, image_dimensions) -> Area:
+        p0 = Point(self.x0, self.y0).to_coord(image_dimensions)
+        p1 = Point(self.x1, self.y1).to_coord(image_dimensions)
+        p2 = Point(self.x2, self.y2).to_coord(image_dimensions)
+        p3 = Point(self.x3, self.y3).to_coord(image_dimensions)
         return Area(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y)
 
     def check_size(self, size) -> bool:
@@ -2991,37 +3672,25 @@ class Furniture(Point):
         width: float,
         height: float,
         type: FurnitureType,
-        size_type: int,
+        edit_type: int,
         angle: float = 0,
         scale: float = 1.0,
         furniture_id: int = None,
         segment_id: int = None,
+        modified: bool = False,
     ) -> None:
         super().__init__(x, y)
         self.x0 = x0
         self.y0 = y0
         self.width = width
         self.height = height
-        if x0 and y0 and width and height:
-            self.x1 = x0 + width
-            self.y1 = y0
-            self.x2 = x0 + width
-            self.y2 = y0 + height
-            self.x3 = x0
-            self.y3 = y0 + height
-        else:
-            self.x1 = None
-            self.y1 = None
-            self.x2 = None
-            self.y2 = None
-            self.x3 = None
-            self.y3 = None
         self.type = type
-        self.size_type = size_type
+        self.edit_type = edit_type
         self.angle = angle
         self.scale = scale
         self.furniture_id = furniture_id
         self.segment_id = segment_id
+        self.modified = modified
 
     def as_dict(self) -> Dict[str, Any]:
         attributes = super().as_dict()
@@ -3029,21 +3698,13 @@ class Furniture(Point):
         if self.x0 is not None and self.y0 is not None:
             attributes[ATTR_X0] = self.x0
             attributes[ATTR_Y0] = self.y0
-        if self.x1 is not None and self.y1 is not None:
-            attributes[ATTR_X1] = self.x1
-            attributes[ATTR_Y1] = self.y1
-        if self.x2 is not None and self.y2 is not None:
-            attributes[ATTR_X2] = self.x2
-            attributes[ATTR_Y2] = self.y2
-        if self.x3 is not None and self.y3 is not None:
-            attributes[ATTR_X3] = self.x3
-            attributes[ATTR_Y3] = self.y3
         if self.width and self.height:
             attributes[ATTR_WIDTH] = self.width
             attributes[ATTR_HEIGHT] = self.height
         if self.segment_id:
             attributes[ATTR_ROOM_ID] = self.segment_id
-        attributes[ATTR_SIZE_TYPE] = self.size_type
+        if self.furniture_id is not None:
+            attributes[ATTR_FURNITURE_ID] = self.furniture_id
         attributes[ATTR_ANGLE] = self.angle
         attributes[ATTR_SCALE] = self.scale
         return attributes
@@ -3058,7 +3719,9 @@ class Furniture(Point):
             or self.width != other.width
             or self.height != other.height
             or self.type != other.type
-            or self.size_type != other.size_type
+            or self.edit_type != other.edit_type
+            or self.furniture_id != other.furniture_id
+            or self.segment_id != other.segment_id
             or self.angle != other.angle
             or self.scale != other.scale
         )
@@ -3100,11 +3763,13 @@ class Carpet(Area):
         y2: float,
         x3: float,
         y3: float,
-        ellipse: bool = False,
+        ellipse: bool = None,
         carpet_type: int = None,
         ignored_areas: List[int] = None,
         segments: List[int] = None,
         polygon: List[float] = None,
+        hidden: bool = None,
+        tassel: List[int] = None,
     ) -> None:
         super().__init__(x0, y0, x1, y1, x2, y2, x3, y3)
         self.id = id
@@ -3113,15 +3778,18 @@ class Carpet(Area):
         self.ellipse = ellipse
         self.polygon = polygon
         self.carpet_cleaning = None
-        self.carpet_settings = None
+        self.carpet_preferences = None
         self.carpet_type = carpet_type
+        self.tassel = tassel
         if ellipse is not None:
             ## Detected carpets returns string but added and ignored carpets are using int
             self.ellipse = ellipse == "1" or ellipse == 1
+        if hidden is not None:
+            self.hidden = hidden == "1" or hidden == 1
 
-    def set_custom_carpet_settings(self, carpet_cleaning, carpet_settings=None):
+    def set_custom_carpet_settings(self, carpet_cleaning, carpet_preferences=None):
         self.carpet_cleaning = carpet_cleaning
-        self.carpet_settings = carpet_settings
+        self.carpet_preferences = carpet_preferences
 
     def __eq__(self: Carpet, other: Carpet) -> bool:
         return not (
@@ -3133,11 +3801,13 @@ class Carpet(Area):
             or self.id != other.id
             or self.ellipse != other.ellipse
             or self.carpet_cleaning != other.carpet_cleaning
-            or self.carpet_settings != other.carpet_settings
+            or self.carpet_preferences != other.carpet_preferences
             or self.carpet_type != other.carpet_type
             or self.segments != other.segments
             or self.ignored_areas != other.ignored_areas
             or self.polygon != other.polygon
+            or self.hidden != other.hidden
+            or self.tassel != other.tassel
         )
 
 
@@ -3187,20 +3857,24 @@ class MapImageDimensions:
     def __init__(self, top: int, left: int, height: int, width: int, grid_size: int) -> None:
         self.top = top
         self.left = left
+        self.original_top = top
+        self.original_left = left
         self.height = height
         self.width = width
         self.grid_size = grid_size
+        self.offset = int(self.grid_size / 2)
         self.scale = 1
         self.padding = [0, 0, 0, 0]
         self.crop = [0, 0, 0, 0]
         self.bounds = None
 
-    def to_img(self, point: Point, offset=True) -> Point:
-        left = self.left
-        top = self.top
-        if not offset and (left % self.grid_size != 0 or top % self.grid_size != 0):
-            left = left + (self.grid_size / 2)
-            top = top + (self.grid_size / 2)
+    def to_img(self, point: Point, original: bool = False) -> Point:
+        if original:
+            left = self.original_left - self.offset
+            top = self.original_top - self.offset
+        else:
+            left = self.left
+            top = self.top
 
         return Point(
             ((point.x - left) / self.grid_size) * self.scale + self.padding[0] - self.crop[0],
@@ -3209,16 +3883,10 @@ class MapImageDimensions:
             - self.crop[1],
         )
 
-    def to_coord(self, point: Point, offset=True) -> Point:
-        left = self.left
-        top = self.top
-        if not offset and (left % self.grid_size != 0 or top % self.grid_size != 0):
-            left = left + (self.grid_size / 2)
-            top = top + (self.grid_size / 2)
-
+    def to_coord(self, point: Point) -> Point:
         return Point(
-            ((point.x - left) / self.grid_size),
-            ((((self.height) * self.grid_size - 1) - (point.y - top)) / self.grid_size),
+            ((point.x - self.left) / self.grid_size),
+            ((((self.height) * self.grid_size - 1) - (point.y - self.top)) / self.grid_size),
         )
 
     def __eq__(self: MapImageDimensions, other: MapImageDimensions) -> bool:
@@ -3226,6 +3894,8 @@ class MapImageDimensions:
             other is not None
             and self.top == other.top
             and self.left == other.left
+            and self.original_top == other.original_top
+            and self.original_left == other.original_left
             and self.height == other.height
             and self.width == other.width
             and self.grid_size == other.grid_size
@@ -3243,6 +3913,7 @@ class CleaningHistory:
         self.key = None
         self.object_name = None
         self.completed: bool = None
+        self.cleaning_status: CleaningStatus = None
         self.water_tank_or_mop: DreameVacuumWaterTank = None
         self.map_index: int = None
         self.map_name: str = None
@@ -3252,10 +3923,12 @@ class CleaningHistory:
         self.second_mopping: int = None
         self.mopping_mode: int = None
         self.multiple_cleaning_time: str = None
-        self.pet_focused_cleaning: int = None
+        self.pet: int = None
         self.task_interrupt_reason: TaskInterruptReason = None
-        self.neglected_segments: Dict[int, int] = None
+        self.blocked_segments: Dict[int, list] = None
         self.clean_again: int = None
+        self.mop_after_sweep: int = None
+        self.customized_cleaning: bool = False
 
         for history_data_item in history_data:
             pid = history_data_item[piid]
@@ -3287,7 +3960,8 @@ class CleaningHistory:
                     else:
                         self.object_name = self.file_name
             elif pid == PIID(DreameVacuumProperty.CLEAN_LOG_STATUS, property_mapping):
-                self.completed = bool(value)
+                self.completed = bool(value == 1 or value == True)
+                self.cleaning_status = CleaningStatus(value) if value in CleaningStatus._value2member_map_ else None
             elif pid == PIID(DreameVacuumProperty.WATER_TANK, property_mapping):
                 if value in DreameVacuumWaterTank._value2member_map_:
                     self.water_tank_or_mop = DreameVacuumWaterTank(value)
@@ -3306,28 +3980,31 @@ class CleaningHistory:
                     self.cleanup_method = (
                         CleanupMethod(value) if value in CleanupMethod._value2member_map_ else CleanupMethod.OTHER
                     )
+                if "clt" in props:
+                    self.mop_after_sweep = props.get("clt")
                 if "abnormal_end" in props:
                     values = json.loads(props["abnormal_end"])
                     self.task_interrupt_reason = (
-                        TaskInterruptReason(values[0])
-                        if values[0] in TaskInterruptReason._value2member_map_
-                        else TaskInterruptReason.UNKNOWN
+                        TaskInterruptReason(values[0]) if values[0] in TaskInterruptReason._value2member_map_ else None
                     )
+                self.customized_cleaning = bool(props.get("customeClean", 0) == 1)
                 self.second_cleaning = props.get("ismultiple")
                 self.second_mopping = props.get("ctyo")
                 self.mopping_mode = props.get("mooClean")
                 self.multiple_cleaning_time = props.get("multime")
-                self.pet_focused_cleaning = props.get("pet")
+                self.pet = props.get("pet")
                 self.clean_again = props.get("cleanagain")
                 if "area_clean_detail" in props:
                     values = props["area_clean_detail"]
                     if len(values) > 1:
                         values = json.loads(values)
                         if values:
-                            self.neglected_segments = {
-                                v[0]: SegmentNeglectReason(v[1])
+                            self.blocked_segments = {
+                                v[0]: (
+                                    [SegmentSkipReason(v[1]), v[2], v[3]] if len(v) > 3 else [SegmentSkipReason(v[1])]
+                                )
                                 for v in values
-                                if v[1] in SegmentNeglectReason._value2member_map_
+                                if v[1] in SegmentSkipReason._value2member_map_
                             }
 
 
@@ -3392,9 +4069,8 @@ class MapPixelType(IntEnum):
     NEW_SEGMENT = 253
     UNKNOWN = 252
     OBSTACLE_WALL = 251
-    HIDDEN_WALL = 250
+    DIRTY_AREA = 250
     CLEAN_AREA = 249
-    DIRTY_AREA = 248
 
 
 class RecoveryMapType(IntEnum):
@@ -3425,7 +4101,14 @@ class TaskEndType(IntEnum):
     MANUAL_DOCKING = 1
     NORMAL_RECHARGING = 2
     ABNORMAL_DOCKING = 3
-    INTERRUPTION_ENDED = 4
+    STOP = 4
+
+
+class CleaningStatus(IntEnum):
+    INTERRUPTED = 0
+    COMPLETED = 1
+    MANUALLY_ENDED = 2
+    FAILED = 3
 
 
 class MapDataPartial:
@@ -3465,6 +4148,7 @@ class MapData:
         self.passable_thresholds: Optional[List[Wall]] = None  # Data json: vws.vwsl
         self.impassable_thresholds: Optional[List[Wall]] = None  # Data json: vws.npthrsd
         self.ramps: Optional[List[Area]] = None  # Data json: vws.ramp
+        self.cliffs: Optional[List[Line]] = None  # Data json: vws.cliff
         self.curtains: Optional[List[Wall]] = None  # Data json: ct.line
         self.path: Optional[Path] = None  # Data json: tr
         self.active_segments: Optional[int] = None  # Data json: sa
@@ -3478,15 +4162,17 @@ class MapData:
         self.docked: Optional[bool] = None  # Data json: oc
         self.clean_log: Optional[bool] = None  # Data json: iscleanlog
         self.cleanset: Optional[Dict[str, List[int]]] = None  # Data json: cleanset
-        self.sequence: Optional[Dict[str, List[int]]] = None  #
         self.carpet_cleanset: Optional[Dict[str, List[int]]] = None  # Data json: carpetcleanset
         self.line_to_robot: Optional[bool] = None  # Data json: l2r
         self.temporary_map: Optional[int] = None  # Data json: suw
         self.cleaned_area: Optional[int] = None  # Data json: cs
         self.cleaning_time: Optional[int] = None  # Data json: ct
         self.completed: Optional[bool] = None  # Data json: cf
-        self.neglected_segments: Optional[List[int]] = None  #
-        self.second_cleaning: Optional[bool] = None  #
+        self.blocked_segments: Optional[Dict[int, List]] = None  #
+        self.second_cleaning: Optional[bool] = None  # History list data json: ismultiple
+        self.second_mopping: Optional[bool] = None  # History list data json: ctyo
+        self.task_interrupt_reason: Optional[TaskInterruptReason] = None  #  History list data json: abnormal_end
+        self.cleaning_status: Optional[CleaningStatus] = None  #  History list data: piid: 13
         self.remaining_battery: Optional[int] = None  # Data json: clean_finish_remain_electricity
         self.work_status: Optional[int] = None  # Data json: wm
         self.recovery_map: Optional[bool] = None  # Data json: us
@@ -3495,20 +4181,37 @@ class MapData:
         self.furnitures: Optional[Dict[int, Furniture]] = None  # Data json: ai_furniture
         self.saved_furnitures: Optional[Dict[int, Furniture]] = None  # Data json: furniture_info
         self.carpets: Optional[List[Carpet]] = None  # Data json: vw.addcpt
-        self.ignored_carpets: Optional[List[Carpet]] = None  # Data json: vw.nocpt
+        self.deleted_carpets: Optional[List[Carpet]] = None  # Data json: vw.nocpt
         self.detected_carpets: Optional[List[Carpet]] = None  # Data json: carpet_info
         self.low_lying_areas: Optional[List[Polygon]] = None  # Data json: sneak_areas or sneak_areas_end
+        self.cleaning_sequence: Optional[Dict[int, int]] = None  # Data json: cleanareaorder
+        self.mop_type: Optional[Dict[int, str]] = None  # Data json: mop_type_with_order
         self.carpet_pixels: Optional[Any] = None  # Generated from map data
         self.new_map: Optional[bool] = None  # Data json: risp
         self.startup_method: Optional[StartupMethod] = None  # Data json: smd
         self.task_end_type: Optional[TaskEndType] = None  # Data json: ctyi
-        self.cleanup_method: Optional[CleanupMethod] = None  #
+        self.cleanup_method: Optional[CleanupMethod] = None  # Data json: cmc
         self.customized_cleaning: Optional[int] = None  # Data json: customeclean
         self.dust_collection_count: Optional[int] = None  # Data json: ds
         self.mop_wash_count: Optional[int] = None  # Data json: wt
-        self.cleaned_segments: Optional[List[Any]] = None  # Data json: CleanArea (from dirty map data)
+        self.cleaned_segments: Optional[List[Any]] = None  # Data json: CleanArea (from cleaning map data)
         self.multiple_cleaning_time: Optional[int] = None  # Data json: multime
         self.dos: Optional[int] = None  # Data json: dos
+        self.mopping_mode: Optional[int] = None  # Data json: mooClean
+        self.notified: Optional[bool] = None  # Data json: nopush
+        self.sequence: bool = False
+        self.change_mop: bool = False
+        self.recommended_area_type: Optional[int] = None  # Data json: rec_vw.type
+        self.recommended_threshold_type: Optional[int] = None  # Data json: rec_vws.type
+        self.recommended_carpets: Optional[List[Carpet]] = None  # Data json: rec_vw.addcpt
+        self.recommended_ramps: Optional[List[Area]] = None  # Data json: rec_vws.ramp
+        self.recommended_cliffs: Optional[List[Line]] = None  # Data json: rec_vws.cliff
+        self.recommended_virtual_thresholds: Optional[List[Wall]] = None  # Data json: rec_vws.vwsl
+        self.recommended_passable_thresholds: Optional[List[Wall]] = None  # Data json: rec_vws.vwsl
+        self.recommended_impassible_thresholds: Optional[List[Wall]] = None  # Data json: rec_vws.npthrsd
+        self.recommended_virtual_walls: Optional[List[Wall]] = None  # Data json: rec_vw.line
+        self.recommended_no_go_areas: Optional[List[Area]] = None  # Data json: rec_vw.rect
+        self.recommended_no_mopping_areas: Optional[List[Area]] = None  # Data json: rec_vw.mop
         # Generated
         self.custom_name: Optional[str] = None  # Map list json: name
         self.object_name: Optional[str] = None  # Map list json: mapobj
@@ -3538,6 +4241,7 @@ class MapData:
         # Generated from pixel_type and robot poisiton
         self.hidden_segments: Optional[int] = None  # Data json: delsr
         self.robot_segment: Optional[int] = None
+        self.station_segment: Optional[int] = None
         # For renderer to detect changes
         self.last_updated: Optional[float] = None
         # For vslam map rendering optimization
@@ -3550,6 +4254,7 @@ class MapData:
         self.ai_furniture_warning: Optional[Any] = None
         self.walls_info: Optional[Any] = None
         self.walls_info_new: Optional[Any] = None
+        self.zone_cleaning: Optional[bool] = False
 
     def __eq__(self: MapData, other: MapData) -> bool:
         if other is None:
@@ -3582,7 +4287,7 @@ class MapData:
         if self.carpets != other.carpets:
             return False
 
-        if self.ignored_carpets != other.ignored_carpets:
+        if self.deleted_carpets != other.deleted_carpets:
             return False
 
         if self.detected_carpets != other.detected_carpets:
@@ -3645,16 +4350,22 @@ class MapData:
         if self.new_map != other.new_map:
             return False
 
-        if self.cleanset != other.cleanset:
+        if not self.saved_map and not other.saved_map and self.cleanset != other.cleanset:
             return False
 
         if self.sequence != other.sequence:
             return False
 
+        if self.cleaning_sequence != other.cleaning_sequence:
+            return False
+
+        if self.mop_type != other.mop_type:
+            return False
+
         if self.carpet_cleanset != other.carpet_cleanset:
             return False
 
-        if self.furnitures != other.furnitures:
+        if not self.saved_map and not other.saved_map and self.furnitures != other.furnitures:
             return False
 
         if self.saved_furnitures != other.saved_furnitures:
@@ -3670,6 +4381,9 @@ class MapData:
             return False
 
         if self.hidden_segments != other.hidden_segments:
+            return False
+
+        if self.zone_cleaning != other.zone_cleaning:
             return False
 
         return True
@@ -3707,7 +4421,7 @@ class MapData:
         if not self.saved_map and self.active_cruise_points is not None:
             attributes_list[ATTR_ACTIVE_CRUISE_POINTS] = self.active_cruise_points
         if self.predefined_points:
-            attributes_list[ATTR_PREDEFINED_POINTS] = list(self.predefined_points.values())
+            attributes_list[ATTR_PREDEFINED_POINTS] = self.predefined_points
         if self.virtual_walls is not None:
             attributes_list[ATTR_VIRTUAL_WALLS] = self.virtual_walls
         if self.virtual_thresholds is not None:
@@ -3726,8 +4440,8 @@ class MapData:
             attributes_list[ATTR_NO_MOPPING_AREAS] = self.no_mopping_areas
         if self.carpets is not None:
             attributes_list[ATTR_CARPETS] = self.carpets
-        if self.ignored_carpets is not None:
-            attributes_list[ATTR_IGNORED_CARPETS] = self.ignored_carpets
+        if self.deleted_carpets is not None:
+            attributes_list[ATTR_DELETED_CARPETS] = self.deleted_carpets
         if self.detected_carpets is not None:
             attributes_list[ATTR_DETECTED_CARPETS] = self.detected_carpets
         if self.curtains is not None:
@@ -3746,23 +4460,29 @@ class MapData:
             attributes_list[ATTR_FURNITURES] = list(self.furnitures.values())
         if self.router_position:
             attributes_list[ATTR_ROUTER_POSITION] = self.router_position
-        if self.startup_method:
+        if self.startup_method is not None:
             attributes_list[ATTR_STARTUP_METHOD] = self.startup_method.name.replace("_", " ").title()
-        if self.dust_collection_count:
+        if self.dust_collection_count is not None:
             attributes_list[ATTR_DUST_COLLECTION_COUNT] = self.dust_collection_count
-        if self.mop_wash_count:
+        if self.mop_wash_count is not None:
             attributes_list[ATTR_MOP_WASH_COUNT] = self.mop_wash_count
         if self.recovery_map_list:
             attributes_list[ATTR_RECOVERY_MAP_LIST] = [v.as_dict() for v in reversed(self.recovery_map_list)]
         return attributes_list
 
     def check_point(self, x, y, absolute=False) -> bool:
+        pixel_type = self.pixel_type
+        dimensions = self.dimensions
+        if self.combined_pixel_type is not None:
+            pixel_type = self.combined_pixel_type
+            dimensions = self.combined_dimensions
+
         if not absolute:
-            x = int((x - self.dimensions.left) / self.dimensions.grid_size)
-            y = int((y - self.dimensions.top) / self.dimensions.grid_size)
-        if x < 0 or x >= self.dimensions.width or y < 0 or y >= self.dimensions.height:
+            x = int((x - dimensions.left) / dimensions.grid_size)
+            y = int((y - dimensions.top) / dimensions.grid_size)
+        if x < 0 or x >= dimensions.width or y < 0 or y >= dimensions.height:
             return False
-        value = int(self.pixel_type[x, y])
+        value = int(pixel_type[x, y])
         return value > 0 and value != 255
 
 
@@ -3776,29 +4496,49 @@ class DirtyData:
 @dataclass
 class Shortcut:
     id: int = -1
+    index: int = -1
     name: str = None
     map_id: int = None
     running: bool = False
     tasks: list[list[ShortcutTask]] = None
-    
+
     def as_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+        return asdict(self, dict_factory=lambda x: {k: v for (k, v) in x if v is not None})
 
 
 @dataclass
 class ShortcutTask:
+    order: int = None
     segment_id: int = None
     suction_level: int = None
     water_volume: int = None
     cleaning_times: int = None
     cleaning_mode: int = None
-    
-    def as_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+    wetness_level: int = None
+    mopping_settings: int = None
+    cleaning_route: int = None
+    custom_mopping_route: int = None
+    mop_temperature: int = None
+    mop_pressure: int = None
+    coords: list[int] = None
+    task_type: DreameVacuumShortcutTaskType = None
 
 
 @dataclass
-class ScheduleTask:
+class DNDTask:
+    id: int = -1
+    enabled: bool = False
+    start: str = None
+    end: str = None
+    repeats: int = None
+    ss: int = False
+
+    def as_dict(self) -> Dict[str, Any]:
+        return asdict(self, dict_factory=lambda x: {k: v for (k, v) in x if v is not None})
+    
+
+@dataclass
+class ScheduledTask:
     id: int = -1
     enabled: bool = False
     invalid: bool = False
@@ -3809,7 +4549,7 @@ class ScheduleTask:
     suction_level: int = None
     water_volume: int = None
     options: str = None
-    
+
     def as_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
@@ -3819,6 +4559,7 @@ class GoToZoneSettings:
     x: int = None
     y: int = None
     stop: bool = False
+    start: bool = False
     suction_level: int = None
     water_level: int = None
     cleaning_mode: int = None
@@ -3867,11 +4608,10 @@ class MapRendererColorScheme:
     passive_segment: tuple[int] = (200, 200, 200, 255)
     hidden_segment: tuple[int] = (226, 226, 226, 255)
     new_segment: tuple[int] = (153, 191, 255, 255)
-    cleaned_area: tuple[int] = (158, 240, 117, 255)
-    dirty_area: tuple[int] = (247, 135, 106, 255)
+    dirty_area: tuple[int] = (123, 148, 172, 255)
     clean_area: tuple[int] = (156, 202, 250, 255)
-    second_clean_area: tuple[int] = (123, 148, 172, 255)
-    neglected_segment: tuple[int] = (255, 159, 10, 110)
+    second_clean_area: tuple[int] = (64, 149, 241, 255)
+    blocked_segment: tuple[int] = (255, 159, 10, 110)
     no_go: tuple[int] = (177, 0, 0, 50)
     no_go_outline: tuple[int] = (199, 0, 0, 200)
     no_mop: tuple[int] = (170, 47, 255, 50)
@@ -3927,6 +4667,13 @@ MAP_COLOR_SCHEME_LIST: Final = {
         no_mop=(134, 0, 226, 128),
         no_mop_outline=(115, 0, 157, 200),
         virtual_wall=(133, 0, 0, 200),
+        virtual_threshold=(36, 163, 55, 255),
+        passable_threshold_outline=(36, 163, 55, 255),
+        passable_threshold=(36, 163, 55, 50),
+        impassable_threshold_outline=(133, 0, 0, 200),
+        impassable_threshold=(133, 0, 0, 200),
+        curtain=(173, 85, 29, 255),
+        ramp_outline=(16, 95, 186, 255),
         active_area=(200, 200, 200, 70),
         active_area_outline=(28, 81, 176, 255),  # (9, 54, 129, 200),
         active_point=(200, 200, 200, 80),
@@ -4000,6 +4747,13 @@ MAP_COLOR_SCHEME_LIST: Final = {
         no_mop=(134, 0, 226, 128),
         no_mop_outline=(115, 0, 157, 200),
         virtual_wall=(133, 0, 0, 200),
+        virtual_threshold=(36, 163, 55, 255),
+        passable_threshold_outline=(36, 163, 55, 255),
+        passable_threshold=(36, 163, 55, 50),
+        impassable_threshold_outline=(133, 0, 0, 200),
+        impassable_threshold=(133, 0, 0, 200),
+        curtain=(173, 85, 29, 255),
+        ramp_outline=(16, 95, 186, 255),
         active_area=(221, 221, 221, 60),
         active_area_outline=(22, 103, 238, 200),
         active_point=(221, 221, 221, 80),
@@ -4131,6 +4885,8 @@ class MapRendererResources:
     cleaning_mode: list[str] = None
     cleaning_route: list[str] = None
     custom_mopping_route: list[str] = None
+    mop_temperature: list[str] = None
+    mop_pressure: list[str] = None
     washing: str = None
     hot_washing: str = None
     drying: str = None
@@ -4148,6 +4904,7 @@ class MapRendererResources:
     problem: str = None
     clean: str = None
     settings: str = None
+    edit: str = None
     wifi: str = None
     version: int = 1
 
@@ -4166,6 +4923,8 @@ class MapRendererData:
     wifi_map: bool = False
     history_map: bool = False
     recovery_map: bool = False
+    temporary_map: bool = False
+    need_optimization: bool = None
     segments: Dict[int, list[int | str]] | None = None
     active_segments: list[int] = field(default_factory=lambda: [])
     active_areas: list[list[int]] = field(default_factory=lambda: [])
@@ -4176,7 +4935,7 @@ class MapRendererData:
     no_mop: list[list[int]] = field(default_factory=lambda: [])
     no_go: list[list[int]] = field(default_factory=lambda: [])
     carpets: list[list[int]] | None = None
-    ignored_carpets: list[list[int]] | None = None
+    deleted_carpets: list[list[int]] | None = None
     detected_carpets: list[list[int]] | None = None
     virtual_walls: list[list[int]] = field(default_factory=lambda: [])
     virtual_thresholds: list[list[int]] | None = None
@@ -4190,33 +4949,58 @@ class MapRendererData:
     path: list[list[int]] = field(default_factory=lambda: [])
     floor_material: Dict[int, list[int]] | None = None
     hidden_segments: Dict[int, list[int]] | None = None
-    neglected_segments: Dict[int, list[int]] | None = None
+    blocked_segments: Dict[int, list[int]] | None = None
     robot_position: list[int] | None = None
     charger_position: list[int] | None = None
     router_position: list[int] | None = None
+    station_segment: int | None = None
     ai_outborders_user: list[list[int]] | None = None
     ai_outborders: list[list[int]] | None = None
     ai_outborders_new: list[list[int]] | None = None
     ai_outborders_2d: list[list[int]] | None = None
     second_cleaning: int | None = None
+    second_mopping: int | None = None
     mop_wash_count: int | None = None
     dust_collection_count: int | None = None
     multiple_cleaning_time: int | None = None
     dos: int | None = None
+    cleaning_map: bool = None
+    cleaning_map_data: MapRendererData = None
+    has_cleaned_area: bool = None
+    has_dirty_area: bool = None
+    mopping_mode: int | None = None
+    wifi_map_data: MapRendererData = None
+    task_end_type: int | None = None
+    task_interrupt_reason: int | None = None
+    cleaning_status: int | None = None
+    recommended_area_type: int | None = (None,)
+    recommended_threshold_type: int | None = (None,)
+    recommended_carpets: list[list[int]] | None = (None,)
+    recommended_ramps: list[list[int]] | None = (None,)
+    recommended_cliffs: list[list[int]] | None = (None,)
+    recommended_virtual_thresholds: list[list[int]] | None = (None,)
+    recommended_passable_thresholds: list[list[int]] | None = (None,)
+    recommended_impassible_thresholds: list[list[int]] | None = (None,)
+    recommended_virtual_walls: list[list[int]] | None = (None,)
+    recommended_no_go_areas: list[list[int]] | None = (None,)
+    recommended_no_mopping_areas: list[list[int]] | None = (None,)
     ai_furniture_warning: int | None = None
     walls_info: Any | None = None
     walls_info_new: Any | None = None
     furniture_version: int | None = None
-    startup_method: str | None = None
-    cleanup_method: str | None = None
+    startup_method: int | None = None
+    cleanup_method: int | None = None
+    cleaned_segments: list[int] | None = None
     cleaned_area: int | None = None
     cleaning_time: int | None = None
     robot_status: int | None = None
     station_status: int | None = None
     completed: bool | None = None
     remaining_battery: int | None = None
+    zone_cleaning: bool | None = False
     cleanset: bool = False
     sequence: bool = False
+    change_mop: bool = False
     docked: bool = True
     work_status: int = 0
     resources: MapRendererResources = None

@@ -3,14 +3,16 @@
         "abort": {
             "already_configured": "Apparaat is al geconfigureerd",
             "reauth_successful": "Herauthenticatie geslaagd.",
-            "no_entry": "Kan de MySkoda configuratie niet vinden. Controleer uw logbestanden en open een probleem op GitHub."
+            "no_entry": "Kan de MySkoda configuratie niet vinden. Controleer uw logbestanden en open een probleem op GitHub.",
+            "reconfigure_successful": "Opnieuw configureren gelukt."
         },
         "error": {
             "cannot_connect": "Kan geen verbinding maken",
             "invalid_auth": "Ongeldige authenticatie",
-            "relogin_in_app": "Er is een fout opgetreden tijdens het inloggen door HomeAssistant. Het kan nodig zijn om opnieuw in te loggen in uw MySkoda app.",
+            "relogin_in_app": "Er is een fout opgetreden tijdens het inloggen door HomeAssistant. Het kan nodig zijn om opnieuw in te loggen in uw MySkoda app of op {login_url}.",
             "unknown": "Er is een onverwachte fout opgetreden. Controleer de HomeAssistant logbestanden.",
-            "no_spin": "De S-PIN ontbreekt. Herconfigureer de integratie en probeer het opnieuw."
+            "no_spin": "De S-PIN ontbreekt. Herconfigureer de integratie en probeer het opnieuw.",
+            "readonly_mode": "Alleen-lezen-modus ingeschakeld. Opdrachten zijn uitgeschakeld."
         },
         "step": {
             "reauth_confirm": {
@@ -27,6 +29,14 @@
                     "password": "Wachtwoord"
                 },
                 "description": "Voer de inloggegevens in van uw MySkoda app."
+            },
+            "reconfigure": {
+                "data": {
+                    "email": "E-mail adres",
+                    "password": "Wachtwoord"
+                },
+                "description": "Uw MySkoda inloggegevens bijwerken.",
+                "title": "MySkoda opnieuw configureren"
             }
         }
     },
@@ -38,16 +48,16 @@
             "charger_connected": {
                 "name": "Laadkabel"
             },
-            "charger_locked": {
+            "charger_lock": {
                 "name": "Laadkabelvergrendeling"
             },
-            "doors_locked": {
+            "doors_lock": {
                 "name": "Deurvergrendeling"
             },
             "doors_open": {
                 "name": "Deuren"
             },
-            "locked": {
+            "vehicle_lock": {
                 "name": "Voertuigvergrendeling"
             },
             "parkinglights_on": {
@@ -165,7 +175,8 @@
                     "charging": "Opladen",
                     "connect_cable": "Geen stroom",
                     "conserving": "Lading bewaren",
-                    "ready_for_charging": "Klaar om op te laden"
+                    "ready_for_charging": "Klaar om op te laden",
+                    "charging_interrupted": "Opladen onderbroken"
                 }
             },
             "estimated_time_left_to_reach_target_temperature": {
@@ -230,6 +241,33 @@
             },
             "outside_temperature": {
                 "name": "Buitentemperatuur"
+            },
+            "overall_mileage": {
+                "name": "Totale kilometers"
+            },
+            "overall_travel_time": {
+                "name": "Totale reistijd"
+            },
+            "overall_average_speed": {
+                "name": "Totale gemiddelde snelheid"
+            },
+            "overall_average_electric_consumption": {
+                "name": "Totaal gemiddeld elektrisch verbruik"
+            },
+            "overall_average_fuel_consumption": {
+                "name": "Totaal gemiddeld brandstofverbruik"
+            },
+            "last_trip_mileage": {
+                "name": "Laatste rit: kilometers"
+            },
+            "last_trip_travel_time": {
+                "name": "Laatste rit: Reistijd"
+            },
+            "last_trip_average_speed": {
+                "name": "Laatste rit: Gemiddelde snelheid"
+            },
+            "last_trip_average_fuel_consumption": {
+                "name": "Laatste rit: Gemiddeld brandstofverbruik"
             }
         },
         "switch": {
@@ -326,6 +364,11 @@
                     "readonly": "Je kunt geen wijzigingen aanbrengen in de auto, alleen gegevens lezen"
                 }
             }
+        }
+    },
+    "exceptions": {
+        "readonly_mode": {
+            "message": "Alleen-lezen-modus ingeschakeld. Opdrachten zijn uitgeschakeld."
         }
     }
 }

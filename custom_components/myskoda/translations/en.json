@@ -3,14 +3,17 @@
         "abort": {
             "already_configured": "Device is already configured",
             "reauth_successful": "Reauthentication has succeeded.",
-            "no_entry": "Could not find MySkoda configuration. Please check your logs and open an issue on GitHub."
+            "no_entry": "Could not find MySkoda configuration. Please check your logs and open an issue on GitHub.",
+            "reconfigure_successful": "Reconfiguration was successful."
         },
         "error": {
             "cannot_connect": "Failed to connect. MySkoda may be down or unreachable.",
             "invalid_auth": "Invalid authentication. Please check your credentials.",
-            "relogin_in_app": "Terms or marketing consent missing. Log out and back in with official MySkoda app, or https://skodaid.vwgroup.io, to accept the new conditions.",
+            "relogin_in_app": "Terms or marketing consent missing. Log out and back in with official MySkoda app, or {login_url}, to accept the new conditions.",
             "unknown": "An unexpected error occurred. Please check the HomeAssistant logfiles and report an issue to the developers.",
-            "no_spin": "The S-PIN is missing from configuration. Please reconfigure the integration and try again."
+            "no_spin": "The S-PIN is missing from configuration. Please reconfigure the integration and try again.",
+            "readonly_mode": "Read-only mode enabled. Command operations are disabled."
+
         },
         "step": {
             "reauth_confirm": {
@@ -27,6 +30,14 @@
                     "password": "Password"
                 },
                 "description": "Enter the credentials from your MySkoda app."
+            },
+            "reconfigure": {
+                "data": {
+                    "email": "E-mail address",
+                    "password": "Password"
+                },
+                "description": "Update your MySkoda credentials.",
+                "title": "Reconfigure MySkoda"
             }
         }
     },
@@ -38,16 +49,16 @@
             "charger_connected": {
                 "name": "Charger Connected"
             },
-            "charger_locked": {
+            "charger_lock": {
                 "name": "Charge Lock"
             },
-            "doors_locked": {
+            "doors_lock": {
                 "name": "Doors Locked"
             },
             "doors_open": {
                 "name": "Doors Open"
             },
-            "locked": {
+            "vehicle_lock": {
                 "name": "Vehicle Locked"
             },
             "parkinglights_on": {
@@ -165,7 +176,8 @@
                     "charging": "Charging",
                     "connect_cable": "No Power",
                     "conserving": "Conserving Charge",
-                    "ready_for_charging": "Ready for Charging"
+                    "ready_for_charging": "Ready for Charging",
+                    "charging_interrupted": "Charging Interrupted"
                 }
             },
             "estimated_time_left_to_reach_target_temperature": {
@@ -230,6 +242,33 @@
             },
             "outside_temperature": {
                 "name": "Outside Temperature"
+            },
+            "overall_mileage": {
+                "name": "Overall Mileage"
+            },
+            "overall_travel_time": {
+                "name": "Overall Travel Time"
+            },
+            "overall_average_speed": {
+                "name": "Overall Average Speed"
+            },
+            "overall_average_electric_consumption": {
+                "name": "Overall Average Electric Consumption"
+            },
+            "overall_average_fuel_consumption": {
+                "name": "Overall Average Fuel Consumption"
+            },
+            "last_trip_mileage": {
+                "name": "Last Trip Mileage"
+            },
+            "last_trip_travel_time": {
+                "name": "Last Trip Travel Time"
+            },
+            "last_trip_average_speed": {
+                "name": "Last Trip Average Speed"
+            },
+            "last_trip_average_fuel_consumption": {
+                "name": "Last Trip Average Fuel Consumption"
             }
         },
         "switch": {
@@ -326,6 +365,11 @@
                     "readonly": "You cannot make any changes to the car, only read data"
                 }
             }
+        }
+    },
+    "exceptions": {
+        "readonly_mode": {
+            "message": "Read-only mode enabled. Command operations are disabled."
         }
     }
 }

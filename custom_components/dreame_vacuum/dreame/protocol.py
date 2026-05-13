@@ -28,7 +28,7 @@ DATA_JSON: Final = (
     "e3siY2xpZW50X2lkIjoiezB9IiwiZXZlbnRzIjpbe3sicGFyYW1zIjp7eyJ2ZXJzaW9uIjoiezF9IiwibW9kZWwiOiJ7Mn0iLCJkZXZpY2VfaWQiOiJ7MH0iLCJzZXNzaW9uX2lkIjp7M30sImVuZ2FnZW1lbnRfdGltZV9tc2VjIjoxMDB9fSwibmFtZSI6Ins0fSJ9fV19fQ=="
 )
 DREAME_STRINGS: Final = (
-    "H4sICAAAAAAEAGNsb3VkX3N0cmluZ3MuanNvbgCFU9tuGjEQ/RUUKaiVysIuiKWKeKAgBK2qbbikIVWFBtvLuvFla5sQ+vUd26Q0fek+2HPmPsc7364Srl1CDQPJEsdIdfXuKu1m/RzvxegkNuPrUi4/1fn16ieqJsFxu5RgXKUla2dJmrxvvOFfKq3YTYMXy0Y6SHpJetNYEhCs3U06nbc+KRl0dt18kO+yrN/P8/6OUNIbpGU3p4MSetkO0g50O1AOUujTspVi0AewnDQeZh/F5msq7rPpkcw2z8Xj9PZeLrLbWT1ap9OHO1UVxWQ/xIBO+FCwDtzBoiDBOmbWnKK844pOtASuENRG18y4E4pIwZx6lQBXaiOH82LZtATtQxCiuTeg3NadEKKTYaVhtto6/chU8xXy5hqsPWpDmwfLjAIZYpov2gBCJiBEH5RD3I7st+DgqrYOZ8iGJnRi1sbkl9J/MHuuOSq2PBr3XHvBMeX7DROfU/teWjhlnNUjT0VEkamLhYIDH8meOGEoCG7dXebtqtTRUKzG8wi0I14KcxuQ9uwf8N5HS02ZCN0RHN9eWsJqLaKlfyqm6FhLCS8dlVz4UH95As9v5WM9c3hVWEIb/3J75iah0Uns2v6DJ7HYCElFtPY0jPZMuYtpIQgC76AN/wUucrgKHLbCXzHWyjEEq1gc6lpwEhzbP2zwrrd4bM/t6KMSGujaiKgorE3pK23cOamfoOU3Lok0fEb812KlSZb0/r9Y338DqLVvecIDAAA="
+    "H4sICAAAAAAEAGNsb3VkX3N0cmluZ3MuanNvbgCNU9tuGjEQ/RUUKaiVyt5ALFWUBwpCSatqmwBpkqpCg+3ddePL1ja59Os7tklJ+pR9WM+Z+xx7fhwlXLuEGgaSJY6R9ujDUT4sxiWel9MncTM7ruXyS1cer36jah4cN0sJxrVasrRI8uRj7x3/1mrFTnq8WvbySTJK8pPekoBg6TDJsvc+KZlk22E5KbdFMR6X5XhLKBlN8npY0kkNo2ILeQbDDOpJDmNaD3IM+gSWk97t2Wdx8z0X18XigZzdPFZ3i4treVlcnHXTdb64vVJtVc2bUwzIwoeCdeB2FgUJ1jGz5hTlLVd0riVwhaAzumPGPaGIFJxTrxLgam3k6Xm17FuC9lMQot8YUG7jnhCik2G1YbbdOH3HVP8V8uYOrH3QhvZ3lhkFMsT0n7UBhExAiN4phziN7A9g59pUh3/IhiZ0YtbG5IfS/zB77DgqNjwaG6694Jjy/YaJ96l9LwOcMs7qkaciosjUwULBgY9k95wwFAS37qrwdlXraKhWs/MItCNeCnMbkHbvH3Djo6WmTITuCI5vDy1htQHR0l8VU3SmpYTnjmoufKg/PIH7u/Kxnjk8Wiyhjb+5hrl5aHQeu7b/4XksNkVSEa09DdOGKXcwXQqCwDtow/+AixyuAoeD8CpmWjmGYBWLQ9cJToJj+ssG726Dv82+Hf2ghAa6NiIqKmtz+kobd07qexj4jUsiDV8Rv1isPCmS0VsWKyRzRu/umXmZbxVVr1Jmb9vV1FM/2BpOG5b6N5EGnrknduEv5+dfaHOmATgEAAA="
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -148,11 +148,12 @@ class DreameVacuumDreameHomeCloudProtocol:
 
         self._queue.put((callback, url, params, retry_count))
 
-    def _api_call(self, url, params=None, retry_count=2):
+    def _api_call(self, url, params=None, retry_count=2, timeout=None):
         return self.request(
             f"{self.get_api_url()}/{url}",
             json.dumps(params, separators=(",", ":")) if params is not None else None,
             retry_count,
+            timeout,
         )
 
     def get_api_url(self) -> str:
@@ -229,6 +230,10 @@ class DreameVacuumDreameHomeCloudProtocol:
             if not self._client_connected:
                 self._client_connected = True
                 _LOGGER.info("Connected to the device client")
+            if (
+                self._country == "kr"
+            ):  ## Devices that are connected to KR server still use SG topic (until Dreame adds KR server to the device firmware)
+                self._client.subscribe(f"/{self._strings[7]}/{self._did}/{self._uid}/{self._model}/sg/")
             client.subscribe(f"/{self._strings[7]}/{self._did}/{self._uid}/{self._model}/{self._country}/")
             if self._connected_callback:
                 self._client_queue.put((self._connected_callback, None))
@@ -294,6 +299,8 @@ class DreameVacuumDreameHomeCloudProtocol:
 
                         try:
                             host = self._host.split(":")
+                            if self._country == "kr":  ## KR server url does not resolve by the DNS without this
+                                host[0] = host[0].replace("10100", "10000")
                             key = f"{self._strings[53]}{self._uid}{self._strings[54]}{DreameVacuumDreameHomeCloudProtocol.get_random_agent_id()}{self._strings[54]}{host[0]}"
                             if paho.mqtt.__version__[0] > "1":
                                 self._client = Client(
@@ -316,9 +323,9 @@ class DreameVacuumDreameHomeCloudProtocol:
                             self._client.tls_insecure_set(True)
                             self._set_client_key()
                             self._client.connect_timeout = 10
+                            self._client.disable_logger()
                             self._client.connect(host[0], port=int(host[1]), keepalive=60)
                             self._client.loop_start()
-                            self._client.disable_logger()
                         except Exception as ex:
                             _LOGGER.error("Connecting to the device client failed: %s", ex)
                     elif not self._client_connected:
@@ -333,10 +340,14 @@ class DreameVacuumDreameHomeCloudProtocol:
 
         if self._strings is None:
             self._strings = json.loads(zlib.decompress(base64.b64decode(DREAME_STRINGS), zlib.MAX_WBITS | 32))
-            if self._account_type != "dreame":
+            if self._account_type == "mova":
                 self._strings[0] = self._strings[57]
                 self._strings[3] = self._strings[58]
                 self._strings[6] = f"{self._strings[6][:5]}2"
+            elif self._account_type == "trouver":
+                self._strings[0] = self._strings[59]
+                self._strings[3] = self._strings[60]
+                self._strings[6] = f"{self._strings[6][:5]}5"
 
         self._auth_failed = False
         try:
@@ -399,48 +410,50 @@ class DreameVacuumDreameHomeCloudProtocol:
             self._connected = True
         return self._logged_in
 
-    def get_supported_devices(self, models, host=None, mac=None) -> Any:
+    def get_supported_devices(self, models, host=None, mac=None, device_id=None) -> Any:
         response = self.get_devices()
-        devices = {}
-        unsupported_devices = {}
+        devices = []
+        unsupported_devices = []
         if response:
             all_devices = list(response["page"]["records"])
-            for device in all_devices:
+            for device in all_devices:                
                 model = device["model"]
-                name = device["customName"] if device["customName"] else device["deviceInfo"]["displayName"]
-                list_name = f"{name} - {model}"
                 if model in models:
-                    devices[list_name] = device
-
-                    if (host is not None and device.get("localip") == host) or (
-                        mac is not None and device.get("mac") == mac
+                    device["name"] = (
+                        device["customName"] if device["customName"] else device["deviceInfo"]["displayName"]
+                    )
+                    devices.append(device)
+                    if (mac is not None and device.get("mac") == mac) or (
+                        device_id is not None and device.get("did") == device_id
                     ):
-                        devices = {list_name: device}
+                        devices = [device]
                         break
                 elif ".vacuum." in model:
-                    unsupported_devices[list_name] = device
+                    _LOGGER.warning("Unsupported device: %s", device)
+                    unsupported_devices.append(device)
 
             if mac is None:
                 try:
                     session_id = random.randint(1000, 100000000)
                     for device in all_devices:
                         model = device["model"]
-                        device_id = hashlib.sha256(
-                            (device["mac"].replace(":", "").lower()).encode(encoding="UTF-8")
-                        ).hexdigest()
-                        requests.post(
-                            base64.b64decode(DATA_URL),
-                            data=base64.b64decode(DATA_JSON)
-                            .decode("utf-8")
-                            .format(
-                                device_id,
-                                VERSION,
-                                model,
-                                session_id,
-                                "device" if model in models else "unsupported_device",
-                            ),
-                            timeout=5,
-                        )
+                        if ".vacuum." in model:
+                            device_id = hashlib.sha256(
+                                (device["mac"].replace(":", "").lower()).encode(encoding="UTF-8")
+                            ).hexdigest()
+                            requests.post(
+                                base64.b64decode(DATA_URL),
+                                data=base64.b64decode(DATA_JSON)
+                                .decode("utf-8")
+                                .format(
+                                    device_id,
+                                    VERSION,
+                                    model,
+                                    session_id,
+                                    "device" if model in models else "unsupported_device",
+                                ),
+                                timeout=5,
+                            )
                 except:
                     pass
         return devices, unsupported_devices
@@ -532,7 +545,7 @@ class DreameVacuumDreameHomeCloudProtocol:
             retry_count,
         )
 
-    def send(self, method, parameters, retry_count: int = 2) -> Any:
+    def send(self, method, parameters, retry_count: int = 2, timeout=None) -> Any:
         host = ""
         if self._host and len(self._host):
             host = f"-{self._host.split('.')[0]}"
@@ -550,6 +563,7 @@ class DreameVacuumDreameHomeCloudProtocol:
                 },
             },
             retry_count,
+            timeout,
         )
         self._id = self._id + 1
         if (
@@ -559,9 +573,49 @@ class DreameVacuumDreameHomeCloudProtocol:
             or "result" not in api_response["data"]
         ):
             if api_response:
-                _LOGGER.error("Failed to execute api call: %s", api_response)
+                ## Success is true but no data, retry once
+                if api_response.get("success") is True and retry_count > 0:
+                    return self.send(method, parameters, 0)
+                _LOGGER.warning("Failed to execute api call: %s", api_response)
             return None
         return api_response["data"]["result"]
+
+    def get_device_file(self, file_name, file_type) -> Any:
+        try:
+            if self._key_expire and time.time() > self._key_expire:
+                if not self.login():
+                    return None
+
+            response = self._session.post(
+                f"{self.get_api_url()}{self._strings[61]}",
+                headers={
+                    "Accept": "*/*",
+                    self._strings[47]: self._strings[3],
+                    self._strings[49]: self._strings[5],
+                    self._strings[50]: self._ti if self._ti else self._strings[6],
+                    self._strings[46]: self._key,
+                    self._strings[48]: self._strings[4] if self._country == "cn" else None,
+                },
+                json={
+                    "did": str(self._did),
+                    "uid": str(self._uid),
+                    "fileinfo": json.dumps({"filename": file_name, "type": file_type}, separators=(",", ":")),
+                },
+                timeout=15,
+            )
+            if response.status_code == 200:
+                return response.content
+            elif response.status_code == 401 and self._secondary_key:
+                _LOGGER.warning("Execute api call failed: Token Expired")
+                if self.login():
+                    return self.get_device_file(file_name, file_name)
+            _LOGGER.warning("Get device file failed! (%s)", response.text)
+
+        except requests.exceptions.Timeout:
+            _LOGGER.warning("Error while executing request: Read timed out. (timeout=15)")
+        except Exception as ex:
+            _LOGGER.warning("Error while executing request: %s", str(ex))
+        return None
 
     def get_file(self, url: str, retry_count: int = 4) -> Any:
         retries = 0
@@ -665,17 +719,19 @@ class DreameVacuumDreameHomeCloudProtocol:
             return None
         return api_response["result"]
 
-    def request(self, url: str, data, retry_count=2) -> Any:
+    def request(self, url: str, data, retry_count=2, timeout=None) -> Any:
         retries = 0
+        if not timeout:
+            timeout = 6
+
+        if self._key_expire and time.time() > self._key_expire:
+            if not self.login():
+                return None
+
         if not retry_count or retry_count < 0:
             retry_count = 0
         while retries < retry_count + 1:
             try:
-                if self._key_expire and time.time() > self._key_expire:
-                    if not self.login():
-                        response = None
-                        break
-
                 headers = {
                     "Accept": "*/*",
                     "Content-Type": "application/x-www-form-urlencoded",
@@ -687,17 +743,17 @@ class DreameVacuumDreameHomeCloudProtocol:
                     self._strings[51]: self._strings[52],
                     self._strings[46]: self._key,
                 }
+
                 if self._country == "cn":
                     headers[self._strings[48]] = self._strings[4]
-                response = self._session.post(url, headers=headers, data=data, timeout=6)
+                response = self._session.post(url, headers=headers, data=data, timeout=timeout)
                 break
             except requests.exceptions.Timeout:
                 retries = retries + 1
                 response = None
                 if self._connected:
                     _LOGGER.warning(
-                        "Error while executing request: Read timed out. (read timeout=6): %s",
-                        data,
+                        f"Error while executing request: Read timed out. (timeout={timeout})"
                     )
             except Exception as ex:
                 retries = retries + 1
@@ -817,11 +873,9 @@ class DreameVacuumMiHomeCloudProtocol:
 
         self._queue.put((callback, url, params, retry_count))
 
-    def _api_call(self, url, params, retry_count=2):
+    def _api_call(self, url, params, retry_count=2, timeout=None):
         response = self.request(
-            f"{self.get_api_url()}/{url}",
-            {"data": json.dumps(params, separators=(",", ":"))},
-            retry_count,
+            f"{self.get_api_url()}/{url}", {"data": json.dumps(params, separators=(",", ":"))}, retry_count, timeout
         )
 
         if not self.check_login(response):
@@ -856,7 +910,7 @@ class DreameVacuumMiHomeCloudProtocol:
 
     @property
     def object_name(self) -> str:
-        return f"{str(self._uid)}/{str(self._did)}/0"        
+        return f"{str(self._uid)}/{str(self._did)}/0"
 
     def check_login(self, response=None) -> bool:
         try:
@@ -919,24 +973,24 @@ class DreameVacuumMiHomeCloudProtocol:
         data = {
             "user": self._username,
             "hash": hashlib.md5(str.encode(self._password)).hexdigest().upper(),
-            "callback": "https://sts.api.io.mi.com/sts",            
+            "callback": "https://sts.api.io.mi.com/sts",
             "sid": "xiaomiio",
             "qs": "%3Fsid%3Dxiaomiio%26_json%3Dtrue",
         }
         if self._sign:
             data["_sign"] = self._sign
-        params = {'_json': 'true'}       
-        
+        params = {"_json": "true"}
+
         self.verification_url = None
         self.captcha_img = None
-        
+
         try:
             cookies = {}
             if self._captcha_code and self._captcha_ick:
-                data['captCode'] = self._captcha_code
-                params['_dc'] = int(time.time() * 1000)
-                cookies['ick'] = self._captcha_ick
-                
+                data["captCode"] = self._captcha_code
+                params["_dc"] = int(time.time() * 1000)
+                cookies["ick"] = self._captcha_ick
+
             response = self._session.post(
                 "https://account.xiaomi.com/pass/serviceLoginAuth2",
                 headers={
@@ -948,7 +1002,7 @@ class DreameVacuumMiHomeCloudProtocol:
                 cookies=cookies,
                 timeout=5,
             )
-            if response is not None:                
+            if response is not None:
                 if response.status_code == 200:
                     data = self.to_json(response.text)
                     location = data.get("location")
@@ -962,15 +1016,15 @@ class DreameVacuumMiHomeCloudProtocol:
                         self.verification_url = data["notificationUrl"]
                         if self.verification_url[:4] != "http":
                             self.verification_url = f"https://account.xiaomi.com{self.verification_url}"
-                            
+
                     if "captchaUrl" in data:
                         url = data["captchaUrl"]
                         if url:
-                            if url[:4] != 'http':
+                            if url[:4] != "http":
                                 url = f"https://account.xiaomi.com{url}"
-                            
+
                             response = self._session.get(url)
-                            if ick := response.cookies.get('ick'):                            
+                            if ick := response.cookies.get("ick"):
                                 self._captcha_ick = ick
                                 self.captcha_img = base64.b64encode(response.content).decode()
                 self._auth_failed = True
@@ -1022,7 +1076,7 @@ class DreameVacuumMiHomeCloudProtocol:
         return self._logged_in
 
     def verify_code(self, code) -> bool:
-        path = "identity/authStart"
+        path = "fe/service/identity/authStart"
         if code and self.verification_url and self._session and path in self.verification_url:
             try:
                 response = self._session.get(
@@ -1079,7 +1133,7 @@ class DreameVacuumMiHomeCloudProtocol:
     def verify_captcha(self, code) -> bool:
         self._captcha_code = code
         return self.login() or self.captcha_img is None
-        
+
     def get_file(self, url: str, retry_count: int = 4) -> Any:
         retries = 0
         if not retry_count or retry_count < 0:
@@ -1132,11 +1186,9 @@ class DreameVacuumMiHomeCloudProtocol:
             retry_count,
         )
 
-    def send(self, method, parameters, retry_count: int = 2) -> Any:
+    def send(self, method, parameters, retry_count: int = 2, timeout=None) -> Any:
         api_response = self._api_call(
-            f"v2/home/rpc/{self._did}",
-            {"method": method, "params": parameters},
-            retry_count,
+            f"v2/home/rpc/{self._did}", {"method": method, "params": parameters}, retry_count, timeout
         )
         if api_response is None or "result" not in api_response:
             return None
@@ -1178,10 +1230,10 @@ class DreameVacuumMiHomeCloudProtocol:
                 return found[0]["token"], found[0]["localip"]
         return None, None
 
-    def get_supported_devices(self, models, host=None, mac=None) -> Any:
+    def get_supported_devices(self, models, host=None, mac=None, device_id=None) -> Any:
         response = self.get_devices()
-        devices = {}
-        unsupported_devices = {}
+        devices = []
+        unsupported_devices = []
         if response:
             all_devices = list(
                 filter(
@@ -1190,41 +1242,41 @@ class DreameVacuumMiHomeCloudProtocol:
                 )
             )
             for device in all_devices:
-                name = device["name"]
                 model = device["model"]
-                list_name = f"{name} - {model}"
                 if model in models:
-                    devices[list_name] = device
-
-                    if (host is not None and device.get("localip") == host) or (
-                        mac is not None and device.get("mac") == mac
+                    devices.append(device)
+                    if (
+                        (mac is not None and device.get("mac") == mac)
+                        or (device_id is not None and device.get("did") == device_id)
+                        or (host is not None and device.get("localip") == host)
                     ):
-                        devices = {list_name: device}
+                        devices = [device]
                         break
                 elif ".vacuum." in model:
-                    unsupported_devices[list_name] = device
+                    unsupported_devices.append(device)
 
             if mac is None:
                 try:
                     session_id = random.randint(1000, 100000000)
                     for device in all_devices:
                         model = device["model"]
-                        device_id = hashlib.sha256(
-                            (device["mac"].replace(":", "").lower()).encode(encoding="UTF-8")
-                        ).hexdigest()
-                        requests.post(
-                            base64.b64decode(DATA_URL),
-                            data=base64.b64decode(DATA_JSON)
-                            .decode("utf-8")
-                            .format(
-                                device_id,
-                                VERSION,
-                                model,
-                                session_id,
-                                "device" if model in models else "unsupported_device",
-                            ),
-                            timeout=5,
-                        )
+                        if ".vacuum." in model:
+                            device_id = hashlib.sha256(
+                                (device["mac"].replace(":", "").lower()).encode(encoding="UTF-8")
+                            ).hexdigest()
+                            requests.post(
+                                base64.b64decode(DATA_URL),
+                                data=base64.b64decode(DATA_JSON)
+                                .decode("utf-8")
+                                .format(
+                                    device_id,
+                                    VERSION,
+                                    model,
+                                    session_id,
+                                    "device" if model in models else "unsupported_device",
+                                ),
+                                timeout=5,
+                            )
                 except:
                     pass
         return devices, unsupported_devices
@@ -1320,7 +1372,7 @@ class DreameVacuumMiHomeCloudProtocol:
             return None
         return api_response["result"]
 
-    def request(self, url: str, params: Dict[str, str], retry_count=2) -> Any:
+    def request(self, url: str, params: Dict[str, str], retry_count=2, timeout=None) -> Any:
         retries = 0
         if not retry_count or retry_count < 0:
             retry_count = 0
@@ -1348,7 +1400,9 @@ class DreameVacuumMiHomeCloudProtocol:
 
         while retries < retry_count + 1:
             try:
-                response = self._session.post(url, headers=headers, cookies=cookies, data=fields, timeout=5)
+                response = self._session.post(
+                    url, headers=headers, cookies=cookies, data=fields, timeout=timeout if timeout else 6
+                )
                 break
             except Exception as ex:
                 retries = retries + 1
@@ -1586,7 +1640,7 @@ class DreameVacuumProtocol:
         if self.device:
             self.device.send_async(callback, method, parameters=parameters, retry_count=retry_count)
 
-    def send(self, method, parameters: Any = None, retry_count: int = 2) -> Any:
+    def send(self, method, parameters: Any = None, retry_count: int = 2, timeout=None) -> Any:
         if (self.prefer_cloud or not self.device) and self.device_cloud:
             if not self.device_cloud.logged_in:
                 # Use different session for device cloud
@@ -1600,7 +1654,7 @@ class DreameVacuumProtocol:
             if not self.device_cloud.logged_in:
                 raise DeviceException("Unable to login to device over cloud") from None
 
-            response = self.device_cloud.send(method, parameters=parameters, retry_count=retry_count)
+            response = self.device_cloud.send(method, parameters=parameters, retry_count=retry_count, timeout=timeout)
             if response is None:
                 if method == "get_properties" or method == "set_properties":
                     self._connected = False
@@ -1611,11 +1665,11 @@ class DreameVacuumProtocol:
         if self.device:
             return self.device.send(method, parameters=parameters, retry_count=retry_count)
 
-    def get_properties(self, parameters: Any = None, retry_count: int = 1) -> Any:
-        return self.send("get_properties", parameters=parameters, retry_count=retry_count)
+    def get_properties(self, parameters: Any = None, retry_count: int = 1, timeout=None) -> Any:
+        return self.send("get_properties", parameters=parameters, retry_count=retry_count, timeout=timeout)
 
     def set_property(self, siid: int, piid: int, value: Any = None, retry_count: int = 2) -> Any:
-        return self.set_properties(
+        return self._set_properties(
             [
                 {
                     "did": f"{siid}.{piid}" if not self.dreame_cloud else str(self.cloud.device_id),
@@ -1627,8 +1681,39 @@ class DreameVacuumProtocol:
             retry_count=retry_count,
         )
 
-    def set_properties(self, parameters: Any = None, retry_count: int = 2) -> Any:
+    def set_properties(self, properties, retry_count: int = 2) -> Any:
+        return self._set_properties(
+            [
+                {
+                    "did": f"{siid}.{piid}" if not self.dreame_cloud else str(self.cloud.device_id),
+                    "siid": siid,
+                    "piid": piid,
+                    "value": value,
+                }
+                for siid, piid, value in properties
+            ],
+            retry_count=retry_count,
+        )
+
+    def set_property_async(self, callback, siid: int, piid: int, value: Any = None, retry_count: int = 2) -> Any:
+        return self._set_properties_async(
+            callback,
+            [
+                {
+                    "did": f"{siid}.{piid}" if not self.dreame_cloud else str(self.cloud.device_id),
+                    "siid": siid,
+                    "piid": piid,
+                    "value": value,
+                }
+            ],
+            retry_count=retry_count,
+        )
+
+    def _set_properties(self, parameters: Any = None, retry_count: int = 2) -> Any:
         return self.send("set_properties", parameters=parameters, retry_count=retry_count)
+
+    def _set_properties_async(self, callback, parameters: Any = None, retry_count: int = 2) -> Any:
+        return self.send_async(callback, "set_properties", parameters=parameters, retry_count=retry_count)
 
     def action_async(self, callback, siid: int, aiid: int, parameters=[], retry_count: int = 2):
         if parameters is None:

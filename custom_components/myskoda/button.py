@@ -2,6 +2,7 @@
 
 import logging
 from datetime import timedelta
+from typing import Coroutine
 
 from homeassistant.components.button import (
     ButtonDeviceClass,
@@ -12,9 +13,12 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import DiscoveryInfoType  # pyright: ignore [reportAttributeAccessIssue]
 from homeassistant.util import Throttle
+from homeassistant.exceptions import ServiceValidationError
 
 from myskoda.models.info import CapabilityId
 from myskoda.mqtt import OperationFailedError
+
+from aiohttp import ClientResponseError
 
 from .const import API_COOLDOWN_IN_SECONDS, CONF_READONLY, COORDINATORS, DOMAIN
 from .coordinator import MySkodaConfigEntry, MySkodaDataUpdateCoordinator
@@ -48,13 +52,19 @@ class MySkodaButton(MySkodaEntity, ButtonEntity):
         super().__init__(coordinator, vin)
         self._is_enabled: bool = True
 
+    def _ensure_not_readonly(self):
+        if self.coordinator.entry.options.get(CONF_READONLY):
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="readonly_mode",
+            )
+
     def is_supported(self) -> bool:
         all_capabilities_present = all(
             self.vehicle.has_capability(cap) for cap in self.required_capabilities()
         )
-        readonly = self.coordinator.entry.options.get(CONF_READONLY)
 
-        return all_capabilities_present and not readonly
+        return all_capabilities_present
 
     def _disable_button(self):
         self._is_enabled = False
@@ -63,6 +73,18 @@ class MySkodaButton(MySkodaEntity, ButtonEntity):
     def _enable_button(self):
         self._is_enabled = True
         self.async_write_ha_state()
+
+    async def _press_button(self, to_call: Coroutine):
+        """Press a button by executing to_call."""
+        self._ensure_not_readonly()
+        if not self._is_enabled:
+            return
+
+        self._disable_button()
+        try:
+            await to_call
+        finally:
+            self._enable_button()
 
     @property
     def available(self) -> bool:
@@ -84,13 +106,12 @@ class HonkFlash(MySkodaButton):
         if not self._is_enabled:
             return  # Ignore presses when disabled
 
-        self._disable_button()
+        myskoda, vin = self.coordinator.myskoda, self.vehicle.info.vin
         try:
-            await self.coordinator.myskoda.honk_flash(self.vin)
-        except OperationFailedError as exc:
+            await self._press_button(myskoda.honk_flash(vin))
+        except (ClientResponseError, OperationFailedError) as exc:
             _LOGGER.error("Failed honk and flash: %s", exc)
-        finally:
-            self._enable_button()
+        _LOGGER.info("Sent honk and flash")
 
     def required_capabilities(self) -> list[CapabilityId]:
         return [CapabilityId.HONK_AND_FLASH]
@@ -108,13 +129,12 @@ class Flash(MySkodaButton):
         if not self._is_enabled:
             return  # Ignore presses when disabled
 
-        self._disable_button()
+        myskoda, vin = self.coordinator.myskoda, self.vehicle.info.vin
         try:
-            await self.coordinator.myskoda.flash(self.vin)
-        except OperationFailedError as exc:
+            await self._press_button(myskoda.flash(vin))
+        except (ClientResponseError, OperationFailedError) as exc:
             _LOGGER.error("Failed to flash lights: %s", exc)
-        finally:
-            self._enable_button()
+        _LOGGER.info("Sent light flash")
 
     def required_capabilities(self) -> list[CapabilityId]:
         return [CapabilityId.HONK_AND_FLASH]
@@ -138,13 +158,12 @@ class WakeUp(MySkodaButton):
         if not self._is_enabled:
             return
 
-        self._disable_button()
+        myskoda, vin = self.coordinator.myskoda, self.vehicle.info.vin
         try:
-            await self.coordinator.myskoda.wakeup(self.vin)
-        except OperationFailedError as exc:
+            await self._press_button(myskoda.wakeup(vin))
+        except (ClientResponseError, OperationFailedError) as exc:
             _LOGGER.error("Failed to wake up vehicle: %s", exc)
-        finally:
-            self._enable_button()
+        _LOGGER.info("Signaled vehicle to wake up")
 
     def is_supported(self) -> bool:
         """Some models have VEHICLE_WAKE_UP while others have VEHICLE_WAKE_UP_TRIGGER."""

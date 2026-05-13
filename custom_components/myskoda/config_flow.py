@@ -6,16 +6,16 @@ import logging
 from typing import Any
 
 import voluptuous as vol
-
 from aiohttp.client_exceptions import ClientResponseError
-
 from homeassistant.config_entries import (
     ConfigFlow as BaseConfigFlow,
+)
+from homeassistant.config_entries import (
     ConfigFlowResult,
     OptionsFlow,
 )
-from homeassistant.core import callback, HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ConfigEntryNotReady
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.exceptions import ConfigEntryNotReady, HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.schema_config_entry_flow import (
     SchemaCommonFlowHandler,
@@ -24,25 +24,28 @@ from homeassistant.helpers.schema_config_entry_flow import (
     SchemaOptionsFlowHandler,
 )
 from homeassistant.util.ssl import get_default_context
+
 from myskoda import MySkoda
 from myskoda.auth.authorization import (
     AuthorizationError,
-    NotAuthorizedError,
     AuthorizationFailedError,
-    TermsAndConditionsError,
     MarketingConsentError,
+    NotAuthorizedError,
+    TermsAndConditionsError,
+    TokenExpiredError,
 )
 
 from .const import (
-    DOMAIN,
     CONF_PASSWORD,
     CONF_POLL_INTERVAL,
-    CONF_POLL_INTERVAL_MIN,
     CONF_POLL_INTERVAL_MAX,
+    CONF_POLL_INTERVAL_MIN,
+    CONF_READONLY,
+    CONF_REFRESH_TOKEN,
     CONF_SPIN,
     CONF_TRACING,
     CONF_USERNAME,
-    CONF_READONLY,
+    DOMAIN,
 )
 from .coordinator import MySkodaConfigEntry
 
@@ -73,7 +76,17 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> None:
         async_get_clientsession(hass), get_default_context(), mqtt_enabled=False
     )
 
-    await hub.connect(data[CONF_USERNAME], data[CONF_PASSWORD])
+    connect_kwargs = {
+        "email": data[CONF_USERNAME],
+        "password": data[CONF_PASSWORD],
+        "refresh_token": data.get(CONF_REFRESH_TOKEN),
+    }
+    try:
+        await hub.connect(**connect_kwargs)
+    except (TokenExpiredError, AuthorizationFailedError):
+        connect_kwargs.pop("refresh_token")
+        await hub.connect(**connect_kwargs)
+
     await hub.disconnect()
 
 
@@ -103,7 +116,7 @@ class ConfigFlow(BaseConfigFlow, domain=DOMAIN):
     """Handle a config flow for MySkoda."""
 
     VERSION = 2
-    MINOR_VERSION = 3
+    MINOR_VERSION = 5
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -115,6 +128,9 @@ class ConfigFlow(BaseConfigFlow, domain=DOMAIN):
             )
 
         errors = {}
+        placeholders = {
+            "login_url": "https://skodaid.vwgroup.io",
+        }
 
         try:
             await validate_input(self.hass, user_input)
@@ -137,7 +153,10 @@ class ConfigFlow(BaseConfigFlow, domain=DOMAIN):
 
         # Only called if there was an error.
         return self.async_show_form(
-            step_id="user", data_schema=STEP_USER_DATA_SCHEMA, errors=errors
+            step_id="user",
+            data_schema=STEP_USER_DATA_SCHEMA,
+            errors=errors,
+            description_placeholders=placeholders,
         )
 
     async def async_step_reauth(self, entry_data: dict[str, Any]) -> ConfigFlowResult:
@@ -187,6 +206,60 @@ class ConfigFlow(BaseConfigFlow, domain=DOMAIN):
                     vol.Required(
                         CONF_PASSWORD, default=self.reauth_entry.data[CONF_PASSWORD]
                     ): str,
+                }
+            ),
+            errors=errors,
+        )
+
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Handle reconfiguration of MySkoda credentials."""
+        errors: dict = {}
+
+        reconfigure_entry = self._get_reconfigure_entry()
+
+        if user_input is not None:
+            try:
+                await validate_input(self.hass, user_input)
+            except (CannotConnect, ClientResponseError):
+                errors["base"] = "cannot_connect"
+            except (
+                InvalidAuth,
+                AuthorizationError,
+                AuthorizationFailedError,
+                NotAuthorizedError,
+            ):
+                errors["base"] = "invalid_auth"
+            except (TermsAndConditionsError, MarketingConsentError):
+                errors["base"] = "relogin_in_app"
+            except Exception:
+                _LOGGER.exception("Unexpected exception during reconfigure")
+                errors["base"] = "unknown"
+            else:
+                # Credentials work. Store them.
+                reconfigure_data = reconfigure_entry.data.copy()
+                reconfigure_data[CONF_USERNAME] = user_input[CONF_USERNAME]
+                reconfigure_data[CONF_PASSWORD] = user_input[CONF_PASSWORD]
+                reconfigure_data[CONF_REFRESH_TOKEN] = None
+
+                self.hass.config_entries.async_update_entry(
+                    reconfigure_entry,
+                    data=reconfigure_data,
+                )
+                self.hass.async_create_task(
+                    self.hass.config_entries.async_reload(reconfigure_entry.entry_id)
+                )
+                return self.async_abort(reason="reconfigure_successful")
+
+        return self.async_show_form(
+            step_id="reconfigure",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONF_USERNAME, default=reconfigure_entry.data[CONF_USERNAME]
+                    ): str,
+                    vol.Required(CONF_PASSWORD): str,
                 }
             ),
             errors=errors,

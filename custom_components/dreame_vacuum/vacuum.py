@@ -7,14 +7,17 @@ import importlib
 from .coordinator import DreameVacuumDataUpdateCoordinator
 from .entity import DreameVacuumEntity
 
+from homeassistant.helpers.importlib import async_import_module
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import config_validation as cv, entity_platform
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.components.vacuum import (
     StateVacuumEntity,
     VacuumEntityFeature,
+    ENTITY_ID_FORMAT,
 )
 from .recorder import VACUUM_UNRECORDED_ATTRIBUTES
 
@@ -49,6 +52,8 @@ from .const import (
     INPUT_CUSTOM_MOPPING_ROUTE,
     INPUT_CLEANING_ROUTE,
     INPUT_WETNESS_LEVEL,
+    INPUT_MOP_TEMPERATURE,
+    INPUT_MOP_PRESSURE,
     INPUT_ROTATION,
     INPUT_SEGMENT,
     INPUT_SEGMENT_ID,
@@ -66,17 +71,28 @@ from .const import (
     INPUT_SHORTCUT_ID,
     INPUT_SHORTCUT_NAME,
     INPUT_CARPET_ARRAY,
-    INPUT_IGNORED_CARPET_ARRAY,
+    INPUT_DELETED_CARPET_ARRAY,
     INPUT_VIRTUAL_THRESHOLD_ARRAY,
+    INPUT_PASSABLE_THRESHOLD_ARRAY,
+    INPUT_IMPASSABLE_THRESHOLD_ARRAY,
+    INPUT_RAMP_ARRAY,
     INPUT_X,
     INPUT_Y,
     INPUT_OBSTACLE_IGNORED,
     INPUT_KEY,
     INPUT_VALUE,
+    INPUT_PARAMS,
     INPUT_ID,
     INPUT_TYPE,
+    INPUT_OBJECT_TYPE,
+    INPUT_CARPET_TYPE,
+    INPUT_MATERIAL,
     INPUT_CARPET_CLEANING,
-    INPUT_CARPET_SETTINGS,
+    INPUT_CARPET_PREFERENCES,
+    INPUT_AREA,
+    INPUT_FURNITURE_ARRAY,
+    INPUT_CURTAIN_ARRAY,
+    INPUT_MOP_TYPE,
     SERVICE_CLEAN_ZONE,
     SERVICE_CLEAN_SEGMENT,
     SERVICE_CLEAN_SPOT,
@@ -99,9 +115,18 @@ from .const import (
     SERVICE_SET_CLEANING_SEQUENCE,
     SERVICE_SET_CUSTOM_CLEANING,
     SERVICE_SET_CUSTOM_CARPET_CLEANING,
+    SERVICE_SET_SEGMENT_TYPE,
+    SERVICE_SET_HIDDEN_SEGMENTS,
+    SERVICE_SET_FLOOR_MATERIAL,
+    SERVICE_SET_LOW_LYING_AREA,
+    SERVICE_SET_FURNITURE,
+    SERVICE_SET_CURTAIN,
+    SERVICE_SET_MOP_TYPE,
     SERVICE_SET_RESTRICTED_ZONE,
     SERVICE_SET_CARPET_AREA,
+    SERVICE_SET_CARPET_TYPE,
     SERVICE_SET_VIRTUAL_THRESHOLD,
+    SERVICE_SET_THRESHOLD,
     SERVICE_SET_PREDEFINED_POINTS,
     SERVICE_SPLIT_SEGMENTS,
     SERVICE_SAVE_TEMPORARY_MAP,
@@ -109,6 +134,7 @@ from .const import (
     SERVICE_REPLACE_TEMPORARY_MAP,
     SERVICE_RESET_CONSUMABLE,
     SERVICE_RENAME_SHORTCUT,
+    SERVICE_DELETE_SHORTCUT,
     SERVICE_SET_OBSTACLE_IGNORE,
     SERVICE_SET_ROUTER_POSITION,
     CONSUMABLE_MAIN_BRUSH,
@@ -121,14 +147,17 @@ from .const import (
     CONSUMABLE_DETERGENT,
     CONSUMABLE_SQUEEGEE,
     CONSUMABLE_ONBOARD_DIRTY_WATER_TANK,
-    CONSUMABLE_DIRTY_WATER_TANK,
+    CONSUMABLE_DIRTY_WATER_CHANNEL,
     CONSUMABLE_DEODORIZER,
     CONSUMABLE_WHEEL,
     CONSUMABLE_SCALE_INHIBITOR,
+    CONSUMABLE_FLUFFING_ROLLER,
+    CONSUMABLE_ROLLER_MOP_FILTER,
+    CONSUMABLE_WATER_OUTLET_FILTER,
 )
 
 STATE_CODE_TO_STATE: Final = {
-    DreameVacuumState.UNKNOWN: STATE_UNKNOWN,
+    DreameVacuumState.UNKNOWN: STATE_IDLE,
     DreameVacuumState.SWEEPING: STATE_CLEANING,
     DreameVacuumState.IDLE: STATE_IDLE,
     DreameVacuumState.PAUSED: STATE_PAUSED,
@@ -163,9 +192,19 @@ STATE_CODE_TO_STATE: Final = {
     DreameVacuumState.RETURNING_TO_DRAIN: STATE_RETURNING,
     DreameVacuumState.DRAINING: STATE_CLEANING,
     DreameVacuumState.AUTO_WATER_DRAINING: STATE_CLEANING,
-    DreameVacuumState.SHORTCUT: STATE_CLEANING,
     DreameVacuumState.MONITORING: STATE_CLEANING,
     DreameVacuumState.MONITORING_PAUSED: STATE_PAUSED,
+    DreameVacuumState.EMPTYING: STATE_DOCKED,
+    DreameVacuumState.DUST_BAG_DRYING: STATE_DOCKED,
+    DreameVacuumState.DUST_BAG_DRYING_PAUSED: STATE_PAUSED,
+    DreameVacuumState.HEADING_TO_EXTRA_CLEANING: STATE_CLEANING,
+    DreameVacuumState.EXTRA_CLEANING: STATE_CLEANING,
+    DreameVacuumState.FINDING_PET_PAUSED: STATE_PAUSED,
+    DreameVacuumState.FINDING_PET: STATE_CLEANING,
+    DreameVacuumState.INITIAL_DEEP_CLEANING: STATE_CLEANING,
+    DreameVacuumState.INITIAL_DEEP_CLEANING_PAUSED: STATE_PAUSED,
+    DreameVacuumState.SANITIZING: STATE_DOCKED,
+    DreameVacuumState.SANITIZING_WITH_DRY: STATE_DOCKED,
 }
 
 SUCTION_LEVEL_TO_FAN_SPEED: Final = {
@@ -186,10 +225,13 @@ CONSUMABLE_RESET_ACTION = {
     CONSUMABLE_DETERGENT: DreameVacuumAction.RESET_DETERGENT,
     CONSUMABLE_SQUEEGEE: DreameVacuumAction.RESET_SQUEEGEE,
     CONSUMABLE_ONBOARD_DIRTY_WATER_TANK: DreameVacuumAction.RESET_ONBOARD_DIRTY_WATER_TANK,
-    CONSUMABLE_DIRTY_WATER_TANK: DreameVacuumAction.RESET_DIRTY_WATER_TANK,
+    CONSUMABLE_DIRTY_WATER_CHANNEL: DreameVacuumAction.RESET_DIRTY_WATER_CHANNEL,
     CONSUMABLE_DEODORIZER: DreameVacuumAction.RESET_DEODORIZER,
     CONSUMABLE_WHEEL: DreameVacuumAction.RESET_WHEEL,
     CONSUMABLE_SCALE_INHIBITOR: DreameVacuumAction.RESET_SCALE_INHIBITOR,
+    CONSUMABLE_FLUFFING_ROLLER: DreameVacuumAction.RESET_FLUFFING_ROLLER,
+    CONSUMABLE_ROLLER_MOP_FILTER: DreameVacuumAction.RESET_ROLLER_MOP_FILTER,
+    CONSUMABLE_WATER_OUTLET_FILTER: DreameVacuumAction.RESET_WATER_OUTLET_FILTER,
 }
 
 
@@ -363,31 +405,63 @@ async def async_setup_entry(
                     )
                 ],
             ),
-            vol.Optional(INPUT_ZONE_ARRAY): vol.All(
-                list,
-                [
-                    vol.ExactSequence(
-                        [
-                            vol.Coerce(int),
-                            vol.Coerce(int),
-                            vol.Coerce(int),
-                            vol.Coerce(int),
-                        ]
-                    )
-                ],
+            vol.Optional(INPUT_ZONE_ARRAY): vol.Any(
+                vol.All(
+                    list,
+                    [
+                        vol.ExactSequence(
+                            [
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                            ]
+                        )
+                    ],
+                ),
+                vol.All(
+                    list,
+                    [
+                        vol.ExactSequence(
+                            [
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                            ]
+                        )
+                    ],
+                ),
             ),
-            vol.Optional(INPUT_MOP_ARRAY): vol.All(
-                list,
-                [
-                    vol.ExactSequence(
-                        [
-                            vol.Coerce(int),
-                            vol.Coerce(int),
-                            vol.Coerce(int),
-                            vol.Coerce(int),
-                        ]
-                    )
-                ],
+            vol.Optional(INPUT_MOP_ARRAY): vol.Any(
+                vol.All(
+                    list,
+                    [
+                        vol.ExactSequence(
+                            [
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                            ]
+                        )
+                    ],
+                ),
+                vol.All(
+                    list,
+                    [
+                        vol.ExactSequence(
+                            [
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                            ]
+                        )
+                    ],
+                ),
             ),
         },
         DreameVacuum.async_set_restricted_zone.__name__,
@@ -396,34 +470,122 @@ async def async_setup_entry(
     platform.async_register_entity_service(
         SERVICE_SET_CARPET_AREA,
         {
-            vol.Optional(INPUT_CARPET_ARRAY): vol.All(
-                list,
-                [
-                    vol.ExactSequence(
-                        [
-                            vol.Coerce(int),
-                            vol.Coerce(int),
-                            vol.Coerce(int),
-                            vol.Coerce(int),
-                        ]
-                    )
-                ],
+            vol.Optional(INPUT_CARPET_ARRAY): vol.Any(
+                vol.All(
+                    list,
+                    [
+                        vol.ExactSequence(
+                            [
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                            ]
+                        )
+                    ],
+                ),
+                vol.All(
+                    list,
+                    [
+                        vol.ExactSequence(
+                            [
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Any(vol.Coerce(int), None),
+                            ]
+                        )
+                    ],
+                ),
+                vol.All(
+                    list,
+                    [
+                        vol.ExactSequence(
+                            [
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Any(vol.Coerce(int), None),
+                                vol.Any(vol.Coerce(int), None),
+                            ]
+                        )
+                    ],
+                ),
+                vol.All(
+                    list,
+                    [
+                        vol.ExactSequence(
+                            [
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Any(vol.Coerce(int), None),
+                                vol.Any(vol.Coerce(int), None),
+                                vol.Any(vol.Coerce(int), None),
+                            ]
+                        )
+                    ],
+                ),
             ),
-            vol.Optional(INPUT_IGNORED_CARPET_ARRAY): vol.All(
-                list,
-                [
-                    vol.ExactSequence(
-                        [
-                            vol.Coerce(int),
-                            vol.Coerce(int),
-                            vol.Coerce(int),
-                            vol.Coerce(int),
-                        ]
-                    )
-                ],
+            vol.Optional(INPUT_DELETED_CARPET_ARRAY): vol.Any(
+                vol.All(
+                    list,
+                    [
+                        vol.ExactSequence(
+                            [
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                            ]
+                        )
+                    ],
+                ),
+                vol.All(
+                    list,
+                    [
+                        vol.ExactSequence(
+                            [
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                            ]
+                        )
+                    ],
+                ),
+                vol.All(
+                    list,
+                    [
+                        vol.ExactSequence(
+                            [
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                                vol.Coerce(int),
+                            ]
+                        )
+                    ],
+                ),
             ),
         },
         DreameVacuum.async_set_carpet_area.__name__,
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_SET_CARPET_TYPE,
+        {
+            vol.Required(INPUT_ID): vol.Any(vol.Coerce(int), [vol.Coerce(int)]),
+            vol.Required(INPUT_OBJECT_TYPE): vol.Any(vol.Coerce(int), [vol.Coerce(int)]),
+            vol.Optional(INPUT_CARPET_TYPE): vol.Any(vol.Coerce(int), [vol.Coerce(int)]),
+        },
+        DreameVacuum.async_set_carpet_type.__name__,
     )
 
     platform.async_register_entity_service(
@@ -444,6 +606,53 @@ async def async_setup_entry(
             ),
         },
         DreameVacuum.async_set_virtual_threshold.__name__,
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_SET_THRESHOLD,
+        {
+            vol.Optional(INPUT_PASSABLE_THRESHOLD_ARRAY): vol.All(
+                list,
+                [
+                    vol.ExactSequence(
+                        [
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                        ]
+                    )
+                ],
+            ),
+            vol.Optional(INPUT_IMPASSABLE_THRESHOLD_ARRAY): vol.All(
+                list,
+                [
+                    vol.ExactSequence(
+                        [
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                        ]
+                    )
+                ],
+            ),
+            vol.Optional(INPUT_RAMP_ARRAY): vol.All(
+                list,
+                [
+                    vol.ExactSequence(
+                        [
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                        ]
+                    )
+                ],
+            ),
+        },
+        DreameVacuum.async_set_threshold.__name__,
     )
 
     platform.async_register_entity_service(
@@ -577,6 +786,8 @@ async def async_setup_entry(
             vol.Optional(INPUT_CUSTOM_MOPPING_ROUTE): cv.ensure_list,
             vol.Optional(INPUT_CLEANING_ROUTE): cv.ensure_list,
             vol.Optional(INPUT_WETNESS_LEVEL): cv.ensure_list,
+            vol.Optional(INPUT_MOP_TEMPERATURE): cv.ensure_list,
+            vol.Optional(INPUT_MOP_PRESSURE): cv.ensure_list,
         },
         DreameVacuum.async_set_custom_cleaning.__name__,
     )
@@ -585,13 +796,116 @@ async def async_setup_entry(
         SERVICE_SET_CUSTOM_CARPET_CLEANING,
         {
             vol.Required(INPUT_ID): vol.Any(vol.Coerce(int), [vol.Coerce(int)]),
-            vol.Required(INPUT_TYPE): vol.Any(vol.Coerce(int), [vol.Coerce(int)]),
+            vol.Required(INPUT_OBJECT_TYPE): vol.Any(vol.Coerce(int), [vol.Coerce(int)]),
             vol.Optional(INPUT_CARPET_CLEANING): vol.Any(vol.Coerce(int), [vol.Coerce(int)]),
-            vol.Optional(INPUT_CARPET_SETTINGS): vol.Any(
+            vol.Optional(INPUT_CARPET_PREFERENCES): vol.Any(
                 [vol.Coerce(str)], [[vol.Coerce(str)]], [vol.Coerce(int)], [[vol.Coerce(int)]]
             ),
         },
         DreameVacuum.async_set_custom_carpet_cleaning.__name__,
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_SET_SEGMENT_TYPE,
+        {
+            vol.Required(INPUT_TYPE): vol.Any(dict[int, list[int]]),
+            vol.Optional(INPUT_MAP_ID): vol.Coerce(int),
+        },
+        DreameVacuum.async_set_segment_type.__name__,
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_SET_HIDDEN_SEGMENTS,
+        {
+            vol.Optional(INPUT_SEGMENTS_ARRAY): vol.All(list, [vol.Coerce(int)]),
+            vol.Optional(INPUT_MAP_ID): vol.Coerce(int),
+        },
+        DreameVacuum.async_set_hidden_segments.__name__,
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_SET_FLOOR_MATERIAL,
+        {
+            vol.Required(INPUT_MATERIAL): vol.Any(dict[int, list[int]]),
+            vol.Optional(INPUT_MAP_ID): vol.Coerce(int),
+        },
+        DreameVacuum.async_set_floor_material.__name__,
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_SET_LOW_LYING_AREA,
+        {
+            vol.Optional(INPUT_AREA): vol.All(
+                list,
+                [
+                    vol.ExactSequence(
+                        [
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                        ]
+                    )
+                ],
+            ),
+        },
+        DreameVacuum.async_set_low_lying_area.__name__,
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_SET_FURNITURE,
+        {
+            vol.Optional(INPUT_FURNITURE_ARRAY): vol.All(
+                list,
+                [
+                    vol.ExactSequence(
+                        [
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                            vol.Coerce(float),
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                        ]
+                    )
+                ],
+            ),
+        },
+        DreameVacuum.async_set_furniture.__name__,
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_SET_CURTAIN,
+        {
+            vol.Optional(INPUT_CURTAIN_ARRAY): vol.All(
+                list,
+                [
+                    vol.ExactSequence(
+                        [
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                            vol.Coerce(int),
+                        ]
+                    )
+                ],
+            ),
+        },
+        DreameVacuum.async_set_curtain.__name__,
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_SET_MOP_TYPE,
+        {
+            vol.Required(INPUT_MOP_TYPE): vol.Any(dict[int, str]),
+            vol.Optional(INPUT_MAP_ID): vol.Coerce(int),
+        },
+        DreameVacuum.async_set_mop_type.__name__,
     )
 
     platform.async_register_entity_service(
@@ -609,10 +923,13 @@ async def async_setup_entry(
                     CONSUMABLE_DETERGENT,
                     CONSUMABLE_SQUEEGEE,
                     CONSUMABLE_ONBOARD_DIRTY_WATER_TANK,
-                    CONSUMABLE_DIRTY_WATER_TANK,
+                    CONSUMABLE_DIRTY_WATER_CHANNEL,
                     CONSUMABLE_DEODORIZER,
                     CONSUMABLE_WHEEL,
                     CONSUMABLE_SCALE_INHIBITOR,
+                    CONSUMABLE_FLUFFING_ROLLER,
+                    CONSUMABLE_ROLLER_MOP_FILTER,
+                    CONSUMABLE_WATER_OUTLET_FILTER,
                 ]
             ),
         },
@@ -626,6 +943,12 @@ async def async_setup_entry(
             vol.Required(INPUT_SHORTCUT_NAME): cv.string,
         },
         DreameVacuum.async_rename_shortcut.__name__,
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_DELETE_SHORTCUT,
+        {vol.Required(INPUT_SHORTCUT_ID): cv.positive_int},
+        DreameVacuum.async_delete_shortcut.__name__,
     )
 
     platform.async_register_entity_service(
@@ -652,6 +975,7 @@ async def async_setup_entry(
         {
             vol.Required(INPUT_KEY): cv.string,
             vol.Optional(INPUT_VALUE): vol.Any(vol.Coerce(int), vol.Coerce(str), vol.Coerce(bool)),
+            vol.Optional(INPUT_PARAMS): vol.Any([vol.Coerce(int)], [vol.Coerce(str)], [vol.Coerce(bool)]),
         },
         DreameVacuum.async_set_property.__name__,
     )
@@ -662,7 +986,15 @@ async def async_setup_entry(
         DreameVacuum.async_call_action.__name__,
     )
 
-    async_add_entities([DreameVacuum(coordinator)])
+    activity_class = None
+    ## For backwards compatibility
+    try:
+        module = await async_import_module(hass, f"homeassistant.components.vacuum")
+        activity_class = module.VacuumActivity
+    except:
+        pass
+
+    async_add_entities([DreameVacuum(coordinator, activity_class)])
 
 
 class DreameVacuum(DreameVacuumEntity, StateVacuumEntity):
@@ -670,7 +1002,7 @@ class DreameVacuum(DreameVacuumEntity, StateVacuumEntity):
 
     _unrecorded_attributes = frozenset(VACUUM_UNRECORDED_ATTRIBUTES)
 
-    def __init__(self, coordinator: DreameVacuumDataUpdateCoordinator) -> None:
+    def __init__(self, coordinator: DreameVacuumDataUpdateCoordinator, activity_class) -> None:
         """Initialize the vacuum entity."""
         super().__init__(coordinator)
 
@@ -678,7 +1010,9 @@ class DreameVacuum(DreameVacuumEntity, StateVacuumEntity):
         self._attr_name = (
             f" {coordinator.device.name}"  ## Add whitespace to display entity on top at the device configuration page
         )
+        self._attr_has_entity_name = False
         self._attr_unique_id = f"{coordinator.device.mac}_" + DOMAIN
+        self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, f"{self.device.name}", hass=self.coordinator.hass)
         self._attr_supported_features = (
             VacuumEntityFeature.SEND_COMMAND
             | VacuumEntityFeature.LOCATE
@@ -690,13 +1024,7 @@ class DreameVacuum(DreameVacuumEntity, StateVacuumEntity):
             | VacuumEntityFeature.STOP
             | VacuumEntityFeature.RETURN_HOME
         )
-
-        ## For backwards compatibility
-        try:
-            module = importlib.import_module("homeassistant.components.vacuum")
-            self._activity_class = module.VacuumActivity
-        except:
-            self._activity_class = None
+        self._activity_class = activity_class
 
         self._set_attrs()
 
@@ -751,7 +1079,7 @@ class DreameVacuum(DreameVacuumEntity, StateVacuumEntity):
             self._attr_fan_speed = None
             self._attr_fan_speed_list = []
 
-        self._vacuum_state = STATE_CODE_TO_STATE.get(self.device.status.state, STATE_UNKNOWN)
+        self._vacuum_state = STATE_CODE_TO_STATE.get(self.device.status.state, STATE_IDLE)
         if self._activity_class is None:
             self._attr_state = self._vacuum_state
         self._attr_extra_state_attributes = self.device.status.attributes
@@ -856,14 +1184,30 @@ class DreameVacuum(DreameVacuumEntity, StateVacuumEntity):
             no_mops,
         )
 
-    async def async_set_carpet_area(self, carpets="", ignored_carpets="") -> None:
+    async def async_set_carpet_area(self, carpets="", deleted_carpets="") -> None:
         """Create or update carpet areas."""
         await self._try_command(
             "Unable to call set_carpet_area: %s",
             self.device.set_carpet_area,
             carpets,
-            ignored_carpets,
+            deleted_carpets,
         )
+
+    async def async_set_carpet_type(
+        self,
+        id,
+        object_type,
+        carpet_type=None,
+    ) -> None:
+        """Set carpet type"""
+        if id != "" and id is not None and type != "" and type is not None:
+            await self._try_command(
+                "Unable to call set_carpet_type: %s",
+                self.device.set_carpet_type,
+                id,
+                object_type,
+                carpet_type,
+            )
 
     async def async_set_virtual_threshold(self, virtual_thresholds="") -> None:
         """Create or update virtual thresholds."""
@@ -871,6 +1215,16 @@ class DreameVacuum(DreameVacuumEntity, StateVacuumEntity):
             "Unable to call set_virtual_threshold: %s",
             self.device.set_virtual_threshold,
             virtual_thresholds,
+        )
+
+    async def async_set_threshold(self, passable_thresholds="", impassable_thresholds="", ramps="") -> None:
+        """Create or update thresholds."""
+        await self._try_command(
+            "Unable to call set_threshold: %s",
+            self.device.set_threshold,
+            passable_thresholds,
+            impassable_thresholds,
+            ramps,
         )
 
     async def async_set_predefined_points(self, points="") -> None:
@@ -951,10 +1305,10 @@ class DreameVacuum(DreameVacuumEntity, StateVacuumEntity):
         """Request new map."""
         await self._try_command("Unable to call request_map: %s", self.device.request_map)
 
-    async def async_set_property(self, key, value) -> None:
+    async def async_set_property(self, key, value=None, params=None) -> None:
         """Set property."""
         if key is not None and value is not None and key != "" and value != "":
-            await self._try_command("set_property failed: %s", self.device.set_property_value, key, value)
+            await self._try_command("set_property failed: %s", self.device.set_property_value, key, value, params)
 
     async def async_call_action(self, key, value=None) -> None:
         """Call action."""
@@ -1049,6 +1403,8 @@ class DreameVacuum(DreameVacuumEntity, StateVacuumEntity):
         custom_mopping_route=None,
         cleaning_route=None,
         wetness_level=None,
+        mop_temperature=None,
+        mop_pressure=None,
     ) -> None:
         """Set custom cleaning"""
         if (
@@ -1072,14 +1428,16 @@ class DreameVacuum(DreameVacuumEntity, StateVacuumEntity):
                 custom_mopping_route,
                 cleaning_route,
                 wetness_level,
+                mop_temperature,
+                mop_pressure,
             )
 
     async def async_set_custom_carpet_cleaning(
         self,
         id,
-        type,
+        object_type,
         carpet_cleaning=None,
-        carpet_settings=None,
+        carpet_preferences=None,
     ) -> None:
         """Set custom carpet cleaning"""
         if id != "" and id is not None and type != "" and type is not None:
@@ -1087,10 +1445,77 @@ class DreameVacuum(DreameVacuumEntity, StateVacuumEntity):
                 "Unable to call set_custom_carpet_cleaning: %s",
                 self.device.set_custom_carpet_cleaning,
                 id,
-                type,
+                object_type,
                 carpet_cleaning,
-                carpet_settings,
+                carpet_preferences,
             )
+
+    async def async_set_segment_type(
+        self,
+        type,
+        map_id=None,
+    ) -> None:
+        """Set segment type"""
+        if type != "" and type is not None:
+            await self._try_command("Unable to call set_segment_type: %s", self.device.set_segment_type, type, map_id)
+
+    async def async_set_hidden_segments(
+        self,
+        segments=[],
+        map_id=None,
+    ) -> None:
+        """Set hidden segments"""
+        if segments != "" and segments is not None:
+            await self._try_command(
+                "Unable to call set_hidden_segments: %s",
+                self.device.set_hidden_segments,
+                segments,
+                map_id,
+            )
+
+    async def async_set_floor_material(
+        self,
+        material,
+        map_id=None,
+    ) -> None:
+        """Set floor material"""
+        if material != "" and material is not None:
+            await self._try_command(
+                "Unable to call set_floor_material: %s", self.device.set_floor_material, material, map_id
+            )
+
+    async def async_set_low_lying_area(
+        self,
+        area,
+    ) -> None:
+        """Set low lying area"""
+        if area != "" and area is not None:
+            await self._try_command("Unable to call set_low_lying_area: %s", self.device.set_low_lying_area, area)
+
+    async def async_set_furniture(
+        self,
+        furnitures,
+    ) -> None:
+        """Set furnitures"""
+        if furnitures != "" and furnitures is not None:
+            await self._try_command("Unable to call set_furniture: %s", self.device.set_furniture, furnitures)
+
+    async def async_set_curtain(
+        self,
+        curtains,
+    ) -> None:
+        """Set curtains"""
+        if curtains != "" and curtains is not None:
+            await self._try_command("Unable to call set_curtain: %s", self.device.set_curtain, curtains)
+
+    async def async_set_mop_type(
+        self,
+        mop_type,
+        map_id=None,
+    ) -> None:
+        """Set mop type"""
+        if mop_type != "" and mop_type is not None:
+            await self._try_command("Unable to call set_mop_type: %s", self.device.set_mop_type, mop_type, map_id)
 
     async def async_install_voice_pack(self, lang_id, url, md5, size, **kwargs) -> None:
         """install a custom language pack"""
@@ -1125,6 +1550,15 @@ class DreameVacuum(DreameVacuumEntity, StateVacuumEntity):
                 self.device.rename_shortcut,
                 shortcut_id,
                 shortcut_name,
+            )
+
+    async def async_delete_shortcut(self, shortcut_id) -> None:
+        """Delete a shortcut"""
+        if shortcut_id and shortcut_id != "":
+            await self._try_command(
+                "Unable to call delete_shortcut: %s",
+                self.device.delete_shortcut,
+                shortcut_id,
             )
 
     async def async_set_obstacle_ignore(self, x, y, obstacle_ignored) -> None:

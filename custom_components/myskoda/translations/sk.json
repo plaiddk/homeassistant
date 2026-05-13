@@ -8,9 +8,10 @@
         "error": {
             "cannot_connect": "Nepodarilo sa pripojiť",
             "invalid_auth": "Neplatná autentifikácia",
-            "relogin_in_app": "Chýba súhlas s podmienkami alebo marketingom. Odhláste sa a znovu sa prihláste pomocou oficiálnej aplikácie MySkoda alebo na stránke https://skodaid.vwgroup.io, aby ste prijali nové podmienky.",
+            "relogin_in_app": "Chýba súhlas s podmienkami alebo marketingom. Odhláste sa a znovu sa prihláste pomocou oficiálnej aplikácie MySkoda alebo na stránke {login_url}, aby ste prijali nové podmienky.",
             "unknown": "Došlo k neočakávanej chybe. Skontrolujte logy v aplikácii HomeAssistant.",
-            "no_spin": "V konfigurácii chýba S-PIN. Zmeňte konfiguráciu integrácie a skúste to znova, prosím."
+            "no_spin": "V konfigurácii chýba S-PIN. Zmeňte konfiguráciu integrácie a skúste to znova, prosím.",
+            "readonly_mode": "Režim len na čítanie je povolený. Operácie príkazov sú zakázané."
         },
         "step": {
             "reauth_confirm": {
@@ -38,16 +39,16 @@
             "charger_connected": {
                 "name": "Pripojenie nabíjačky"
             },
-            "charger_locked": {
+            "charger_lock": {
                 "name": "Zámka nabíjania"
             },
-            "doors_locked": {
+            "doors_lock": {
                 "name": "Zámok dverí"
             },
             "doors_open": {
                 "name": "Dvere"
             },
-            "locked": {
+            "vehicle_lock": {
                 "name": "Uzamknutie vozidla"
             },
             "parkinglights_on": {
@@ -165,7 +166,8 @@
                     "charging": "Nabíjanie",
                     "connect_cable": "Pripojte kábel",
                     "conserving": "Udržanie nabitia",
-                    "ready_for_charging": "Pripravené na nabíjanie"
+                    "ready_for_charging": "Pripravené na nabíjanie",
+                    "charging_interrupted": "Nabíjanie prerušené."
                 }
             },
             "estimated_time_left_to_reach_target_temperature": {
@@ -326,6 +328,11 @@
                     "readonly": "V aute nemôžete vykonávať žiadne zmeny, iba čítať údaje"
                 }
             }
+        }
+    },
+    "exceptions": {
+        "readonly_mode": {
+            "message": "Režim len na čítanie je povolený. Operácie príkazov sú zakázané."
         }
     }
 }

@@ -1,11 +1,64 @@
 """Handles state variable access and change notification."""
 
 import asyncio
+from datetime import datetime
 import logging
+from typing import Any, ClassVar, Self
 
-from homeassistant.core import Context
+from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
+from homeassistant.core import Context, HomeAssistant, State as CoreState
 from homeassistant.helpers.restore_state import DATA_RESTORE_STATE
 from homeassistant.helpers.service import async_get_all_descriptions
+
+try:
+    # HA >= 2026.5
+    from homeassistant.helpers.template.extensions.math import _SENTINEL as MATH_SENTINEL, MathExtension
+    from homeassistant.helpers.template.extensions.type_cast import (
+        _SENTINEL as TYPECAST_SENTINEL,
+        TypeCastExtension,
+    )
+    from homeassistant.helpers.template.helpers import (
+        _SENTINEL,
+        forgiving_boolean,
+        raise_no_default,
+    )
+except ImportError:
+    # HA < 2026.5
+    from homeassistant.helpers.template import (  # type: ignore[no-redef]
+        _SENTINEL,
+        forgiving_boolean,
+        forgiving_float as _forgiving_float,
+        forgiving_int as _forgiving_int,
+        forgiving_round as _forgiving_round,
+        raise_no_default,
+    )
+
+    TYPECAST_SENTINEL = _SENTINEL
+    MATH_SENTINEL = _SENTINEL
+
+    class TypeCastExtension:  # type: ignore[no-redef]
+        """Shim for older HA versions that export forgiving_* as module-level functions."""
+
+        @staticmethod
+        def forgiving_float(value, default=_SENTINEL):
+            """Shim for forgiving_float."""
+            return _forgiving_float(value, default=default)
+
+        @staticmethod
+        def forgiving_int(value, default=_SENTINEL, base=10):
+            """Shim for forgiving_int."""
+            return _forgiving_int(value, default=default, base=base)
+
+    class MathExtension:  # type: ignore[no-redef]
+        """Shim for older HA versions that export forgiving_round as a module-level function."""
+
+        @staticmethod
+        def forgiving_round(value, precision=0, method="common", default=_SENTINEL):
+            """Shim for forgiving_round."""
+            return _forgiving_round(value, precision=precision, method=method, default=default)
+
+
+from homeassistant.util import dt as dt_util
 
 from .const import LOGGER_PATH
 from .entity import PyscriptEntity
@@ -13,20 +66,63 @@ from .function import Function
 
 _LOGGER = logging.getLogger(LOGGER_PATH + ".state")
 
-STATE_VIRTUAL_ATTRS = {"entity_id", "last_changed", "last_updated"}
+STATE_VIRTUAL_ATTRS = {"entity_id", "last_changed", "last_updated", "last_reported"}
 
 
 class StateVal(str):
     """Class for representing the value and attributes of a state variable."""
 
-    def __new__(cls, state):
+    def __new__(cls, state: CoreState) -> Self:
         """Create a new instance given a state variable."""
         new_var = super().__new__(cls, state.state)
         new_var.__dict__ = state.attributes.copy()
         new_var.entity_id = state.entity_id
         new_var.last_updated = state.last_updated
         new_var.last_changed = state.last_changed
+        new_var.last_reported = state.last_reported
         return new_var
+
+    def as_float(self, default: float = TYPECAST_SENTINEL) -> float:
+        """Return the state converted to float via the forgiving helper."""
+        return TypeCastExtension.forgiving_float(self, default=default)
+
+    def as_int(self, default: int = TYPECAST_SENTINEL, base: int = 10) -> int:
+        """Return the state converted to int via the forgiving helper."""
+        return TypeCastExtension.forgiving_int(self, default=default, base=base)
+
+    def as_bool(self, default: bool = _SENTINEL) -> bool:
+        """Return the state converted to bool via the forgiving helper."""
+        return forgiving_boolean(self, default=default)
+
+    def as_round(self, precision: int = 0, method: str = "common", default: float = MATH_SENTINEL) -> float:
+        """Return the rounded state value via the forgiving helper."""
+        return MathExtension.forgiving_round(self, precision=precision, method=method, default=default)
+
+    def as_datetime(self, default: datetime = _SENTINEL) -> datetime:
+        """Return the state converted to a datetime, matching the forgiving template behaviour."""
+        try:
+            return dt_util.parse_datetime(self, raise_on_error=True)
+        except (ValueError, TypeError):
+            if default is _SENTINEL:
+                raise_no_default("as_datetime", self)
+        return default
+
+    def is_unknown(self) -> bool:
+        """Return True if the state equals STATE_UNKNOWN."""
+        return self == STATE_UNKNOWN
+
+    def is_unavailable(self) -> bool:
+        """Return True if the state equals STATE_UNAVAILABLE."""
+        return self == STATE_UNAVAILABLE
+
+    def has_value(self) -> bool:
+        """Return True if the state is neither unknown nor unavailable."""
+        return not self.is_unknown() and not self.is_unavailable()
+
+
+STATE_CALLABLE_ATTRS = {
+    attr for attr, value in StateVal.__dict__.items() if callable(value) and not attr.startswith("_")
+}
 
 
 class State:
@@ -35,12 +131,12 @@ class State:
     #
     # Global hass instance
     #
-    hass = None
+    hass: HomeAssistant | None = None
 
     #
     # notify message queues by variable
     #
-    notify = {}
+    notify: ClassVar[dict[str, dict[asyncio.Queue, list[str]]]] = {}
 
     #
     # Last value of state variable notifications.  We maintain this
@@ -48,22 +144,22 @@ class State:
     # rather than fetching the current value, which is subject to
     # race conditions when multiple state variables are set quickly.
     #
-    notify_var_last = {}
+    notify_var_last: ClassVar[dict[str, StateVal | None]] = {}
 
     #
     # pyscript yaml configuration
     #
-    pyscript_config = {}
+    pyscript_config: ClassVar[dict[str, Any]] = {}
 
     #
     # pyscript vars which have already been registered as persisted
     #
-    persisted_vars = {}
+    persisted_vars: ClassVar[dict[str, PyscriptEntity]] = {}
 
     #
     # other parameters of all services that have "entity_id" as a parameter
     #
-    service2args = {}
+    service2args: ClassVar[dict[str, dict[str, Any]]] = {}
 
     def __init__(self):
         """Warn on State instantiation."""
@@ -88,7 +184,7 @@ class State:
                 cls.service2args[domain][service].discard("entity_id")
 
     @classmethod
-    async def notify_add(cls, var_names, queue):
+    async def notify_add(cls, var_names: set[str], queue: asyncio.Queue) -> bool:
         """Register to notify state variables changes to be sent to queue."""
 
         added = False
@@ -104,7 +200,7 @@ class State:
         return added
 
     @classmethod
-    def notify_del(cls, var_names, queue):
+    def notify_del(cls, var_names: set[str], queue: asyncio.Queue) -> None:
         """Unregister notify of state variables changes for given queue."""
 
         for var_name in var_names if isinstance(var_names, set) else {var_names}:
@@ -117,7 +213,7 @@ class State:
             del cls.notify[state_var_name][queue]
 
     @classmethod
-    async def update(cls, new_vars, func_args):
+    async def update(cls, new_vars: dict[str, Any], func_args: dict[str, Any]) -> None:
         """Deliver all notifications for state variable changes."""
 
         notify = {}
@@ -259,6 +355,7 @@ class State:
             or (parts[0] in cls.service2args and parts[2] in cls.service2args[parts[0]])
             or parts[2] in value.attributes
             or parts[2] in STATE_VIRTUAL_ATTRS
+            or parts[2] in STATE_CALLABLE_ATTRS
         ):
             return True
         return False

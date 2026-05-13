@@ -69,7 +69,7 @@ class ProgramSelect(InteractiveEntityBase, SelectEntity):
 
     @property
     def unique_id(self) -> str:
-        return f'{self.haId}_programs'
+        return f'{self.safe_haId}_programs'
 
     @property
     def translation_key(self) -> str:
@@ -332,6 +332,7 @@ class DelayedOperationSelect(InteractiveEntityBase, SelectEntity):
         parts = option.split(':')
         delay = int(parts[0])*3600 + int(parts[1])*60
         self._appliance.set_startonly_option(self._key, delay)
+        self.async_write_ha_state()
 
     async def async_on_update(self, appliance:Appliance, key:str, value) -> None:
         if key == Events.PROGRAM_FINISHED:

@@ -1,22 +1,22 @@
 - id: runplanner_sync_select_names
   alias: 'RunPlanner: Sync route names to dropdown'
-  mode: single
-  trigger:
-  - platform: state
-    entity_id: sensor.runplanner_routes_names
-  - platform: homeassistant
+  triggers:
+  - entity_id: sensor.runplanner_routes_count
+    trigger: state
+  - trigger: homeassistant
     event: start
-  action:
+  actions:
   - variables:
-      json: '{{ states(''sensor.runplanner_routes_names'') | string }}'
-      list: '{% set s = json if json not in [''unknown'',''unavailable'',''none'','''']
-        else ''[]'' %} {{ s | replace("''", ''"'') | from_json }}'
+      raw: '{{ state_attr(''sensor.runplanner_routes_count'', ''data'') }}'
+      list: '{{ raw | from_json if raw not in [None, ''unknown'', ''unavailable'']
+        else [] }}'
       names: '{{ list | map(attribute=''name'') | list }}'
-  - service: input_select.set_options
-    target:
+  - target:
       entity_id: input_select.runplanner_route
     data:
       options: '{{ names if names|length>0 else [''—''] }}'
+    action: input_select.set_options
+  mode: single
 - id: '1732746359999'
   alias: Opvask hvis tændt og lukkes
   description: Hvis opvaskemaskine tændes og lukkes, så klargøres opvask i den billigste
@@ -455,7 +455,7 @@
       - action: light.toggle
         metadata: {}
         data:
-          kelvin: 2411
+          color_temp_kelvin: 2357
         target:
           area_id: lille_stue
       button_1_double_press: []
@@ -464,7 +464,8 @@
       button_2_single_press:
       - action: light.toggle
         metadata: {}
-        data: {}
+        data:
+          color_temp_kelvin: 2000
         target:
           area_id:
           - stue
@@ -629,7 +630,7 @@
   id: ev_smart_charging_follow_connection
   alias: EV Smart Charging – Follow Monta Connection
   triggers:
-  - entity_id: binary_sensor.monta_thomas_ladestander_cable_plugged_in
+  - entity_id: binary_sensor.skoda_enyaq_ladekabel
     trigger: state
   - event: start
     trigger: homeassistant
@@ -643,7 +644,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.monta_thomas_ladestander_cable_plugged_in
+        entity_id: binary_sensor.skoda_enyaq_ladekabel
         state: 'on'
       sequence:
       - target:
@@ -661,3 +662,19 @@
   initial_state: true
 - *id001
 - *id001
+- alias: CCTV Loop
+  id: cctv_video_loop_continuous
+  description: Cycles randomly through local CCTV videos every 8 seconds.
+  trigger:
+  - platform: time_pattern
+    seconds: /6
+  condition: []
+  action:
+  - service: input_text.set_value
+    target:
+      entity_id: input_text.random_video_filename
+    data:
+      value: '{% set max_val = 3 %} a{{ range(1, max_val + 1) | random }}.mp4
+
+        '
+  mode: single

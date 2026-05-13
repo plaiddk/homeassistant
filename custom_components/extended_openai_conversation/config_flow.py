@@ -1,19 +1,26 @@
 """Config flow for OpenAI Conversation integration."""
+
 from __future__ import annotations
 
 import logging
 import types
-from types import MappingProxyType
 from typing import Any
 
 from openai._exceptions import APIConnectionError, AuthenticationError
 import voluptuous as vol
 import yaml
 
-from homeassistant import config_entries
+from homeassistant.config_entries import (
+    ConfigEntry,
+    ConfigEntryState,
+    ConfigFlow,
+    ConfigFlowResult,
+    ConfigSubentryFlow,
+    SubentryFlowResult,
+)
 from homeassistant.const import CONF_API_KEY, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResult
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.selector import (
     BooleanSelector,
     NumberSelector,
@@ -26,6 +33,8 @@ from homeassistant.helpers.selector import (
 )
 
 from .const import (
+    API_PROVIDERS,
+    CONF_API_PROVIDER,
     CONF_API_VERSION,
     CONF_ATTACH_USERNAME,
     CONF_BASE_URL,
@@ -42,12 +51,14 @@ from .const import (
     CONF_TOP_P,
     CONF_USE_TOOLS,
     CONTEXT_TRUNCATE_STRATEGIES,
+    DEFAULT_API_PROVIDER,
     DEFAULT_ATTACH_USERNAME,
     DEFAULT_CHAT_MODEL,
     DEFAULT_CONF_BASE_URL,
     DEFAULT_CONF_FUNCTIONS,
     DEFAULT_CONTEXT_THRESHOLD,
     DEFAULT_CONTEXT_TRUNCATE_STRATEGY,
+    DEFAULT_CONVERSATION_NAME,
     DEFAULT_MAX_FUNCTION_CALLS_PER_CONVERSATION,
     DEFAULT_MAX_TOKENS,
     DEFAULT_NAME,
@@ -58,13 +69,13 @@ from .const import (
     DEFAULT_USE_TOOLS,
     DOMAIN,
 )
-from .helpers import validate_authentication
+from .helpers import get_authenticated_client
 
 _LOGGER = logging.getLogger(__name__)
 
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
-        vol.Optional(CONF_NAME): str,
+        vol.Optional(CONF_NAME, default="ChatGPT"): str,
         vol.Required(CONF_API_KEY): str,
         vol.Optional(CONF_BASE_URL, default=DEFAULT_CONF_BASE_URL): str,
         vol.Optional(CONF_API_VERSION): str,
@@ -72,6 +83,17 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
         vol.Optional(
             CONF_SKIP_AUTHENTICATION, default=DEFAULT_SKIP_AUTHENTICATION
         ): bool,
+        vol.Optional(CONF_API_PROVIDER, default=DEFAULT_API_PROVIDER): SelectSelector(
+            SelectSelectorConfig(
+                options=[
+                    SelectOptionDict(
+                        value=api_provider["key"], label=api_provider["label"]
+                    )
+                    for api_provider in API_PROVIDERS
+                ],
+                mode=SelectSelectorMode.DROPDOWN,
+            )
+        ),
     }
 )
 
@@ -103,31 +125,36 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> None:
     base_url = data.get(CONF_BASE_URL)
     api_version = data.get(CONF_API_VERSION)
     organization = data.get(CONF_ORGANIZATION)
-    skip_authentication = data.get(CONF_SKIP_AUTHENTICATION)
+    skip_authentication = data.get(CONF_SKIP_AUTHENTICATION, False)
+    api_provider = data.get(CONF_API_PROVIDER)
 
     if base_url == DEFAULT_CONF_BASE_URL:
         # Do not set base_url if using OpenAI for case of OpenAI's base_url change
         base_url = None
         data.pop(CONF_BASE_URL)
 
-    await validate_authentication(
+    if api_provider == "azure" and not base_url:
+        raise HomeAssistantError("Azure OpenAI requires a custom base URL.")
+
+    await get_authenticated_client(
         hass=hass,
         api_key=api_key,
         base_url=base_url,
         api_version=api_version,
         organization=organization,
+        api_provider=api_provider,
         skip_authentication=skip_authentication,
     )
 
 
-class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class ExtendedOpenAIConversationConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for OpenAI Conversation."""
 
-    VERSION = 1
+    VERSION = 2
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle the initial step."""
         if user_input is None:
             return self.async_show_form(
@@ -147,80 +174,125 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors["base"] = "unknown"
         else:
             return self.async_create_entry(
-                title=user_input.get(CONF_NAME, DEFAULT_NAME), data=user_input
+                title=user_input.get(CONF_NAME, DEFAULT_NAME),
+                data=user_input,
+                subentries=[
+                    {
+                        "subentry_type": "conversation",
+                        "data": dict(DEFAULT_OPTIONS),
+                        "title": DEFAULT_CONVERSATION_NAME,
+                        "unique_id": None,
+                    }
+                ],
             )
 
         return self.async_show_form(
             step_id="user", data_schema=STEP_USER_DATA_SCHEMA, errors=errors
         )
 
-    @staticmethod
-    def async_get_options_flow(
-        config_entry: config_entries.ConfigEntry,
-    ) -> config_entries.OptionsFlow:
-        """Create the options flow."""
-        return OptionsFlow(config_entry)
+    @classmethod
+    @callback
+    def async_get_supported_subentry_types(
+        cls, config_entry: ConfigEntry
+    ) -> dict[str, type[ConfigSubentryFlow]]:
+        """Return subentries supported by this integration."""
+        return {"conversation": ExtendedOpenAISubentryFlowHandler}
 
 
-class OptionsFlow(config_entries.OptionsFlow):
-    """OpenAI config flow options handler."""
+class ExtendedOpenAISubentryFlowHandler(ConfigSubentryFlow):
+    """Flow for managing OpenAI subentries."""
 
-    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
-        """Initialize options flow."""
-        self.config_entry = config_entry
+    options: dict[str, Any]
+
+    @property
+    def _is_new(self) -> bool:
+        """Return if this is a new subentry."""
+        return self.source == "user"
+
+    async def async_step_user(
+        self, user_input: dict[str, Any] | None = None
+    ) -> SubentryFlowResult:
+        """Add a subentry."""
+        self.options = dict(DEFAULT_OPTIONS)
+        return await self.async_step_init()
+
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> SubentryFlowResult:
+        """Handle reconfiguration of a subentry."""
+        self.options = dict(self._get_reconfigure_subentry().data)
+        return await self.async_step_init()
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> SubentryFlowResult:
         """Manage the options."""
+        # abort if entry is not loaded
+        if self._get_entry().state != ConfigEntryState.LOADED:
+            return self.async_abort(reason="entry_not_loaded")
+
         if user_input is not None:
-            return self.async_create_entry(
-                title=user_input.get(CONF_NAME, DEFAULT_NAME), data=user_input
+            if self._is_new:
+                title = user_input.get(CONF_NAME, DEFAULT_NAME)
+                if CONF_NAME in user_input:
+                    del user_input[CONF_NAME]
+                return self.async_create_entry(
+                    title=title,
+                    data=user_input,
+                )
+            return self.async_update_and_abort(
+                self._get_entry(),
+                self._get_reconfigure_subentry(),
+                data=user_input,
             )
-        schema = self.openai_config_option_schema(self.config_entry.options)
+
+        schema = self.openai_config_option_schema(self.options)
+
+        if self._is_new:
+            schema = {
+                vol.Optional(CONF_NAME, default=DEFAULT_NAME): str,
+                **schema,
+            }
+
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema(schema),
         )
 
-    def openai_config_option_schema(self, options: MappingProxyType[str, Any]) -> dict:
+    def openai_config_option_schema(self, options: dict[str, Any]) -> dict:
         """Return a schema for OpenAI completion options."""
-        if not options:
-            options = DEFAULT_OPTIONS
-
         return {
             vol.Optional(
                 CONF_PROMPT,
-                description={"suggested_value": options[CONF_PROMPT]},
+                description={"suggested_value": options.get(CONF_PROMPT)},
                 default=DEFAULT_PROMPT,
             ): TemplateSelector(),
             vol.Optional(
                 CONF_CHAT_MODEL,
-                description={
-                    # New key in HA 2023.4
-                    "suggested_value": options.get(CONF_CHAT_MODEL, DEFAULT_CHAT_MODEL)
-                },
+                description={"suggested_value": options.get(CONF_CHAT_MODEL)},
                 default=DEFAULT_CHAT_MODEL,
             ): str,
             vol.Optional(
                 CONF_MAX_TOKENS,
-                description={"suggested_value": options[CONF_MAX_TOKENS]},
+                description={"suggested_value": options.get(CONF_MAX_TOKENS)},
                 default=DEFAULT_MAX_TOKENS,
             ): int,
             vol.Optional(
                 CONF_TOP_P,
-                description={"suggested_value": options[CONF_TOP_P]},
+                description={"suggested_value": options.get(CONF_TOP_P)},
                 default=DEFAULT_TOP_P,
             ): NumberSelector(NumberSelectorConfig(min=0, max=1, step=0.05)),
             vol.Optional(
                 CONF_TEMPERATURE,
-                description={"suggested_value": options[CONF_TEMPERATURE]},
+                description={"suggested_value": options.get(CONF_TEMPERATURE)},
                 default=DEFAULT_TEMPERATURE,
             ): NumberSelector(NumberSelectorConfig(min=0, max=1, step=0.05)),
             vol.Optional(
                 CONF_MAX_FUNCTION_CALLS_PER_CONVERSATION,
                 description={
-                    "suggested_value": options[CONF_MAX_FUNCTION_CALLS_PER_CONVERSATION]
+                    "suggested_value": options.get(
+                        CONF_MAX_FUNCTION_CALLS_PER_CONVERSATION,
+                    )
                 },
                 default=DEFAULT_MAX_FUNCTION_CALLS_PER_CONVERSATION,
             ): int,
@@ -247,7 +319,9 @@ class OptionsFlow(config_entries.OptionsFlow):
             vol.Optional(
                 CONF_CONTEXT_TRUNCATE_STRATEGY,
                 description={
-                    "suggested_value": options.get(CONF_CONTEXT_TRUNCATE_STRATEGY)
+                    "suggested_value": options.get(
+                        CONF_CONTEXT_TRUNCATE_STRATEGY,
+                    )
                 },
                 default=DEFAULT_CONTEXT_TRUNCATE_STRATEGY,
             ): SelectSelector(

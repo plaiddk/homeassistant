@@ -18,19 +18,37 @@
   "config": {
     "error": {
       "1": "Unknown error",
-      "2": "Unknown error"
+      "2": "Unknown error",
+      "auth_failed": "MitID authentication failed",
+      "api_error": "Failed to connect to Aula API"
+    },
+    "abort": {
+      "reauth_successful": "Re-authentication successful!"
     },
     "step": {
       "user": {
         "data": {
-          "username": "Unilogin username",
-          "password": "Unilogin password",
-          "schoolschedule": "School schedules as calendar entities",
-          "ugeplan": "Ugeplaner as sensor attributes",
-          "mu_opgaver": "Assignments from Min Uddannelse as sensor attributes"
+          "mitid_username": "MitID Username",
+          "mitid_use_token": "Using MitID token device",
+          "schoolschedule": "Enable school schedule calendar",
+          "ugeplan": "Enable weekly plans (ugeplaner)",
+          "mu_opgaver": "Enable assignments from Min Uddannelse",
+          "teacher_full_name": "Show full teacher names (instead of initials)"
         },
-        "description": "Enter your Unilogin credentials",
-        "title": "Authentication"
+        "description": "Configure your Aula integration with MitID",
+        "title": "Aula MitID Login"
+      },
+      "token_credentials": {
+        "title": "MitID Token Device",
+        "description": "Enter your MitID token device credentials.",
+        "data": {
+          "mitid_password": "MitID Password (for token device)",
+          "mitid_token": "MitID Token (from token device)"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate Aula",
+        "description": "Your Aula session needs to be re-authenticated. Username: {username}\n\nClick Submit to continue with MitID authentication."
       }
     }
   },
@@ -51,7 +69,8 @@
         "data": {
           "schoolschedule": "School schedules as calendar entities",
           "ugeplan": "Ugeplaner as sensor attributes",
-          "mu_opgaver": "Assignments from Min Uddannelse as sensor attributes"
+          "mu_opgaver": "Assignments from Min Uddannelse as sensor attributes",
+          "teacher_full_name": "Show full teacher names (instead of initials)"
         },
         "description": "",
         "title": "Options"

@@ -20,7 +20,10 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import (
     DiscoveryInfoType,  # pyright: ignore [reportAttributeAccessIssue]
 )
+from homeassistant.exceptions import ServiceValidationError
 from homeassistant.util import Throttle
+
+from aiohttp import ClientResponseError
 
 from myskoda.models.air_conditioning import (
     AirConditioning,
@@ -112,6 +115,13 @@ class MySkodaClimateEntity(MySkodaEntity, ClimateEntity):
         self._optimistic_data.pop(attr, None)
         self.async_write_ha_state()
 
+    def _ensure_not_readonly(self):
+        if self.coordinator.entry.options.get(CONF_READONLY):
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="readonly_mode",
+            )
+
     @callback
     def _handle_coordinator_update(self) -> None:
         """Clear optimistic values when fresh data arrives and no operation in progress."""
@@ -120,6 +130,7 @@ class MySkodaClimateEntity(MySkodaEntity, ClimateEntity):
         super()._handle_coordinator_update()
 
     async def _stop_auxiliary_heating(self) -> None:
+        self._ensure_not_readonly()
         self._operation_in_progress = True
         try:
             await self.coordinator.myskoda.stop_auxiliary_heating(self.vehicle.info.vin)
@@ -129,6 +140,7 @@ class MySkodaClimateEntity(MySkodaEntity, ClimateEntity):
     async def _start_auxiliary_heating(
         self, spin: str, config: AuxiliaryConfig
     ) -> None:
+        self._ensure_not_readonly()
         self._operation_in_progress = True
         try:
             await self.coordinator.myskoda.start_auxiliary_heating(
@@ -140,6 +152,7 @@ class MySkodaClimateEntity(MySkodaEntity, ClimateEntity):
             self._operation_in_progress = False
 
     async def _stop_air_conditioning(self) -> None:
+        self._ensure_not_readonly()
         self._operation_in_progress = True
         try:
             await self.coordinator.myskoda.stop_air_conditioning(self.vehicle.info.vin)
@@ -147,6 +160,7 @@ class MySkodaClimateEntity(MySkodaEntity, ClimateEntity):
             self._operation_in_progress = False
 
     async def _start_air_conditioning(self, temperature: float) -> None:
+        self._ensure_not_readonly()
         self._operation_in_progress = True
         try:
             await self.coordinator.myskoda.start_air_conditioning(
@@ -156,6 +170,7 @@ class MySkodaClimateEntity(MySkodaEntity, ClimateEntity):
             self._operation_in_progress = False
 
     async def _set_target_temperature(self, temperature: float) -> None:
+        self._ensure_not_readonly()
         self._operation_in_progress = True
         try:
             await self.coordinator.myskoda.set_target_temperature(
@@ -234,7 +249,7 @@ class MySkodaClimate(MySkodaClimateEntity):
                 _LOGGER.info("Auxiliary heating detected, stopping first.")
                 try:
                     await self._stop_auxiliary_heating()
-                except OperationFailedError as exc:
+                except (ClientResponseError, OperationFailedError) as exc:
                     self._unset_optimistic_data(OptimisticAttribute.HVAC_MODE)
                     _LOGGER.error("Failed to stop aux heater, aborting action: %s", exc)
                     return
@@ -242,7 +257,7 @@ class MySkodaClimate(MySkodaClimateEntity):
             try:
                 await self._start_air_conditioning(target_temperature.temperature_value)
 
-            except OperationFailedError as exc:
+            except (ClientResponseError, OperationFailedError) as exc:
                 self._unset_optimistic_data(OptimisticAttribute.HVAC_MODE)
                 _LOGGER.error("Failed to start air conditioning: %s", exc)
 
@@ -250,7 +265,7 @@ class MySkodaClimate(MySkodaClimateEntity):
             _LOGGER.info("Stopping Air conditioning.")
             try:
                 await self._stop_air_conditioning()
-            except OperationFailedError as exc:
+            except (ClientResponseError, OperationFailedError) as exc:
                 _LOGGER.error("Failed to stop air conditioning: %s", exc)
         _LOGGER.info("HVAC mode set to %s.", hvac_mode)
 
@@ -273,7 +288,7 @@ class MySkodaClimate(MySkodaClimateEntity):
         try:
             await self._set_target_temperature(temp)
             _LOGGER.info("Target temperature set to %s.", temp)
-        except OperationFailedError as exc:
+        except (ClientResponseError, OperationFailedError) as exc:
             self._unset_optimistic_data(OptimisticAttribute.TARGET_TEMPERATURE)
             _LOGGER.error("Failed to set target temperature: %s", exc)
 
@@ -284,9 +299,8 @@ class MySkodaClimate(MySkodaClimateEntity):
         all_capabilities_present = all(
             self.vehicle.has_capability(cap) for cap in self.required_capabilities()
         )
-        readonly = self.coordinator.entry.options.get(CONF_READONLY)
 
-        return all_capabilities_present and not readonly
+        return all_capabilities_present
 
 
 class AuxiliaryHeater(MySkodaClimateEntity):
@@ -433,7 +447,7 @@ class AuxiliaryHeater(MySkodaClimateEntity):
                 _LOGGER.info("%s mode detected, stopping first.", state)
                 try:
                     await self._stop_air_conditioning()
-                except OperationFailedError as exc:
+                except (ClientResponseError, OperationFailedError) as exc:
                     self._unset_optimistic_data(OptimisticAttribute.HVAC_MODE)
                     _LOGGER.error("Failed to stop air conditioning: %s", exc)
                     return
@@ -452,7 +466,7 @@ class AuxiliaryHeater(MySkodaClimateEntity):
             _LOGGER.info("Starting %s [%s]", start_mode or "heating", config)
             try:
                 await self._start_auxiliary_heating(spin=spin, config=config)
-            except OperationFailedError as exc:
+            except (ClientResponseError, OperationFailedError) as exc:
                 self._unset_optimistic_data(OptimisticAttribute.HVAC_MODE)
                 _LOGGER.error("Failed to start aux heating: %s", exc)
 
@@ -477,7 +491,7 @@ class AuxiliaryHeater(MySkodaClimateEntity):
                 _LOGGER.info("Stopping Auxiliary heater.")
                 try:
                     await self._stop_auxiliary_heating()
-                except OperationFailedError as exc:
+                except (ClientResponseError, OperationFailedError) as exc:
                     _LOGGER.error("Failed to stop aux heater: %s", exc)
 
         _LOGGER.info("Auxiliary HVAC mode set to %s.", hvac_mode)

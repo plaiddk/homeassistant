@@ -66,6 +66,14 @@
         },
         "description": "Logga in på Movahome Cloud."
       },
+      "trouver": {
+        "data": {
+          "username": "Användarnamn",
+          "password": "Löserord",
+          "country": "Server-land"
+        },
+        "description": "Logga in på Trouver Cloud."
+      },
       "devices": {
         "data": {
           "devices": "Enheter som stöds"
@@ -205,7 +213,10 @@
         "state": {
           "none": "Inget",
           "tile": "Klinker",
-          "wood": "Trägolv"
+          "wood": "Trägolv",
+          "low_pile_carpet": "Låg lugg matta",
+          "medium_pile_carpet": "Mellanlugg matta",
+          "carpet": "Matta"
         }
       },
       "voice_assistant_language": {
@@ -213,7 +224,43 @@
           "default": "Standard",
           "english": "Engelska",
           "german": "Tyska",
-          "chinese": "Kinesiska"
+          "chinese": "Kinesiska",
+          "russian": "Ryska",
+          "italian": "Italienska",
+          "french": "Franska",
+          "korean": "Koreanska"
+        }
+      },
+      "mop_pressure": {
+        "state": {
+          "light": "Lätt",
+          "normal": "Normal"
+        }
+      },
+      "mop_temperature": {
+        "state": {
+          "normal": "Normal",
+          "warm": "Varm"
+        }
+      },
+      "low_lying_area_frequency": {
+        "state": {
+          "weekly": "Veckovis",
+          "daily": "Dagligen"
+        }
+      },
+      "scraper_frequency": {
+        "state": {
+          "off": "Av",
+          "weekly": "Veckovis",
+          "daily": "Dagligen"
+        }
+      },
+      "auto_lds_coverage": {
+        "state": {
+          "off": "Av",
+          "security": "Säkerhet",
+          "extreme": "Extrem"
         }
       },
       "order": {
@@ -225,7 +272,8 @@
         "state": {
           "by_area": "Av yta",
           "by_time": "Av tid",
-          "by_room": "Av rum"
+          "by_room": "Av rum",
+          "intelligent": "Intelligent"
         }
       },
       "mop_clean_frequency": {
@@ -238,7 +286,9 @@
           "off": "Av",
           "standard": "Standard",
           "high_frequency": "Hög frekvens",
-          "low_frequency": "Låg frekvens"
+          "low_frequency": "Låg frekvens",
+          "custom_frequency": "Anpassad frekvens",
+          "intelligent": "Intelligent"
         }
       },
       "floor_material_direction": {
@@ -279,7 +329,8 @@
           "normal": "Normal",
           "mild": "Mild",
           "warm": "Värma",
-          "hot": "Varm"
+          "hot": "Varm",
+          "max": "Max"
         }
       },
       "auto_recleaning": {
@@ -350,9 +401,24 @@
           "returning_to_drain": "Återgår för att dränera",
           "draining": "Dränerar",
           "auto_water_draining": "Automatisk dränering",
+          "emptying": "Tömning",
+          "dust_bag_drying": "Dammsugarpåse torkning",
+          "dust_bag_drying_paused": "Dammsugarpåse torkning pausad",
+          "heading_to_extra_cleaning": "På väg till extrarengöring",
+          "extra_cleaning": "Extrarengöring",
+          "finding_pet_paused": "Husdjurs‑sökning pausad",
+          "finding_pet": "Husdjurs‑sökning",
           "shortcut": "Genväg",
           "monitoring": "Övervakning",
-          "monitoring_paused": "Övervakning pausad"
+          "monitoring_paused": "Övervakning pausad",
+          "initial_deep_cleaning": "Initiering av djup rengöring",
+          "initial_deep_cleaning_paused": "Initiering av djup rengöring pausad",
+          "sanitizing": "Desinficering",
+          "sanitizing_with_dry": "Desinficering med torkning",
+          "changing_mop": "Byter mopp",
+          "changing_mop_paused": "Moppbyte pausat",
+          "floor_maintaining": "Golvunderhåll",
+          "floor_maintaining_paused": "Golvunderhåll pausat"
         }
       },
       "status": {
@@ -542,7 +608,40 @@
           "dirty_tank_not_installed": "Smutsvattentank är inte installerad.",
           "robot_in_hidden_room": "Dolt utrymme. Flytta robotdammsugare till en annan yta och försök igen.",
           "washboard_not_working": "Tvättbräda har slutat fungera.",
-          "return_to_charge_failed": "Misslyckades att återgå för att ladda."
+          "return_to_charge_failed": "Misslyckades att återgå för att ladda.",
+          "lds_failed_to_lift": "Misslyckades med att lyfta LDS-modulen.",
+          "robot_stuck": "LDS kan inte lyftas här för positionering.",
+          "robot_stuck_repeat": "Flytta roboten till ett öppet område och återuppta uppgiften.",
+          "slippery_floor": "Halt golv. Försök igen senare.",
+          "check_mop_install": "Kontrollera att moppen är korrekt installerad.",
+          "dirty_water_tank_full": "Onormal vattennivå i smutsvattentanken.",
+          "retractable_leg_stuck": "Kontrollera om de infällbara benen har fastnat.",
+          "internal_error": "Fel på grund av internt fel. Försök starta om roboten.",
+          "robot_stuck_on_tables": "Roboten har fastnat mellan bord och stolar.",
+          "robot_stuck_on_passage": "Roboten har fastnat i en trång passage.",
+          "robot_stuck_on_threshold": "Roboten har fastnat vid trappsteg/tröskel.",
+          "robot_stuck_on_low_lying_area": "Roboten har fastnat i ett område med låg takhöjd.",
+          "robot_stuck_on_ramp": "Roboten har upptäckt farliga ramper på vägen.",
+          "robot_stuck_on_obstacle": "Roboten har upptäckt hinder på vägen.",
+          "robot_stuck_on_pet": "Roboten har upptäckt människor eller husdjur på vägen.",
+          "robot_stuck_on_slippery_surface": "Roboten sitter fast på grund av halka.",
+          "robot_stuck_on_carpet": "Roboten halkar på mattan",
+          "drainage_failed": "Onormal tömning från smutsvattentanken",
+          "mop_not_detected": "Mopp ej upptäckt.",
+          "mop_holder_error": "Fel antal/placering av mopphållare i stationen.",
+          "dock_error": "Stationsfel.",
+          "wash_failed": "Misslyckades med att tvätta smutsig mopp.",
+          "robot_stuck_on_curtain": "Roboten halkar i gardinområdet",
+          "edge_mop_stop_rotate": "Kantmoppen har slutat rotera.",
+          "edge_mop_detached": "Kantmoppen har lossnat.",
+          "chassis_lift_malfunction": "Fel på chassilyft.",
+          "mop_cover_error": "Kontrollera om det finns skräp nära mopprullen och kåpan.",
+          "roller_mop_error": "Kontrollera om det finns skräp nära mopprullen och kåpan.",
+          "onboard_water_tank_empty": "Låg vattennivå i robotens renvattentank.",
+          "onboard_dirty_water_tank_full": "Robotens smutsvattentank är full.",
+          "mop_not_installed": "Mopp ej installerad.",
+          "fluffing_roller_error": "Fel på fluffvals.",
+          "blocked_by_obstacle": "Robot blockerad av hinder."
         }
       },
       "charging_status": {
@@ -669,7 +768,27 @@
           "water_stain": "Fläckstädning",
           "water_stain_paused": "Fläckstädning pausad",
           "boosted_edge_cleaning": "Förstärkt kantrengöring",
-          "hair_compressing": "Hårkomprimering"
+          "hair_compressing": "Hårkomprimering",
+          "large_particle_cleaning": "Rengöring av stora partiklar",
+          "intensive_stain_cleaning": "Intensiv fläckrensning",
+          "stain_cleaning": "Fläckrengöring",
+          "initial_deep_cleaning": "Initiering av djup rengöring",
+          "initial_deep_cleaning_paused": "Initiering av djup rengöring pausad",
+          "mop_pad_heating": "Mop‑pads uppvärmning",
+          "cleaning_after_mapping": "Rengöring efter kartläggning",
+          "small_particle_cleaning": "Rengöring av små partiklar",
+          "changing_mop": "Byter mopp",
+          "changing_mop_paused": "Moppbyte pausat",
+          "floor_maintaining": "Golvunderhåll",
+          "floor_maintaining_paused": "Golvunderhåll pausat",
+          "wood_floor_maintaining": "Trägolvsunderhåll"
+        }
+      },
+      "dust_bag_drying_status": {
+        "state": {
+          "idle": "Inaktiv",
+          "drying": "Torkar",
+          "paused": "Pausad"
         }
       }
     }
@@ -1003,7 +1122,7 @@
           "name": "Mattstädning",
           "description": "Anpassade rengöringsinställningar för varje matta."
         },
-        "carpet_settings": {
+        "carpet_preferences": {
           "name": "Mattinställningar",
           "description": "Anpassade mattinställningar för varje matta med en lista över aktiverade inställningar."
         }
@@ -1051,6 +1170,16 @@
         }
       }
     },
+    "vacuum_delete_shortcut": {
+      "name": "Ta bort genväg",
+      "description": "Ta bort en genväg. (Endast på enheter som stöds)",
+      "fields": {
+        "shortcut_id": {
+          "name": "Genvägs-ID",
+          "description": "ID för genvägen."
+        }
+      }
+    },
     "vacuum_set_carpet_area": {
       "name": "Ställ in mattområde",
       "description": "Definera och ignorera mattor. (Endast på enheter som stöds)",
@@ -1059,7 +1188,7 @@
           "name": "Mattor",
           "description": "Mattområden."
         },
-        "ignored_carpets": {
+        "deleted_carpets": {
           "name": "Ignorerade mattor",
           "description": "Ignorerade mattområden för att ta bort automatiskt detekterade mattor."
         }

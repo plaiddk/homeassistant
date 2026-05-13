@@ -2,6 +2,7 @@
 
 import logging
 from datetime import timedelta
+from typing import Coroutine
 
 from homeassistant.components.number import (
     NumberDeviceClass,
@@ -10,11 +11,14 @@ from homeassistant.components.number import (
     NumberMode,
 )
 from homeassistant.const import EntityCategory, PERCENTAGE, UnitOfTime
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.typing import DiscoveryInfoType  # pyright: ignore [reportAttributeAccessIssue]
 from homeassistant.util import Throttle
+from homeassistant.exceptions import ServiceValidationError
+
+from aiohttp import ClientResponseError
 
 from myskoda.models.info import CapabilityId
 from myskoda.mqtt import OperationFailedError
@@ -47,30 +51,42 @@ class MySkodaNumber(MySkodaEntity, NumberEntity):
     Base class for all number entities in the MySkoda integration.
     """
 
+    _assumed_value: float | None = None
+
     def __init__(self, coordinator: MySkodaDataUpdateCoordinator, vin: str):
         super().__init__(coordinator, vin)
-        self._is_enabled: bool = True
 
     def is_supported(self) -> bool:
         all_capabilities_present = all(
             self.vehicle.has_capability(cap) for cap in self.required_capabilities()
         )
-        readonly = self.coordinator.entry.options.get(CONF_READONLY)
+        return all_capabilities_present
 
-        return all_capabilities_present and not readonly
+    def _ensure_not_readonly(self):
+        if self.coordinator.entry.options.get(CONF_READONLY):
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="readonly_mode",
+            )
 
-    def _disable_number(self):
-        self._is_enabled = False
-        self.async_write_ha_state()
+    async def _change_number(self, to_call: Coroutine, value: float):
+        """Change the number by executing to_call."""
+        self._ensure_not_readonly()
+        self._assumed_value = value
+        self._attr_native_value = value
 
-    def _enable_number(self):
-        self._is_enabled = True
-        self.async_write_ha_state()
+        await to_call
 
     @property
-    def available(self) -> bool:
-        """Indicates if the number is available."""
-        return self._is_enabled
+    def assumed_state(self) -> bool:
+        """Indicates that we are currently in assumed state, opportunistically awaiting coordinator update."""
+        return self._assumed_value is not None
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle an update from the coordinator by unsetting the _assumed_value since it is now verified."""
+        self._assumed_value = None
+        super()._handle_coordinator_update()
 
 
 class ChargeLimit(MySkodaNumber):
@@ -99,18 +115,16 @@ class ChargeLimit(MySkodaNumber):
 
     @Throttle(timedelta(seconds=API_COOLDOWN_IN_SECONDS))
     async def async_set_native_value(self, value: float):  # noqa: D102
-        if not self._is_enabled:
-            return
+        self._ensure_not_readonly()
 
-        self._disable_number()
+        myskoda, vin = self.coordinator.myskoda, self.vehicle.info.vin
         try:
-            await self.coordinator.myskoda.set_charge_limit(
-                self.vehicle.info.vin, int(value)
+            await self._change_number(
+                myskoda.set_charge_limit(vin, int(value)), int(value)
             )
-        except OperationFailedError as exc:
+        except (ClientResponseError, OperationFailedError) as exc:
             _LOGGER.error("Failed to set charging limit: %s", exc)
-        finally:
-            self._enable_number()
+        _LOGGER.info("Set charging limit to %s", int(value))
 
     def is_supported(self) -> bool:
         charge_limit_supported = self.vehicle.has_capability(

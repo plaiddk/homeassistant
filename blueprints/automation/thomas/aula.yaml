@@ -55,7 +55,7 @@ actions:
         Givet ugeplanen nedenfor: Udtræk én linje pr. skoledag i den pågældende uge (mandag–fredag). Inkludér ALLE dage, også selvom det ikke nødvendigvis hører under det med særlig fokus. Så bare lav et kort notat om det.
             
         Formål:
-        Som forælder vil jeg se, hvad der skal huskes pr. dag med SÆRLIG fokus på lektier (afleveringer/opgaver,læse), bøger/bibliotek, idræt/svømning og ture.
+        Som forælder vil jeg se, hvad der skal huskes pr. dag med SÆRLIG fokus på lektier (afleveringer/opgaver/lektier,læse), bøger/bibliotek, idræt/svømning og ture.
 
         Detektion (eksempler, ikke udtømmende):
         - Lektier: "lektier", "lektie", "aflevering", "opgave/opg.", "læselektier", "læs s.", "skriv", "stav", "øve".
@@ -73,6 +73,7 @@ actions:
         4) Maks 5000 tegn i "message". Vær ultrakonkis; fjern fyldord og gentagelser.
         5) Ingen linjeskift i "message". Brug dansk. Ingen dato-hallucinationer.
         6) Hvis ugeplanen angiver lektier "til torsdag", placér dem på den nævnte forfaldsdag (torsdag), ikke på annonceringsdagen.
+        7) Du skal have fokus på at opdele "Lektier / Lave". Da Lave er noget de gør på klassen sammen, og Lektier er noget der skal laves til skoledagen. Så der skal være en tydelig opdeling og ikke køres sammen
 
         Det skal være i dette format:
         - **YYYY-MM-DD**: Beskeden ud fra de regler som er opstillet og detektion

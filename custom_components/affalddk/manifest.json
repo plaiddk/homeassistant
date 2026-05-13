@@ -1,0 +1,19 @@
+{
+    "domain": "affalddk",
+    "name": "Affaldshåndtering DK",
+    "after_dependencies": [
+        "http"
+    ],
+    "codeowners": [
+        "@briis",
+        "@TermeHansen"
+    ],
+    "config_flow": true,
+    "documentation": "https://github.com/briis/affalddk",
+    "iot_class": "cloud_polling",
+    "issue_tracker": "https://github.com/briis/affalddk/issues",
+    "requirements": [
+        "beautifulsoup4"
+    ],
+    "version": "3.3.1"
+}

@@ -53,7 +53,7 @@ actions:
       agent_id: "{{ agent_id }}"
       text: >
         Givet NÆSTE UGES ugeplan nedenfor: Udtræk én linje pr. skoledag i den pågældende uge (mandag–fredag). Inkludér ALLE dage, også selvom det ikke nødvendigvis hører under det med særlig fokus. Så bare lav et kort notat om det.
-        (samme regler/detektion som din v4 — uændret)
+        (samme regler/detektion som din v4 — uændret). 
 
         Det skal være i dette format:
         - **YYYY-MM-DD**: Beskeden ud fra de regler som er opstillet og detektion

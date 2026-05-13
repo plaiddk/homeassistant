@@ -9,10 +9,21 @@ from homeassistant.components.device_tracker.config_entry import (
 from homeassistant.components.device_tracker.const import SourceType
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import DiscoveryInfoType  # pyright: ignore [reportAttributeAccessIssue]
+from homeassistant.helpers.typing import (
+    DiscoveryInfoType,  # pyright: ignore [reportAttributeAccessIssue]
+)
 
-from myskoda.models.info import CapabilityId
-from myskoda.models.position import Error, ErrorType, Position, Positions, PositionType
+from myskoda.models.charging import Charging, ChargingStatus
+from myskoda.models.info import CapabilityId, ViewPoint, ViewType
+from myskoda.models.position import (
+    Error,
+    ErrorType,
+    ParkingCoordinates,
+    ParkingPositionV3,
+    Position,
+    Positions,
+    PositionType,
+)
 
 from .const import COORDINATORS, DOMAIN
 from .coordinator import MySkodaConfigEntry, MySkodaDataUpdateCoordinator
@@ -65,6 +76,22 @@ class DeviceTracker(MySkodaEntity, TrackerEntity):
                     err for err in pos.errors if err.type == ErrorType.VEHICLE_IN_MOTION
                 )
 
+    def _charging(self) -> Charging | None:
+        if charging := self.vehicle.charging:
+            return charging
+
+    def _status(self) -> ChargingStatus | None:
+        if charging := self._charging():
+            if status := charging.status:
+                return status
+
+    def _vehicle_parking_position(self) -> ParkingPositionV3 | None:
+        return self.vehicle.parking_position
+
+    def _parking_position(self) -> ParkingCoordinates | None:
+        if pp := self._vehicle_parking_position():
+            return pp.parking_position
+
     @property
     def source_type(self) -> SourceType:  # noqa: D102
         return SourceType.GPS
@@ -73,6 +100,8 @@ class DeviceTracker(MySkodaEntity, TrackerEntity):
     def latitude(self) -> float | None:  # noqa: D102
         position = self._vehicle_position()
         if position is None:
+            if pp := self._parking_position():
+                return pp.gps_coordinates.latitude
             return None
         return position.gps_coordinates.latitude
 
@@ -80,6 +109,8 @@ class DeviceTracker(MySkodaEntity, TrackerEntity):
     def longitude(self) -> float | None:  # noqa: D102
         position = self._vehicle_position()
         if position is None:
+            if pp := self._parking_position():
+                return pp.gps_coordinates.longitude
             return None
         return position.gps_coordinates.longitude
 
@@ -88,27 +119,23 @@ class DeviceTracker(MySkodaEntity, TrackerEntity):
         """Return extra state attributes."""
         attributes = {}
 
-        if render := self.get_renders().get("main"):
+        if pp := self._parking_position():
+            attributes["parking_address"] = pp.formatted_address
+
+        if render := self.get_renders().get(ViewPoint.MAIN):
             attributes["entity_picture"] = render
-        elif render := self.get_composite_renders().get("unmodified_exterior_front"):
+        elif renders := self.get_composite_renders().get(
+            ViewType.UNMODIFIED_EXTERIOR_FRONT
+        ):
             _LOGGER.debug("Main render not found, choosing composite render instead.")
-            render_list = self.get_composite_renders().get("unmodified_exterior_front")
-            if isinstance(render_list, list) and render_list:
-                for render in render_list:
-                    if isinstance(render, dict) and "exterior_front" in render:
-                        attributes["entity_picture"] = render["exterior_front"]
-                        break
-        else:
+            attributes["entity_picture"] = renders.get(ViewPoint.EXTERIOR_FRONT)
+        elif renders := self.get_composite_renders().get(
+            ViewType.UNMODIFIED_EXTERIOR_SIDE
+        ):
             _LOGGER.debug(
                 "'unmodified_exterior_front' not found, falling back to 'unmodified_exterior_side'."
             )
-            render_list = self.get_composite_renders().get("unmodified_exterior_side")
-            if isinstance(render_list, list) and render_list:
-                for render in render_list:
-                    if isinstance(render, dict) and "exterior_side" in render:
-                        attributes["entity_picture"] = render["exterior_side"]
-                        break
-
+            attributes["entity_picture"] = renders.get(ViewPoint.EXTERIOR_SIDE)
         return attributes
 
     @property
@@ -116,6 +143,13 @@ class DeviceTracker(MySkodaEntity, TrackerEntity):
         if err := self._pos_error():
             if err.type == ErrorType.VEHICLE_IN_MOTION:
                 return "vehicle_in_motion"
+
+    @property
+    def battery_level(self) -> int | None:
+        if self.has_all_capabilities([CapabilityId.CHARGING]):
+            if status := self._status():
+                if status.battery.state_of_charge_in_percent is not None:
+                    return min(status.battery.state_of_charge_in_percent, 100)
 
     def required_capabilities(self) -> list[CapabilityId]:
         return [CapabilityId.PARKING_POSITION]

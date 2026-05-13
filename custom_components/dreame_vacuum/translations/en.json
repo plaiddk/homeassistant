@@ -37,7 +37,7 @@
           "prefer_cloud": "Prefer cloud connection"
         },
         "description": "Log in to the Xiaomi Miio cloud, see https://www.openhab.org/addons/bindings/miio/#country-servers for the cloud server to use."
-      },      
+      },
       "2fa": {
         "data": {
           "verification_code": "Two-factor verification code"
@@ -66,6 +66,14 @@
         },
         "description": "Log in to the Movahome cloud."
       },
+      "trouver": {
+        "data": {
+          "username": "Username",
+          "password": "Password",
+          "country": "Server country"
+        },
+        "description": "Log in to the Trouver cloud."
+      },
       "devices": {
         "data": {
           "devices": "Supported Devices"
@@ -84,7 +92,7 @@
           "color_scheme": "Map color scheme",
           "icon_set": "Map icon set",
           "notify": "Notification",
-          "hidden_map_objects": "Map objects",
+          "hidden_map_objects": "Hidden Map objects",
           "low_resolution": "Low resolution map",
           "square": "Square map"
         }
@@ -102,7 +110,7 @@
           "color_scheme": "Map color scheme",
           "icon_set": "Map icon set",
           "notify": "Notification",
-          "hidden_map_objects": "Map objects",
+          "hidden_map_objects": "Hidden Map objects",
           "low_resolution": "Low resolution map",
           "square": "Square map",
           "configuration_type": "Configuration type",
@@ -205,7 +213,10 @@
         "state": {
           "none": "None",
           "tile": "Floor tile",
-          "wood": "Wood floor"
+          "wood": "Wood floor",
+          "low_pile_carpet": "Low pile carpet",
+          "medium_pile_carpet": "Medium pile carpet",
+          "carpet": "Carpet"
         }
       },
       "voice_assistant_language": {
@@ -213,7 +224,43 @@
           "default": "Default",
           "english": "English",
           "german": "German",
-          "chinese": "Chinese"
+          "chinese": "Chinese",
+          "russian": "Russian",
+          "italian": "Italian",
+          "french": "French",
+          "korean": "Korean"
+        }
+      },
+      "mop_pressure": {
+        "state": {
+          "light": "Light",
+          "normal": "Normal"
+        }
+      },
+      "mop_temperature": {
+        "state": {
+          "normal": "Normal",
+          "warm": "Warm"
+        }
+      },
+      "low_lying_area_frequency": {
+        "state": {
+          "weekly": "Weekly",
+          "daily": "Daily"
+        }
+      },
+      "scraper_frequency": {
+        "state": {
+          "off": "Off",
+          "weekly": "Weekly",
+          "daily": "Daily"
+        }
+      },
+      "auto_lds_coverage": {
+        "state": {
+          "off": "Off",
+          "security": "Security",
+          "extreme": "Extreme"
         }
       },
       "order": {
@@ -225,9 +272,10 @@
         "state": {
           "by_area": "By Area",
           "by_time": "By Time",
-          "by_room": "By Room"
+          "by_room": "By Room",
+          "intelligent": "Intelligent"
         }
-      },      
+      },
       "mop_clean_frequency": {
         "state": {
           "by_room": "By Room"
@@ -238,7 +286,9 @@
           "off": "Off",
           "standard": "Standard",
           "high_frequency": "High Frequency",
-          "low_frequency": "Low Frequency"
+          "low_frequency": "Low Frequency",
+          "custom_frequency": "Custom Frequency",
+          "intelligent": "Intelligent"
         }
       },
       "floor_material_direction": {
@@ -279,7 +329,8 @@
           "normal": "Normal",
           "mild": "Mild",
           "warm": "Warm",
-          "hot": "Hot"
+          "hot": "Hot",
+          "max": "Max"
         }
       },
       "auto_recleaning": {
@@ -350,9 +401,24 @@
           "returning_to_drain": "Returning to drain",
           "draining": "Draining",
           "auto_water_draining": "Auto water draining",
+          "emptying": "Emptying",
+          "dust_bag_drying": "Dust bag drying",
+          "dust_bag_drying_paused": "Dust bag drying paused",
+          "heading_to_extra_cleaning": "Heading to extra cleaning",
+          "extra_cleaning": "Extra cleaning",
+          "finding_pet_paused": "Finding pet paused",
+          "finding_pet": "Finding pet",
           "shortcut": "Shortcut",
           "monitoring": "Monitoring",
-          "monitoring_paused": "Monitoring paused"
+          "monitoring_paused": "Monitoring paused",
+          "initial_deep_cleaning": "Initial deep cleaning",
+          "initial_deep_cleaning_paused": "Initial deep cleaning paused",
+          "sanitizing": "Sanitizing",
+          "sanitizing_with_dry": "Sanitizing with dry",
+          "changing_mop": "Changing mop",
+          "changing_mop_paused": "Changing mop paused",
+          "floor_maintaining": "Floor maintaining",
+          "floor_maintaining_paused": "Floor maintaining paused"
         }
       },
       "status": {
@@ -542,7 +608,40 @@
           "dirty_tank_not_installed": "The used water tank of robot is not installed.",
           "robot_in_hidden_room": "Hidden area. Please move the robot to the appropriate area and retry.",
           "washboard_not_working": "Washboard stops working.",
-          "return_to_charge_failed": "Failed to return to charge."
+          "return_to_charge_failed": "Failed to return to charge.",
+          "lds_failed_to_lift": "Failed to lift LDS module.",
+          "robot_stuck": "LDS cannot be raised here for positioning.",
+          "robot_stuck_repeat": "Move robot to an open area and resume the task.",
+          "slippery_floor": "Slippery floor. Please try again later.",
+          "check_mop_install": "Please check if the mop is installed properly.",
+          "dirty_water_tank_full": "Abnormal water level in the robot's used water tank.",
+          "retractable_leg_stuck": "Please check if the retractable legs are tangled.",
+          "internal_error": "Malfunction due to an internal error. Try to restart the robot.",
+          "robot_stuck_on_tables": "Robot stuck among the tables and chairs.",
+          "robot_stuck_on_passage": "Robot stuck in the narrow passage.",
+          "robot_stuck_on_threshold": "Robot stuck at the step/threshold.",
+          "robot_stuck_on_low_lying_area": "Robot stuck in a low-clearance area.",
+          "robot_stuck_on_ramp": "Robot has detected Easy-to-Fall ramps on the path.",
+          "robot_stuck_on_obstacle": "Robot has detected obstacles on the path.",
+          "robot_stuck_on_pet": "Robot has detected people or pets on the path.",
+          "robot_stuck_on_slippery_surface": "Robot is stuck due to slipping.",
+          "robot_stuck_on_carpet": "Robot slips on the carpet",
+          "drainage_failed": "Abnormal water drainage from used water tank",
+          "mop_not_detected": "Mop not detected.",
+          "mop_holder_error": "Mop holder quantity/placement error in the dock.",
+          "dock_error": "Dock Error.",
+          "wash_failed": "Failed to wash dirty mop.",
+          "robot_stuck_on_curtain": "Robot slips in the curtain area",
+          "edge_mop_stop_rotate": "Edge mop stopped rotating.",
+          "edge_mop_detached": "Edge mop detached.",
+          "chassis_lift_malfunction": "Chassis lift malfunction.",
+          "mop_cover_error": "Check for any debris near the roller mop and mop cover.",
+          "roller_mop_error": "Check for any debris near the roller mop and mop cover.",
+          "onboard_water_tank_empty": "Low water level in robot’s clean water box.",
+          "onboard_dirty_water_tank_full": "Robot's used water box is full.",
+          "mop_not_installed": "Mop Not Installed.",
+          "fluffing_roller_error": "Fluffing Roller Error.",
+          "blocked_by_obstacle": "Robot blocked by obstacle."
         }
       },
       "charging_status": {
@@ -669,7 +768,27 @@
           "water_stain": "Water stain cleaning",
           "water_stain_paused": "Water stain cleaning paused",
           "boosted_edge_cleaning": "Boosted edge cleaning",
-          "hair_compressing": "Hair compressing"
+          "hair_compressing": "Hair compressing",
+          "large_particle_cleaning": "Large particle cleaning",
+          "intensive_stain_cleaning": "Intensive stain cleaning",
+          "stain_cleaning": "Stain cleaning",
+          "initial_deep_cleaning": "Initial deep cleaning",
+          "initial_deep_cleaning_paused": "Initial deep cleaning paused",
+          "mop_pad_heating": "Mop pad heating",
+          "cleaning_after_mapping": "Cleaning after mapping",
+          "small_particle_cleaning": "Small particle cleaning",
+          "changing_mop": "Changing mop",
+          "changing_mop_paused": "Changing mop paused",
+          "floor_maintaining": "Floor maintaining",
+          "floor_maintaining_paused": "Floor maintaining paused",
+          "wood_floor_maintaining": "Wood floor maintaining"
+        }
+      },
+      "dust_bag_drying_status": {
+        "state": {
+          "idle": "Idle",
+          "drying": "Drying",
+          "paused": "Paused"
         }
       }
     }
@@ -976,7 +1095,7 @@
         "water_volume": {
           "name": "Water Volume",
           "description": "Water volume for each room."
-        },        
+        },
         "wetness_level": {
           "name": "Wetness Level",
           "description": "Wetness level for each room (On supported devices)."
@@ -1007,7 +1126,7 @@
           "name": "Carpet Cleaning",
           "description": "Custom carpet cleaning setting for each carpet."
         },
-        "carpet_settings": {
+        "carpet_preferences": {
           "name": "Carpet Settings",
           "description": "Custom carpet settings setting for each carpet with an array of enabled settings."
         }
@@ -1055,6 +1174,16 @@
         }
       }
     },
+    "vacuum_delete_shortcut": {
+      "name": "Delete Shortcut",
+      "description": "Delete a shortcut. (Only on supported devices)",
+      "fields": {
+        "shortcut_id": {
+          "name": "Shortcut ID",
+          "description": "ID of the shortcut."
+        }
+      }
+    },
     "vacuum_set_carpet_area": {
       "name": "Set Carpet Area",
       "description": "Define carpets and ignored carpets. (Only on supported devices)",
@@ -1063,7 +1192,7 @@
           "name": "Carpets",
           "description": "Carpet areas."
         },
-        "ignored_carpets": {
+        "deleted_carpets": {
           "name": "Ignored Carpets",
           "description": "Ignored carpet areas for deleting the automatically detected carpets."
         }

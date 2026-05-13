@@ -6,7 +6,7 @@
         "error": {
             "cannot_connect": "Yhteyden muodostaminen epäonnistui",
             "invalid_auth": "Virheellinen todennus",
-            "relogin_in_app": "Virhe havaittu kirjautumisessa. Voi olla tarpeellista kirjautua uudelleen MySkoda-sovelluksessa.",
+            "relogin_in_app": "Virhe havaittu kirjautumisessa. Voi olla tarpeellista kirjautua uudelleen MySkoda-sovelluksessa {login_url}.",
             "unknown": "Tapahtui odottamaton virhe. Tarkista Home Assistantin lokit."
         },
         "step": {
@@ -34,14 +34,14 @@
                     "on": "Kytketty"
                 }
             },
-            "charger_locked": {
+            "charger_lock": {
                 "name": "Kaapelin lukitus",
                 "state": {
                     "off": "Auki",
                     "on": "Lukittu"
                 }
             },
-            "doors_locked": {
+            "doors_lock": {
                 "name": "Ovien lukitus",
                 "state": {
                     "off": "Lukossa",
@@ -55,7 +55,7 @@
                     "on": "Auki"
                 }
             },
-            "locked": {
+            "vehicle_lock": {
                 "name": "Ajoneuvon lukitus",
                 "state": {
                     "off": "Lukossa",

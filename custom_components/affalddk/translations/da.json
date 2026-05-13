@@ -1,0 +1,48 @@
+{
+    "config": {
+        "error": {
+            "name_exists": "Adressen er allerede sat op. Brug en anden adresse.",
+            "request_error": "Fejl ved hentning af data fra serveren.",
+            "location_not_found": "Den angivne adresse blev ikke fundet.",
+            "municipality_not_supported": "Kommunen er ikke understøttet i denne Integration",
+            "connection_error": "API svarer ikke. Prøv igen senere."
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "municipality": "Vælg Kommune",
+                    "zipcode": "Postnummer",
+                    "road_name": "Vej navn",
+                    "house_number": "Hus nummer",
+                    "calendar_end_time": "Tømmings slut tid",
+                    "calendar_start_time": "Tømmings start tid"
+                },
+                "description": "Hent affald opsamlingsdata fra danske kommuner.",
+                "title": "Affald DK"
+            },
+            "select_address": {
+                "data": {
+                    "address": "Vælg Addresse"
+                },
+                "description": "{municipality}\nVej navn: \"{road_name}\"\nHus nummer: \"{house_number}\"\nPostnummer: \"{zipcode}\"",
+                "title": "Affald DK"
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "municipality": "Vælg Kommune",
+                    "zipcode": "Postnummer",
+                    "road_name": "Vej navn",
+                    "house_number": "Hus nummer",
+                    "calendar_end_time": "Tømmings slut tid",
+                    "calendar_start_time": "Tømmings start tid",
+                    "dynamic_next_event_icon": "Vis første affaldstype ikon for næste tømning",
+                    "unit_language": "Enheds sprog"
+                }
+            }
+        }
+    }
+}

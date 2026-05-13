@@ -1,11 +1,15 @@
 var __defProp = Object.defineProperty;
+var __returnValue = (v) => v;
+function __exportSetter(name, newValue) {
+  this[name] = __returnValue.bind(null, newValue);
+}
 var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, {
       get: all[name],
       enumerable: true,
       configurable: true,
-      set: (newValue) => all[name] = () => newValue
+      set: __exportSetter.bind(all, name)
     });
 };
 var __legacyDecorateClassTS = function(decorators, target, key, desc) {
@@ -714,6 +718,61 @@ var init_decorators = __esm(() => {
   init_query_assigned_nodes();
 });
 
+// node_modules/custom-card-helpers/dist/index.m.js
+var NumberFormat, TimeFormat, DOMAINS_TOGGLE, fireEvent = (node, type, detail, options) => {
+  options = options || {};
+  detail = detail === null || detail === undefined ? {} : detail;
+  const event = new Event(type, {
+    bubbles: options.bubbles === undefined ? true : options.bubbles,
+    cancelable: Boolean(options.cancelable),
+    composed: options.composed === undefined ? true : options.composed
+  });
+  event.detail = detail;
+  node.dispatchEvent(event);
+  return event;
+}, SPECIAL_TYPES, navigate = (_node, path, replace = false) => {
+  if (replace) {
+    history.replaceState(null, "", path);
+  } else {
+    history.pushState(null, "", path);
+  }
+  fireEvent(window, "location-changed", {
+    replace
+  });
+};
+var init_index_m = __esm(() => {
+  (function(NumberFormat2) {
+    NumberFormat2["language"] = "language";
+    NumberFormat2["system"] = "system";
+    NumberFormat2["comma_decimal"] = "comma_decimal";
+    NumberFormat2["decimal_comma"] = "decimal_comma";
+    NumberFormat2["space_comma"] = "space_comma";
+    NumberFormat2["none"] = "none";
+  })(NumberFormat || (NumberFormat = {}));
+  (function(TimeFormat2) {
+    TimeFormat2["language"] = "language";
+    TimeFormat2["system"] = "system";
+    TimeFormat2["am_pm"] = "12";
+    TimeFormat2["twenty_four"] = "24";
+  })(TimeFormat || (TimeFormat = {}));
+  DOMAINS_TOGGLE = new Set([
+    "fan",
+    "input_boolean",
+    "light",
+    "switch",
+    "group",
+    "automation"
+  ]);
+  SPECIAL_TYPES = new Set([
+    "call-service",
+    "divider",
+    "section",
+    "weblink",
+    "cast",
+    "select"
+  ]);
+});
+
 // src/types/config.ts
 var DesktopPosition, NavbarCustomActions, DEFAULT_NAVBAR_CONFIG, STUB_CONFIG;
 var init_config = __esm(() => {
@@ -734,53 +793,61 @@ var init_config = __esm(() => {
     NavbarCustomActions2["customJSAction"] = "custom-js-action";
   })(NavbarCustomActions ||= {});
   DEFAULT_NAVBAR_CONFIG = {
-    routes: [],
-    template: undefined,
+    desktop: {
+      min_width: 768,
+      mode: "floating",
+      position: "bottom" /* bottom */,
+      show_labels: false,
+      show_popup_label_backgrounds: false
+    },
+    haptic: {
+      double_tap_action: true,
+      hold_action: true,
+      tap_action: false,
+      url: false
+    },
     layout: {
       auto_padding: {
-        enabled: true,
         desktop_px: 100,
-        mobile_px: 80,
-        media_player_px: 100
+        enabled: true,
+        media_player_px: 100,
+        mobile_px: 80
       },
       reflect_child_state: false
     },
-    desktop: {
-      show_labels: false,
-      show_popup_label_backgrounds: false,
-      min_width: 768,
-      position: "bottom" /* bottom */
+    media_player: {
+      album_cover_background: false,
+      desktop_position: "bottom-center" /* bottomCenter */
     },
     mobile: {
+      mode: "docked",
       show_labels: false,
-      show_popup_label_backgrounds: false,
-      mode: "docked"
-    }
+      show_popup_label_backgrounds: false
+    },
+    routes: [],
+    template: undefined
   };
   STUB_CONFIG = {
     routes: [
-      { url: window.location.pathname, icon: "mdi:home", label: "Home" },
+      { icon: "mdi:home", label: "Home", url: window.location.pathname },
       {
-        url: `${window.location.pathname}/devices`,
-        icon: "mdi:devices",
-        label: "Devices",
         hold_action: {
           action: "navigate",
           navigation_path: "/config/devices/dashboard"
-        }
+        },
+        icon: "mdi:devices",
+        label: "Devices",
+        url: `${window.location.pathname}/devices`
       },
       {
-        url: "/config/automation/dashboard",
         icon: "mdi:creation",
-        label: "Automations"
+        label: "Automations",
+        url: "/config/automation/dashboard"
       },
-      { url: "/config/dashboard", icon: "mdi:cog", label: "Settings" },
+      { icon: "mdi:cog", label: "Settings", url: "/config/dashboard" },
       {
         icon: "mdi:dots-horizontal",
         label: "More",
-        tap_action: {
-          action: "open-popup" /* openPopup */
-        },
         popup: [
           { icon: "mdi:cog", url: "/config/dashboard" },
           {
@@ -791,14 +858,17 @@ var init_config = __esm(() => {
             icon: "mdi:power",
             tap_action: {
               action: "call-service",
-              service: "homeassistant.restart",
-              service_data: {},
               confirmation: {
                 text: "Are you sure you want to restart Home Assistant?"
-              }
+              },
+              service: "homeassistant.restart",
+              service_data: {}
             }
           }
-        ]
+        ],
+        tap_action: {
+          action: "open-popup" /* openPopup */
+        }
       }
     ]
   };
@@ -808,17 +878,17 @@ var init_config = __esm(() => {
 function genericGetProperty(obj, key) {
   return key.split(".").reduce((o6, k2) => o6?.[k2], obj);
 }
-function genericSetProperty(obj, key, value) {
+function genericSetProperty(obj, key, value, options = { allowDeletion: false }) {
   const paths = key.split(".");
   const finalKey = paths.pop();
   const copy = Array.isArray(obj) ? [...obj] : { ...obj };
   let currentObj = copy;
   let originalObj = obj;
-  for (let i5 = 0;i5 < paths.length; i5++) {
-    const p3 = paths[i5];
+  for (let i6 = 0;i6 < paths.length; i6++) {
+    const p3 = paths[i6];
     if (typeof originalObj[p3] !== "object" || originalObj[p3] === undefined || originalObj[p3] === null) {
-      const nextKey = paths[i5 + 1];
-      const isArrayIndex = nextKey !== undefined && !isNaN(Number(nextKey));
+      const nextKey = paths[i6 + 1];
+      const isArrayIndex = nextKey !== undefined && !Number.isNaN(Number(nextKey));
       currentObj[p3] = isArrayIndex ? [] : {};
     } else {
       currentObj[p3] = Array.isArray(originalObj[p3]) ? [...originalObj[p3]] : { ...originalObj[p3] };
@@ -826,7 +896,11 @@ function genericSetProperty(obj, key, value) {
     currentObj = currentObj[p3];
     originalObj = originalObj[p3] ?? {};
   }
-  currentObj[finalKey] = value;
+  if ((value === null || value === undefined) && options.allowDeletion) {
+    delete currentObj[finalKey];
+  } else {
+    currentObj[finalKey] = value;
+  }
   return copy;
 }
 
@@ -863,11 +937,252 @@ var mapStringToEnum = (enumType, value) => {
   return;
 }, generateHash = (str) => {
   let hash = 0;
-  for (let i5 = 0;i5 < str.length; i5++) {
-    hash = (hash << 5) - hash + str.charCodeAt(i5);
+  for (let i6 = 0;i6 < str.length; i6++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i6);
   }
   return hash.toString();
 };
+
+// src/utils/docs-links.ts
+var DOCS_LINKS;
+var init_docs_links = __esm(() => {
+  DOCS_LINKS = {
+    jsTemplate: "https://joseluis9595.github.io/lovelace-navbar-card/docs/types/js-template",
+    styles: "https://joseluis9595.github.io/lovelace-navbar-card/docs/configuration/styles",
+    template: "https://joseluis9595.github.io/lovelace-navbar-card/docs/configuration/template"
+  };
+});
+
+// src/utils/dom.ts
+function fireDOMEvent(node, type, data, EventConstructor) {
+  const { options, detailOverride } = data ?? {};
+  const eventConstructor = EventConstructor || Event;
+  const event = new eventConstructor(type, options);
+  if (detailOverride !== undefined) {
+    event.detail = detailOverride;
+  }
+  node.dispatchEvent(event);
+  return event;
+}
+var DASHBOARD_PADDING_STYLE_ID = "navbar-card-forced-padding-styles", DEFAULT_STYLES_ID = "navbar-card-default-styles", USER_STYLES_ID = "navbar-card-user-styles", getNavbarTemplates = () => {
+  const lovelacePanel = document?.querySelector("home-assistant")?.shadowRoot?.querySelector("home-assistant-main")?.shadowRoot?.querySelector("ha-drawer partial-panel-resolver ha-panel-lovelace");
+  if (lovelacePanel) {
+    return lovelacePanel.lovelace.config["navbar-templates"];
+  }
+  return null;
+}, forceResetRipple = (target) => {
+  const rippleElements = target?.querySelectorAll("ha-ripple");
+  rippleElements?.forEach((ripple) => {
+    setTimeout(() => {
+      ripple.hovered = false;
+      ripple.pressed = false;
+    }, 10);
+  });
+}, findHuiRoot = () => {
+  return window.document.querySelector("home-assistant")?.shadowRoot?.querySelector("home-assistant-main")?.shadowRoot?.querySelector("ha-panel-lovelace")?.shadowRoot?.querySelector("hui-root");
+}, forceOpenEditMode = () => {
+  const huiRoot = findHuiRoot();
+  if (!huiRoot?.shadowRoot)
+    return;
+  huiRoot.lovelace.setEditMode(true);
+}, removeDashboardPadding = () => {
+  const huiRoot = findHuiRoot();
+  if (!huiRoot?.shadowRoot)
+    return;
+  const styleEl = huiRoot.shadowRoot.querySelector(`#${DASHBOARD_PADDING_STYLE_ID}`);
+  if (styleEl) {
+    styleEl.remove();
+  }
+}, forceDashboardPadding = (options) => {
+  const autoPaddingEnabled = options?.autoPadding?.enabled ?? DEFAULT_NAVBAR_CONFIG.layout?.auto_padding?.enabled;
+  const huiRoot = findHuiRoot();
+  if (!huiRoot?.shadowRoot) {
+    console.warn("[navbar-card] Could not find hui-root. Custom padding styles will not be applied.");
+    return;
+  }
+  const totalPaddings = {
+    desktop: {
+      ["top" /* top */]: 0,
+      ["bottom" /* bottom */]: 0,
+      ["left" /* left */]: 0,
+      ["right" /* right */]: 0
+    },
+    mobile: {
+      bottom: 0
+    }
+  };
+  let styleEl = huiRoot.shadowRoot.querySelector(`#${DASHBOARD_PADDING_STYLE_ID}`);
+  if (!autoPaddingEnabled) {
+    if (styleEl) {
+      styleEl.remove();
+    }
+    return;
+  }
+  const desktopMinWidth = options?.desktop?.min_width ?? 768;
+  const desktopPosition = options?.desktop?.position ?? DEFAULT_NAVBAR_CONFIG.desktop.position;
+  const mobileMaxWidth = desktopMinWidth - 1;
+  let cssText = "";
+  const desktopPaddingPx = options?.autoPadding?.desktop_px ?? DEFAULT_NAVBAR_CONFIG.layout?.auto_padding?.desktop_px ?? 0;
+  totalPaddings.desktop[desktopPosition] += desktopPaddingPx;
+  const mobilePaddingPx = options?.autoPadding?.mobile_px ?? DEFAULT_NAVBAR_CONFIG.layout?.auto_padding?.mobile_px ?? 0;
+  totalPaddings.mobile.bottom += mobilePaddingPx;
+  const mediaPlayerPaddingPx = options?.autoPadding?.media_player_px ?? DEFAULT_NAVBAR_CONFIG.layout?.auto_padding?.media_player_px ?? 0;
+  const mediaPlayerPosition = options?.widgetPositions?.["media_player"] ?? null;
+  if (mediaPlayerPosition) {
+    switch (mediaPlayerPosition) {
+      case "top-left" /* topLeft */:
+      case "top-center" /* topCenter */:
+      case "top-right" /* topRight */:
+        totalPaddings.desktop["top" /* top */] += mediaPlayerPaddingPx;
+        break;
+      case "bottom-center" /* bottomCenter */:
+      case "bottom-right" /* bottomRight */:
+      case "bottom-left" /* bottomLeft */:
+        totalPaddings.desktop["bottom" /* bottom */] += mediaPlayerPaddingPx;
+        break;
+    }
+    totalPaddings.mobile.bottom += mediaPlayerPaddingPx;
+  }
+  if (totalPaddings.desktop["top" /* top */] > 0) {
+    cssText += `
+      @media (min-width: ${desktopMinWidth}px) {
+        :not(.edit-mode) > hui-view:before {
+          content: "";
+          display: block;
+          height: ${totalPaddings.desktop["top" /* top */]}px;
+          width: 100%;
+          background-color: transparent;
+        }
+      }
+    `;
+  }
+  if (totalPaddings.desktop["bottom" /* bottom */] > 0) {
+    cssText += `
+      @media (min-width: ${desktopMinWidth}px) {
+        :not(.edit-mode) > hui-view:after {
+          content: "";
+          display: block;
+          height: ${totalPaddings.desktop["bottom" /* bottom */]}px;
+          width: 100%;
+          background-color: transparent;
+        }
+      }
+    `;
+  }
+  if (totalPaddings.desktop["left" /* left */] > 0) {
+    cssText += `
+      @media (min-width: ${desktopMinWidth}px) {
+       :not(.edit-mode) > #view {
+            padding-left: ${totalPaddings.desktop["left" /* left */]}px !important;
+          }
+      }
+    `;
+  }
+  if (totalPaddings.desktop["right" /* right */] > 0) {
+    cssText += `
+      @media (min-width: ${desktopMinWidth}px) {
+       :not(.edit-mode) > #view {
+            padding-right: ${totalPaddings.desktop["right" /* right */]}px !important;
+          }
+      }
+    `;
+  }
+  if (totalPaddings.mobile.bottom > 0) {
+    cssText += `
+        @media (max-width: ${mobileMaxWidth}px) {
+          :not(.edit-mode) > hui-view:after {
+            content: "";
+            display: block;
+            height: ${totalPaddings.mobile.bottom}px;
+            width: 100%;
+            background-color: transparent;
+            }
+          }
+        `;
+  }
+  if (!styleEl) {
+    styleEl = document.createElement("style");
+    styleEl.id = DASHBOARD_PADDING_STYLE_ID;
+    styleEl.textContent = cssText;
+    huiRoot.shadowRoot.appendChild(styleEl);
+  } else {
+    styleEl.textContent = cssText;
+  }
+}, createStyleElement = (root, id, styles) => {
+  const rootEl = root.shadowRoot;
+  let styleEl = rootEl?.querySelector(`#${id}`);
+  if (styleEl) {
+    styleEl.remove();
+  }
+  styleEl = document.createElement("style");
+  styleEl.id = id;
+  styleEl.textContent = styles.cssText;
+  rootEl?.appendChild(styleEl);
+}, injectStyles = (root, defaultStyles, userStyles) => {
+  createStyleElement(root, DEFAULT_STYLES_ID, defaultStyles);
+  createStyleElement(root, USER_STYLES_ID, userStyles);
+}, preventEventDefault = (e7) => {
+  e7.preventDefault();
+  e7.stopPropagation();
+}, scrollToTop = () => {
+  window.scrollTo({
+    behavior: "smooth",
+    left: 0,
+    top: 0
+  });
+}, matchesCurrentNavigationPath = (url) => {
+  const pathname = window.location.pathname;
+  if (!url)
+    return false;
+  if (url.startsWith("/")) {
+    return pathname === url;
+  }
+  const normalizedPathname = pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+  const normalizedUrl = url.endsWith("/") ? url.slice(0, -1) : url;
+  return normalizedPathname.endsWith(`/${normalizedUrl}`);
+}, conditionallyRender = (condition, renderContent) => {
+  if (condition) {
+    return renderContent();
+  }
+  return x`<div class="loader-container">
+    <span class="loader"></span>
+  </div>`;
+}, supportsHAComponent = (component) => {
+  return customElements?.get(component) != null;
+};
+var init_dom = __esm(() => {
+  init_lit();
+  init_config();
+});
+
+// src/utils/haptic.ts
+var shouldTriggerHaptic = (context, actionType, isNavigation = false) => {
+  const hapticConfig = context.config?.haptic ?? DEFAULT_NAVBAR_CONFIG.haptic;
+  if (typeof hapticConfig === "boolean") {
+    return hapticConfig;
+  }
+  if (isNavigation) {
+    return hapticConfig.url ?? DEFAULT_NAVBAR_CONFIG.haptic.url;
+  }
+  switch (actionType) {
+    case "tap":
+      return hapticConfig.tap_action ?? DEFAULT_NAVBAR_CONFIG.haptic.tap_action;
+    case "hold":
+      return hapticConfig.hold_action ?? DEFAULT_NAVBAR_CONFIG.haptic.hold_action;
+    case "double_tap":
+      return hapticConfig.double_tap_action ?? DEFAULT_NAVBAR_CONFIG.haptic.double_tap_action;
+    default:
+      return false;
+  }
+}, triggerHaptic = (context, actionType, isNavigation = false) => {
+  if (shouldTriggerHaptic(context, actionType, isNavigation)) {
+    fireDOMEvent(window, "haptic", { detailOverride: "selection" });
+  }
+};
+var init_haptic = __esm(() => {
+  init_types();
+  init_utils();
+});
 
 // src/utils/template.ts
 var templateFunctionCache, isTemplate = (value) => {
@@ -918,7 +1233,7 @@ var templateFunctionCache, isTemplate = (value) => {
     return template;
   }
 }, processBadgeTemplate = (hass, template) => {
-  if (!hass || !template)
+  if (!(hass && template))
     return false;
   try {
     const func = new Function("states", `return ${template}`);
@@ -933,206 +1248,48 @@ var init_template = __esm(() => {
   templateFunctionCache = new Map;
 });
 
-// src/utils/dom.ts
-function fireDOMEvent(node, type, data, EventConstructor) {
-  const { options, detailOverride } = data ?? {};
-  const constructor = EventConstructor || Event;
-  const event = new constructor(type, options);
-  if (detailOverride !== undefined) {
-    event.detail = detailOverride;
-  }
-  node.dispatchEvent(event);
-  return event;
-}
-var DASHBOARD_PADDING_STYLE_ID = "navbar-card-forced-padding-styles", DEFAULT_STYLES_ID = "navbar-card-default-styles", USER_STYLES_ID = "navbar-card-user-styles", getNavbarTemplates = () => {
-  const lovelacePanel = document?.querySelector("home-assistant")?.shadowRoot?.querySelector("home-assistant-main")?.shadowRoot?.querySelector("ha-drawer partial-panel-resolver ha-panel-lovelace");
-  if (lovelacePanel) {
-    return lovelacePanel.lovelace.config["navbar-templates"];
-  }
-  return null;
-}, forceResetRipple = (target) => {
-  const rippleElements = target?.querySelectorAll("ha-ripple");
-  rippleElements?.forEach((ripple) => {
-    setTimeout(() => {
-      ripple.hovered = false;
-      ripple.pressed = false;
-    }, 10);
-  });
-}, findHuiRoot = () => {
-  return window.document.querySelector("home-assistant")?.shadowRoot?.querySelector("home-assistant-main")?.shadowRoot?.querySelector("ha-panel-lovelace")?.shadowRoot?.querySelector("hui-root");
-}, forceOpenEditMode = () => {
-  const huiRoot = findHuiRoot();
-  if (!huiRoot?.shadowRoot)
-    return;
-  huiRoot.lovelace.setEditMode(true);
-}, removeDashboardPadding = () => {
-  const huiRoot = findHuiRoot();
-  if (!huiRoot?.shadowRoot)
-    return;
-  const styleEl = huiRoot.shadowRoot.querySelector(`#${DASHBOARD_PADDING_STYLE_ID}`);
-  if (styleEl) {
-    styleEl.remove();
-  }
-}, forceDashboardPadding = (options) => {
-  const autoPaddingEnabled = options?.auto_padding?.enabled ?? DEFAULT_NAVBAR_CONFIG.layout?.auto_padding?.enabled;
-  const huiRoot = findHuiRoot();
-  if (!huiRoot?.shadowRoot) {
-    console.warn("[navbar-card] Could not find hui-root. Custom padding styles will not be applied.");
-    return;
-  }
-  let styleEl = huiRoot.shadowRoot.querySelector(`#${DASHBOARD_PADDING_STYLE_ID}`);
-  if (!autoPaddingEnabled) {
-    if (styleEl) {
-      styleEl.remove();
-    }
-    return;
-  }
-  const desktopMinWidth = options?.desktop?.min_width ?? 768;
-  const mobileMaxWidth = desktopMinWidth - 1;
-  let cssText = "";
-  const desktopPaddingPx = options?.auto_padding?.desktop_px ?? DEFAULT_NAVBAR_CONFIG.layout?.auto_padding?.desktop_px ?? 0;
-  if (["left", "right"].includes(options?.desktop?.position ?? "") && desktopPaddingPx > 0) {
-    cssText += `
-      @media (min-width: ${desktopMinWidth}px) {
-       :not(.edit-mode) > #view {
-            padding-${options?.desktop?.position}: ${desktopPaddingPx}px !important;
-          }
-      }
-    `;
-  } else if ((options?.desktop?.position === "bottom" || options?.desktop?.position === "top") && desktopPaddingPx > 0) {
-    cssText += `
-      @media (min-width: ${desktopMinWidth}px) {
-        :not(.edit-mode) > hui-view:${options?.desktop?.position === "top" ? "before" : "after"} {
-          content: "";
-          display: block;
-          height: ${desktopPaddingPx}px;  
-          width: 100%;
-          background-color: transparent; 
-        }
-      }
-    `;
-  }
-  let mobilePaddingPx = options?.auto_padding?.mobile_px ?? DEFAULT_NAVBAR_CONFIG.layout?.auto_padding?.mobile_px ?? 0;
-  if (options?.show_media_player) {
-    mobilePaddingPx += options?.auto_padding?.media_player_px ?? DEFAULT_NAVBAR_CONFIG.layout?.auto_padding?.media_player_px ?? 0;
-  }
-  if (mobilePaddingPx > 0) {
-    cssText += `
-      @media (max-width: ${mobileMaxWidth}px) {
-        :not(.edit-mode) > hui-view:after {
-          content: "";
-          display: block;
-          height: ${mobilePaddingPx}px;
-          width: 100%;
-          background-color: transparent;
-          }
-        }
-      `;
-  }
-  if (!styleEl) {
-    styleEl = document.createElement("style");
-    styleEl.id = DASHBOARD_PADDING_STYLE_ID;
-    styleEl.textContent = cssText;
-    huiRoot.shadowRoot.appendChild(styleEl);
-  } else {
-    styleEl.textContent = cssText;
-  }
-}, createStyleElement = (root, id, styles) => {
-  const rootEl = root.shadowRoot;
-  let styleEl = rootEl?.querySelector(`#${id}`);
-  if (styleEl) {
-    styleEl.remove();
-  }
-  styleEl = document.createElement("style");
-  styleEl.id = id;
-  styleEl.textContent = styles.cssText;
-  rootEl?.appendChild(styleEl);
-}, injectStyles = (root, defaultStyles, userStyles) => {
-  createStyleElement(root, DEFAULT_STYLES_ID, defaultStyles);
-  createStyleElement(root, USER_STYLES_ID, userStyles);
-}, preventEventDefault = (e5) => {
-  e5.preventDefault();
-  e5.stopPropagation();
-}, conditionallyRender = (condition, renderContent) => {
-  if (condition) {
-    return renderContent();
-  }
-  return x`<div class="loader-container">
-    <span class="loader"></span>
-  </div>`;
-};
-var init_dom = __esm(() => {
-  init_lit();
-  init_config();
-});
-
-// src/utils/haptic.ts
-var shouldTriggerHaptic = (context, actionType, isNavigation = false) => {
-  const hapticConfig = context.config?.haptic;
-  if (typeof hapticConfig === "boolean") {
-    return hapticConfig;
-  }
-  if (!hapticConfig) {
-    return !isNavigation;
-  }
-  if (isNavigation) {
-    return hapticConfig.url ?? false;
-  }
-  switch (actionType) {
-    case "tap":
-      return hapticConfig.tap_action ?? false;
-    case "hold":
-      return hapticConfig.hold_action ?? false;
-    case "double_tap":
-      return hapticConfig.double_tap_action ?? false;
-    default:
-      return false;
-  }
-}, triggerHaptic = (context, actionType, isNavigation = false) => {
-  if (shouldTriggerHaptic(context, actionType, isNavigation)) {
-    fireDOMEvent(window, "haptic", { detailOverride: "selection" });
-  }
-};
-var init_haptic = __esm(() => {
-  init_utils();
-});
-
 // src/utils/index.ts
 var init_utils = __esm(() => {
-  init_template();
+  init_docs_links();
   init_dom();
   init_haptic();
-});
-
-// node_modules/custom-card-helpers/dist/index.m.js
-var t5, r6, $2, ne = function(e7, t6, r7, n6) {
-  n6 = n6 || {}, r7 = r7 == null ? {} : r7;
-  var i7 = new Event(t6, { bubbles: n6.bubbles === undefined || n6.bubbles, cancelable: Boolean(n6.cancelable), composed: n6.composed === undefined || n6.composed });
-  return i7.detail = r7, e7.dispatchEvent(i7), i7;
-}, ie, de = function(e7, t6, r7) {
-  r7 === undefined && (r7 = false), r7 ? history.replaceState(null, "", t6) : history.pushState(null, "", t6), ne(window, "location-changed", { replace: r7 });
-};
-var init_index_m = __esm(() => {
-  (function(e7) {
-    e7.language = "language", e7.system = "system", e7.comma_decimal = "comma_decimal", e7.decimal_comma = "decimal_comma", e7.space_comma = "space_comma", e7.none = "none";
-  })(t5 || (t5 = {})), function(e7) {
-    e7.language = "language", e7.system = "system", e7.am_pm = "12", e7.twenty_four = "24";
-  }(r6 || (r6 = {}));
-  $2 = new Set(["fan", "input_boolean", "light", "switch", "group", "automation"]);
-  ie = new Set(["call-service", "divider", "section", "weblink", "cast", "select"]);
+  init_template();
 });
 
 // src/lib/action-handler.ts
-var ACTIONS_WITH_CUSTOM_ENTITY, chooseKeyForQuickbar = (action) => {
-  switch (action.mode) {
-    case "devices":
-      return "d";
-    case "entities":
-      return "e";
-    case "commands":
-    default:
-      return "c";
+var ACTIONS_WITH_CUSTOM_ENTITY, openQuickbar = (action) => {
+  const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+  let key;
+  if (action.mode) {
+    switch (action.mode) {
+      case "devices":
+        key = "d";
+        break;
+      case "entities":
+        key = "e";
+        break;
+      case "commands":
+      default:
+        key = "c";
+        break;
+    }
+  } else {
+    key = "k";
   }
+  const eventInit = {
+    bubbles: true,
+    cancelable: true,
+    key
+  };
+  if (!action.mode) {
+    if (isMac) {
+      eventInit.metaKey = true;
+    } else {
+      eventInit.ctrlKey = true;
+    }
+  }
+  const event = new KeyboardEvent("keydown", eventInit);
+  document.dispatchEvent(event);
 }, executeAction = (params) => {
   const { context, target, action, actionType, data } = params;
   const { route, popupItem } = data;
@@ -1168,13 +1325,7 @@ var ACTIONS_WITH_CUSTOM_ENTITY, chooseKeyForQuickbar = (action) => {
       break;
     case "quickbar" /* quickbar */:
       triggerHaptic(context, actionType);
-      fireDOMEvent(context, "keydown", {
-        options: {
-          bubbles: true,
-          composed: true,
-          key: chooseKeyForQuickbar(action)
-        }
-      }, KeyboardEvent);
+      openQuickbar(action);
       break;
     case "show-notifications" /* showNotifications */:
       triggerHaptic(context, actionType);
@@ -1206,22 +1357,31 @@ var ACTIONS_WITH_CUSTOM_ENTITY, chooseKeyForQuickbar = (action) => {
     default:
       if (action != null) {
         triggerHaptic(context, actionType);
+        if (action.action === "navigate" && matchesCurrentNavigationPath(action.navigation_path)) {
+          scrollToTop();
+          return;
+        }
         const extractedEntity = ACTIONS_WITH_CUSTOM_ENTITY.includes(action.action) ? action.entity ?? action.entity_id : undefined;
         setTimeout(() => {
           fireDOMEvent(context, "hass-action", {
-            options: { bubbles: true, composed: true },
             detailOverride: {
               action: actionType,
               config: {
                 [`${actionType}_action`]: action,
                 entity: extractedEntity
               }
-            }
+            },
+            options: { bubbles: true, composed: true }
           });
         }, 10);
       } else if (actionType === "tap" && (route?.url || popupItem?.url)) {
         triggerHaptic(context, actionType, true);
-        de(context, route?.url ?? popupItem?.url ?? "");
+        const destinationUrl = route?.url ?? popupItem?.url ?? "";
+        if (matchesCurrentNavigationPath(destinationUrl)) {
+          scrollToTop();
+          return;
+        }
+        navigate(context, destinationUrl);
       }
       break;
   }
@@ -1233,8 +1393,385 @@ var init_action_handler = __esm(() => {
   ACTIONS_WITH_CUSTOM_ENTITY = ["more-info", "toggle"];
 });
 
-// src/styles.ts
-var HOST_STYLES, NAVBAR_CONTAINER_STYLES, MEDIA_PLAYER_STYLES, ROUTE_STYLES, POPUP_STYLES, EDITOR_STYLES, ROUTES_EDITOR_DND_STYLES, COMPONENTS_STYLES, getDefaultStyles = () => {
+// src/styles/editor.ts
+var EDITOR_STYLES, DRAGGABLE_ITEM_STYLES;
+var init_editor = __esm(() => {
+  init_lit();
+  EDITOR_STYLES = i`
+  .navbar-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .navbar-editor ha-textfield {
+    width: 100%;
+  }
+
+  .navbar-editor ha-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .navbar-editor .navbar-template-toggle-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0px !important;
+    border-radius: 99px;
+    font-size: 0.85em;
+    font-weight: 600;
+    border: 0px;
+    padding: 4px 8px !important;
+    cursor: pointer;
+  }
+
+  .reset-overrides-button {
+    white-space: nowrap;
+  }
+
+  .editor-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    padding: 12px;
+  }
+
+  .editor-row {
+    gap: 6px;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .editor-row-item {
+    flex: 1;
+  }
+
+  .editor-row-item ha-textfield {
+    width: 100%;
+  }
+
+  @media (max-width: 600px) {
+    .editor-row {
+      flex-direction: column !important;
+      gap: 0.5em;
+    }
+    .editor-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .editor-row-item {
+      width: 100%;
+    }
+  }
+
+  .editor-label {
+    font-weight: 500;
+  }
+
+  .routes-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25em;
+  }
+
+  ha-expansion-panel h4[slot='header'],
+  ha-expansion-panel h5[slot='header'],
+  ha-expansion-panel h6[slot='header'] {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.7em;
+    padding: 0.2em 0.5em 0.2em 0;
+    height: 40px;
+    margin: 0px !important;
+    margin-left: 1em;
+  }
+
+  ha-expansion-panel h4[slot='header'] .expansion-panel-title,
+  ha-expansion-panel h5[slot='header'] .expansion-panel-title,
+  ha-expansion-panel h6[slot='header'] .expansion-panel-title {
+    flex: 1;
+  }
+
+  .draggable-item-header {
+    display: flex;
+    align-items: center;
+    gap: 0.7em;
+    padding: 0.2em 0.5em 0.2em 0;
+  }
+
+  .draggable-item-header-title {
+    font-weight: bold;
+    color: var(--primary-color);
+  }
+
+  .draggable-item-header-summary {
+    flex: 1;
+    opacity: 0.7;
+    font-size: 0.95em;
+    display: flex;
+    align-items: center;
+    gap: 0.3em;
+  }
+
+  .draggable-item-header-image {
+    height: 1.2em;
+    vertical-align: middle;
+  }
+
+  .draggable-item-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    background: var(--primary-background-color);
+    border-radius: 8px;
+    padding: 1em 1.2em 1.2em 1.2em;
+    margin: 1em 0em;
+  }
+
+  .popup-controls {
+    display: flex;
+    gap: 0.5em;
+    margin-bottom: 1em;
+  }
+
+  .editor-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1em;
+  }
+
+  .editor-divider {
+    margin: 1.5em 0 1em 0;
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    height: 1px;
+    background: none;
+  }
+
+  .add-popup-btn {
+    margin-top: 1em;
+  }
+
+  .template-editor-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+    margin-bottom: 0.7em;
+  }
+
+  .template-editor-helper {
+    font-size: 0.93em;
+    color: var(--secondary-text-color, #888);
+  }
+
+  .quickbar-mode-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .templatable-field-container {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .templatable-field-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5em;
+  }
+
+  .templatable-field-header-label {
+    flex: 1;
+  }
+
+  /* Custom Editor inputs */
+
+  .editor-select-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .editor-select {
+    cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 48px;
+    padding: 10px 12px;
+    padding-right: 32px;
+    border-radius: var(--ha-border-radius-sm, 4px); /* TODO JLAQ: review this variable */
+    border: 1px solid var(--divider-color, rgba(0, 0, 0, 0.14));
+    background: var(--input-fill-color, var(--card-background-color, #fff));
+    color: var(--primary-text-color, #000);
+    outline: none;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+
+    /* Remove default dropdown arrow */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    /* Add our own dropdown icon */
+    background-image: linear-gradient(
+      135deg,
+      transparent 50%,
+      var(--secondary-text-color, #666) 50%
+    );
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 8px 6px;
+  }
+
+  .editor-select:hover:not(:disabled) {
+    border-color: color-mix(
+      in srgb,
+      var(--primary-color, #03a9f4) 40%,
+      var(--divider-color, rgba(0, 0, 0, 0.14))
+    );
+    background-color: color-mix(
+      in srgb,
+      var(--primary-color, #03a9f4) 4%,
+      var(--input-fill-color, var(--card-background-color, #fff))
+    );
+  }
+
+  .editor-select:focus {
+    border-color: var(--primary-color, #03a9f4);
+    box-shadow: 0 0 0 1px
+      color-mix(in srgb, var(--primary-color, #03a9f4) 30%, transparent);
+  }
+
+  .editor-select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .editor-select-helper {
+    font-size: 0.9em;
+    color: var(--secondary-text-color, #666);
+  }
+
+  /* Custom Tabs Styles */
+
+  .editor-tab-nav {
+    margin-bottom: 0.25em;
+    display: flex;
+    background: var(--card-background-color, #fff);
+    border-radius: 8px;
+    border: 1px solid var(--divider-color, #e0e0e0);
+  }
+
+  .editor-tab-button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--secondary-text-color, #666);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .editor-tab-button:hover {
+    background: color-mix(
+      in srgb,
+      var(--primary-color, #03a9f4) 10%,
+      transparent
+    );
+  }
+
+  .editor-tab-button.active {
+    background: var(--primary-color, #03a9f4);
+    color: white;
+  }
+
+  .editor-tab-button ha-icon {
+    --mdc-icon-size: 18px;
+  }
+
+  .loader-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 60px;
+  }
+
+  .loader {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 2px solid transparent;
+    border-top: 4px solid var(--primary-color, #03a9f4);
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+  }
+
+  @keyframes rotation {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+`;
+  DRAGGABLE_ITEM_STYLES = i`
+  .draggable-item {
+    border: 1.5px dashed transparent;
+    border-radius: 8px;
+    transition:
+      border-color 0.2s,
+      background 0.2s;
+    background: none;
+    position: relative;
+  }
+
+  .draggable-item.drag-over {
+    border-color: var(--primary-color, #03a9f4);
+    background: rgba(3, 169, 244, 0.08);
+  }
+
+  .draggable-item.dragging {
+    opacity: 0.6;
+    background: #eee;
+    z-index: 2;
+  }
+
+  .drag-handle {
+    cursor: grab;
+    margin-right: 8px;
+    color: var(--primary-color, #03a9f4);
+    vertical-align: middle;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .delete-btn ha-icon {
+    color: var(--error-color, #db4437) !important;
+  }
+`;
+});
+
+// src/styles/index.ts
+var HOST_STYLES, NAVBAR_CONTAINER_STYLES, MEDIA_PLAYER_STYLES, ROUTE_STYLES, POPUP_STYLES, COMPONENTS_STYLES, getDefaultStyles = () => {
   return i`
     ${HOST_STYLES}
     ${NAVBAR_CONTAINER_STYLES}
@@ -1246,11 +1783,12 @@ var HOST_STYLES, NAVBAR_CONTAINER_STYLES, MEDIA_PLAYER_STYLES, ROUTE_STYLES, POP
 }, getEditorStyles = () => {
   return i`
     ${EDITOR_STYLES}
-    ${ROUTES_EDITOR_DND_STYLES}
+    ${DRAGGABLE_ITEM_STYLES}
   `;
 };
 var init_styles = __esm(() => {
   init_lit();
+  init_editor();
   HOST_STYLES = i`
   :host {
     --navbar-border-radius: var(--ha-card-border-radius, 12px);
@@ -1262,7 +1800,11 @@ var init_styles = __esm(() => {
     --navbar-box-shadow-desktop: var(--material-shadow-elevation-2dp);
     --navbar-box-shadow-mobile-floating: var(--material-shadow-elevation-2dp);
 
+    /* TODO rename this CSS variable */
+    --navbar-lateral-margin: 16px;
+
     --navbar-z-index: 3;
+    --navbar-media-player-z-index: 4;
     --navbar-popup-backdrop-z-index: 900;
     --navbar-popup-z-index: 901;
   }
@@ -1336,13 +1878,15 @@ var init_styles = __esm(() => {
     border-radius: var(--navbar-border-radius);
     box-shadow: var(--navbar-box-shadow-desktop);
     padding: 12px 8px;
+    justify-content: center;
+    gap: 10px;
   }
 
   .navbar.desktop.bottom {
     flex-direction: column;
     top: unset;
     right: unset;
-    bottom: 16px;
+    bottom: var(--navbar-lateral-margin);
     left: calc(50% + var(--mdc-drawer-width, 0px) / 2);
     transform: translate(-50%, 0);
   }
@@ -1355,7 +1899,7 @@ var init_styles = __esm(() => {
     flex-direction: column;
     bottom: unset;
     right: unset;
-    top: 16px;
+    top: var(--navbar-lateral-margin);
     left: calc(50% + var(--mdc-drawer-width, 0px) / 2);
     transform: translate(-50%, 0);
   }
@@ -1366,7 +1910,7 @@ var init_styles = __esm(() => {
 
   .navbar.desktop.left {
     flex-direction: row-reverse;
-    left: calc(var(--mdc-drawer-width, 0px) + 16px);
+    left: calc(var(--mdc-drawer-width, 0px) + var(--navbar-lateral-margin));
     right: unset;
     bottom: unset;
     top: 50%;
@@ -1375,12 +1919,12 @@ var init_styles = __esm(() => {
 
   .navbar-card.desktop.left {
     flex-direction: column;
-    gap: 10px;
+    align-items: center;
   }
 
   .navbar.desktop.right {
     flex-direction: row;
-    right: 16px;
+    right: var(--navbar-lateral-margin);
     left: unset;
     bottom: unset;
     top: 50%;
@@ -1389,7 +1933,66 @@ var init_styles = __esm(() => {
 
   .navbar-card.desktop.right {
     flex-direction: column;
-    gap: 10px;
+    align-items: center;
+  }
+
+  /* Desktop docked mode styles */
+  .navbar-card.desktop.docked {
+    border-radius: 0px;
+  }
+
+  .navbar.desktop.docked.bottom {
+    bottom: 0px;
+    left: var(--mdc-drawer-width, 0px);
+    right: 0px;
+    width: auto;
+    transform: none;
+  }
+
+  .navbar-card.desktop.docked.bottom {
+    width: 100%;
+    border-radius: 0px;
+  }
+
+  .navbar.desktop.docked.top {
+    top: 0px;
+    left: var(--mdc-drawer-width, 0px);
+    right: 0px;
+    width: auto;
+    transform: none;
+  }
+
+  .navbar-card.desktop.docked.top {
+    width: 100%;
+    border-radius: 0px;
+  }
+
+  .navbar.desktop.docked.left {
+    left: var(--mdc-drawer-width, 0px);
+    top: 0px;
+    bottom: 0px;
+    height: 100%;
+    width: auto;
+    transform: none;
+  }
+
+  .navbar-card.desktop.docked.left {
+    height: 100%;
+    border-radius: 0px;
+  }
+
+  .navbar.desktop.docked.right {
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    height: 100%;
+    width: auto;
+    transform: none;
+  }
+
+  .navbar-card.desktop.docked.right {
+    height: 100%;
+    border-radius: 0px;
   }
 `;
   MEDIA_PLAYER_STYLES = i`
@@ -1406,11 +2009,58 @@ var init_styles = __esm(() => {
     width: 90%;
     overflow: hidden;
     position: relative;
-    border: none;
     box-shadow: var(--navbar-box-shadow-mobile-floating);
     border-radius: var(--navbar-border-radius);
     display: flex;
     flex-direction: row;
+  }
+
+  :is(.media-player, .media-player-carousel).mobile {
+    border: none;
+    align-self: center;
+  }
+
+  .media-player.desktop {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  /* Center media player when inside navbar (wider than max-width) */
+  :is(.media-player, .media-player-carousel).desktop:not(.position-absolute) {
+    align-self: center;
+  }
+
+  :is(.media-player, .media-player-carousel).desktop.position-absolute {
+    position: fixed;
+    width: 400px;
+    z-index: var(--navbar-media-player-z-index);
+  }
+
+  :is(.media-player, .media-player-carousel).desktop.position-absolute.top-left {
+    left: var(--navbar-lateral-margin);
+    top: calc(var(--header-height) + var(--navbar-lateral-margin));
+  }
+  :is(.media-player, .media-player-carousel).desktop.position-absolute.top-center {
+    left: 50%;
+    top: calc(var(--header-height) + var(--navbar-lateral-margin));
+    transform: translateX(-50%);
+  }
+  :is(.media-player, .media-player-carousel).desktop.position-absolute.top-right {
+    right: var(--navbar-lateral-margin);
+    top: calc(var(--header-height) + var(--navbar-lateral-margin));
+  }
+  :is(.media-player, .media-player-carousel).desktop.position-absolute.bottom-left {
+    left: calc(var(--mdc-drawer-width, 0px) + var(--navbar-lateral-margin));
+    bottom: var(--navbar-lateral-margin);
+  }
+  :is(.media-player, .media-player-carousel).desktop.position-absolute.bottom-center {
+    left: 50%;
+    bottom: var(--navbar-lateral-margin);
+    transform: translateX(-50%);
+  }
+  :is(.media-player, .media-player-carousel).desktop.position-absolute.bottom-right {
+    right: var(--navbar-lateral-margin);
+    bottom: var(--navbar-lateral-margin);
   }
 
   .media-player .media-player-bg {
@@ -1476,6 +2126,61 @@ var init_styles = __esm(() => {
   .media-player .media-player-progress-bar-fill {
     background-color: var(--navbar-primary-color);
     height: 100%;
+  }
+
+  /* Media player carousel */
+
+  .media-player-carousel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    border: none;
+  }
+
+  .media-player-carousel.desktop {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .media-player-viewport {
+    width: 100%;
+    overflow: hidden;
+    touch-action: pan-y;
+    user-select: none;
+  }
+
+  .media-player-track {
+    display: flex;
+    gap: 12px;
+    will-change: transform;
+  }
+
+  .media-player-carousel .media-player {
+    flex: 0 0 100%;
+    min-width: 0;
+    width: 100%;
+    border: none;
+  }
+
+  .media-player-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding-top: 6px;
+  }
+
+  .media-player-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--disabled-color);
+    transition: background 0.2s, transform 0.2s;
+  }
+
+  .media-player-dot.active {
+    background: var(--navbar-primary-color);
+    transform: scale(1.1);
   }
 `;
   ROUTE_STYLES = i`
@@ -1693,7 +2398,7 @@ var init_styles = __esm(() => {
   .navbar-popup.visible .popup-item {
     opacity: 1;
     transform: translateY(0);
-    transition-delay: calc(var(--index) * 0.05s);
+    transition-delay: calc(var(--index) * var(--popup-item-stagger-step, 0.05s));
   }
 
   .popup-item.label-bottom {
@@ -1744,274 +2449,6 @@ var init_styles = __esm(() => {
   .popup-item.active .button {
     color: var(--navbar-primary-color);
     background: color-mix(in srgb, var(--navbar-primary-color) 30%, white);
-  }
-`;
-  EDITOR_STYLES = i`
-  .navbar-editor {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .navbar-editor ha-textfield {
-    width: 100%;
-  }
-
-  .navbar-editor ha-button {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .navbar-editor .navbar-template-toggle-button {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5em;
-    padding: 0px !important;
-    border-radius: 99px;
-    font-size: 0.85em;
-    font-weight: 600;
-    border: 0px;
-    padding: 4px 8px !important;
-    cursor: pointer;
-  }
-
-  .editor-section {
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-    padding: 12px;
-  }
-  .editor-row {
-    gap: 6px;
-    display: flex;
-    flex-direction: row;
-  }
-  .editor-row-item {
-    flex: 1;
-  }
-  .editor-row-item ha-textfield {
-    width: 100%;
-  }
-  @media (max-width: 600px) {
-    .editor-row {
-      flex-direction: column !important;
-      gap: 0.5em;
-    }
-    .route-grid {
-      grid-template-columns: 1fr !important;
-    }
-    .editor-row-item {
-      width: 100%;
-    }
-  }
-  .editor-label {
-    font-weight: 500;
-  }
-  .routes-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25em;
-  }
-  ha-expansion-panel h4[slot='header'],
-  ha-expansion-panel h5[slot='header'],
-  ha-expansion-panel h6[slot='header'] {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.7em;
-    padding: 0.2em 0.5em 0.2em 0;
-    height: 40px;
-    margin: 0px !important;
-    margin-left: 1em;
-  }
-
-  ha-expansion-panel h4[slot='header'] .expansion-panel-title,
-  ha-expansion-panel h5[slot='header'] .expansion-panel-title,
-  ha-expansion-panel h6[slot='header'] .expansion-panel-title {
-    flex: 1;
-  }
-  .route-header {
-    display: flex;
-    align-items: center;
-    gap: 0.7em;
-    padding: 0.2em 0.5em 0.2em 0;
-  }
-  .route-header-title {
-    font-weight: bold;
-    color: var(--primary-color);
-  }
-  .route-header-summary {
-    flex: 1;
-    opacity: 0.7;
-    font-size: 0.95em;
-    display: flex;
-    align-items: center;
-    gap: 0.3em;
-  }
-  .route-header-image {
-    height: 1.2em;
-    vertical-align: middle;
-  }
-  .route-editor {
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-    background: var(--primary-background-color);
-    border-radius: 8px;
-    padding: 1em 1.2em 1.2em 1.2em;
-    margin: 1em 0em;
-  }
-  .popup-controls {
-    display: flex;
-    gap: 0.5em;
-    margin-bottom: 1em;
-  }
-  .route-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1em;
-  }
-  .route-divider {
-    margin: 1.5em 0 1em 0;
-    border: none;
-    border-top: 1px solid #e0e0e0;
-    height: 1px;
-    background: none;
-  }
-  .add-popup-btn {
-    margin-top: 1em;
-  }
-  .template-editor-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3em;
-    margin-bottom: 0.7em;
-  }
-  .template-editor-helper {
-    font-size: 0.93em;
-    color: var(--secondary-text-color, #888);
-  }
-  .quickbar-mode-container {
-    display: flex;
-    flex-direction: column;
-  }
-  .templatable-field-container {
-    display: flex;
-    flex-direction: row;
-  }
-  .templatable-field-header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5em;
-  }
-  .templatable-field-header-label {
-    flex: 1;
-  }
-
-  /* Custom Tabs Styles */
-
-  .editor-tab-nav {
-    margin-bottom: 0.25em;
-    display: flex;
-    background: var(--card-background-color, #fff);
-    border-radius: 8px;
-    border: 1px solid var(--divider-color, #e0e0e0);
-  }
-
-  .editor-tab-button {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 6px 8px;
-    border: none;
-    background: transparent;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--secondary-text-color, #666);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .editor-tab-button:hover {
-    background: color-mix(
-      in srgb,
-      var(--primary-color, #03a9f4) 10%,
-      transparent
-    );
-  }
-
-  .editor-tab-button.active {
-    background: var(--primary-color, #03a9f4);
-    color: white;
-  }
-
-  .editor-tab-button ha-icon {
-    --mdc-icon-size: 18px;
-  }
-  .loader-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 60px;
-  }
-  .loader {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: inline-block;
-    border: 2px solid transparent;
-    border-top: 4px solid var(--primary-color, #03a9f4);
-    box-sizing: border-box;
-    animation: rotation 1s linear infinite;
-  }
-
-  @keyframes rotation {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-`;
-  ROUTES_EDITOR_DND_STYLES = i`
-  .draggable-route {
-    border: 1.5px dashed transparent;
-    border-radius: 8px;
-    transition:
-      border-color 0.2s,
-      background 0.2s;
-    background: none;
-    position: relative;
-  }
-  .draggable-route.drag-over {
-    border-color: var(--primary-color, #03a9f4);
-    background: rgba(3, 169, 244, 0.08);
-  }
-  .draggable-route.dragging {
-    opacity: 0.6;
-    background: #eee;
-    z-index: 2;
-  }
-  .drag-handle {
-    cursor: grab;
-    margin-right: 8px;
-    color: var(--primary-color, #03a9f4);
-    vertical-align: middle;
-    display: inline-flex;
-    align-items: center;
-  }
-  .delete-btn ha-icon {
-    color: var(--error-color, #db4437) !important;
   }
 `;
   COMPONENTS_STYLES = i`
@@ -2138,6 +2575,65 @@ var init_dist = __esm(() => {
   init_load_ha_components();
 });
 
+// src/editor/ui/renderDropdown.ts
+var renderHAComboBox = (value, onChange, options) => {
+  return x`
+      <ha-combo-box
+        helper=${options.helper}
+        helperPersistent=${options.helperPersistent}
+        label=${options.label}
+        .items=${options.items}
+        .value=${value ?? options.defaultValue ?? null}
+        .disabled=${options.disabled}
+        .hideClearIcon=${!options.allowEmptyValue}
+        @value-changed="${(e7) => {
+    onChange(e7.detail.value ?? null);
+  }}" />
+    `;
+}, renderHTMLSelect = (value, onChange, options) => {
+  const currentValue = value ?? options.defaultValue ?? null;
+  const currentValueStr = currentValue !== null && currentValue !== undefined ? String(currentValue) : "";
+  return x`
+      <div class="editor-select-field">
+        <label class="editor-label">${options.label}</label>
+        <select
+          class="editor-select"
+          .value=${currentValueStr}
+          ?disabled=${options.disabled}
+          @change=${(e7) => {
+    const value2 = e7.target.value;
+    if (value2 === "") {
+      onChange(null);
+      return;
+    }
+    const selectedItem = options.items.find((item) => String(item.value) === value2);
+    onChange(selectedItem?.value ?? null);
+  }}>
+          ${options.allowEmptyValue ? x`<option value="">
+            &ndash;
+            </option>` : x``}
+          ${options.items.map((item) => x`<option
+              value=${String(item.value)}
+              ?selected=${String(item.value) === currentValueStr}>
+              ${item.label}
+            </option>`)}
+        </select>
+        ${options.helper ? x`<div class="editor-select-helper">
+                ${options.helper}
+              </div>` : x``}
+      </div>
+    `;
+}, renderDropdown = (value, onChange, options) => {
+  if (supportsHAComponent("ha-combo-box")) {
+    return renderHAComboBox(value, onChange, options);
+  }
+  return renderHTMLSelect(value, onChange, options);
+};
+var init_renderDropdown = __esm(() => {
+  init_lit();
+  init_utils();
+});
+
 // src/navbar-card-editor.ts
 var exports_navbar_card_editor = {};
 __export(exports_navbar_card_editor, {
@@ -2145,13 +2641,15 @@ __export(exports_navbar_card_editor, {
 });
 var HAActions, GENERIC_JS_TEMPLATE_HELPER, BOOLEAN_JS_TEMPLATE_HELPER, STRING_JS_TEMPLATE_HELPER, NavbarCardEditor;
 var init_navbar_card_editor = __esm(() => {
+  init_dist();
   init_lit();
   init_decorators();
-  init_dist();
+  init_renderDropdown();
+  init_action_handler();
   init_types();
   init_utils();
+  init_docs_links();
   init_styles();
-  init_action_handler();
   ((HAActions2) => {
     HAActions2["tap_action"] = "tap_action";
     HAActions2["hold_action"] = "hold_action";
@@ -2160,7 +2658,7 @@ var init_navbar_card_editor = __esm(() => {
   GENERIC_JS_TEMPLATE_HELPER = x`Insert valid Javascript code without [[[
   ]]].
   <a
-    href="https://github.com/joseluis9595/lovelace-navbar-card?tab=readme-ov-file#jstemplate"
+    href="${DOCS_LINKS.jsTemplate}"
     target="_blank"
     rel="noopener"
     >See documentation</a
@@ -2174,12 +2672,16 @@ var init_navbar_card_editor = __esm(() => {
     constructor() {
       super(...arguments);
       this._config = { routes: [] };
+      this._loadingComponents = false;
+      this._templateModeByField = {};
       this._lazyLoadedSections = {
         ["routes" /* routes */]: false
       };
     }
     firstUpdated(_changedProperties) {
       super.firstUpdated(_changedProperties);
+      this._templateModeByField = {};
+      this._loadingComponents = true;
       loadHaComponents([
         "ha-form",
         "ha-tooltip",
@@ -2195,8 +2697,11 @@ var init_navbar_card_editor = __esm(() => {
         "ha-formfield",
         "ha-icon-picker",
         "ha-entity-picker",
-        "ha-textarea"
-      ]);
+        "ha-textarea",
+        "ha-selector"
+      ]).finally(() => {
+        this._loadingComponents = false;
+      });
     }
     markSectionAsLazyLoaded(section) {
       if (this._lazyLoadedSections[section])
@@ -2206,20 +2711,102 @@ var init_navbar_card_editor = __esm(() => {
         this.requestUpdate();
       }, 200);
     }
+    _dispatchConfigChangedEvent() {
+      this.dispatchEvent(new CustomEvent("config-changed", {
+        detail: {
+          config: this._config
+        }
+      }));
+    }
     setConfig(config2) {
       this._config = config2;
     }
     updateConfig(newConfig) {
       this._config = deepMergeKeepArrays(this._config, newConfig);
-      this.dispatchEvent(new CustomEvent("config-changed", {
-        detail: { config: this._config }
-      }));
+      this._dispatchConfigChangedEvent();
     }
     updateConfigByKey(key, value) {
-      this._config = genericSetProperty(this._config, key, value);
-      this.dispatchEvent(new CustomEvent("config-changed", {
-        detail: { config: this._config }
-      }));
+      this._config = genericSetProperty(this._config, key, value, {
+        allowDeletion: true
+      });
+      this._dispatchConfigChangedEvent();
+    }
+    addMediaPlayer = () => {
+      const players = this._config.media_player?.players ?? [];
+      const newPlayer = { entity: "" };
+      this.updateConfig({
+        media_player: {
+          ...this._config.media_player,
+          players: [...players, newPlayer]
+        }
+      });
+    };
+    removeMediaPlayer = (playerIndex) => {
+      const players = [...this._config.media_player?.players ?? []];
+      players.splice(playerIndex, 1);
+      this.updateConfig({
+        media_player: {
+          ...this._config.media_player,
+          players: players.length === 0 ? undefined : players
+        }
+      });
+    };
+    addRouteOrPopup = (routeIndex) => {
+      let routes = [...this._config.routes ?? []];
+      const newItemData = {
+        icon: "mdi:alert-circle-outline",
+        label: "",
+        url: ""
+      };
+      if (routeIndex == null) {
+        routes = [...routes, newItemData];
+      } else {
+        const popup2 = [...routes[routeIndex].popup || [], newItemData];
+        routes[routeIndex] = { ...routes[routeIndex], popup: popup2 };
+      }
+      this.updateConfig({ routes });
+    };
+    removeRouteOrPopup = (routeIndex, popupIndex) => {
+      if (!this._config.routes || this._config.routes.length == 0)
+        return;
+      const routes = [...this._config.routes];
+      if (popupIndex == null) {
+        routes.splice(routeIndex, 1);
+      } else {
+        const popup2 = [...routes[routeIndex].popup || []];
+        popup2.splice(popupIndex, 1);
+        routes[routeIndex] = {
+          ...routes[routeIndex],
+          popup: popup2.length === 0 ? undefined : popup2
+        };
+      }
+      this.updateConfig({ routes: routes.length === 0 ? undefined : routes });
+    };
+    _hasTemplateOverrides() {
+      const { template: _template, routes, ...rest } = this._config;
+      const hasExtraFields = Object.keys(rest).some((k2) => k2 !== "type" && rest[k2] != null);
+      const hasRoutes = Array.isArray(routes) && routes.length > 0;
+      return hasExtraFields || hasRoutes;
+    }
+    _resetToTemplateOnly = () => {
+      const type = this._config.type;
+      this._config = {
+        ...type != null ? { type } : {},
+        template: this._config.template
+      };
+      this._dispatchConfigChangedEvent();
+    };
+    _isTemplateMode(configKey) {
+      const modeByField = this._templateModeByField[String(configKey)];
+      if (modeByField !== undefined)
+        return modeByField;
+      return isTemplate(genericGetProperty(this._config, configKey));
+    }
+    _setTemplateMode(configKey, isTemplate2) {
+      this._templateModeByField = {
+        ...this._templateModeByField,
+        [String(configKey)]: isTemplate2
+      };
     }
     makeHelpTooltipIcon(options) {
       return x`<ha-tooltip .placement="right" .content=${options.tooltip}>
@@ -2227,18 +2814,19 @@ var init_navbar_card_editor = __esm(() => {
     </ha-tooltip>`;
     }
     makeComboBox(options) {
+      return renderDropdown(genericGetProperty(this._config, options.configKey) ?? options.defaultValue ?? null, (value) => {
+        this.updateConfigByKey(options.configKey, value);
+      }, options);
+    }
+    makeNavigationPicker(options) {
       return x`
-      <ha-combo-box
-        helper=${options.helper}
-        helperPersistent=${options.helperPersistent}
-        label=${options.label}
-        .items=${options.items}
-        .value=${genericGetProperty(this._config, options.configKey) ?? options.defaultValue}
-        .disabled=${options.disabled}
-        .hideClearIcon=${options.hideClearIcon}
-        @value-changed="${(e7) => {
-        this.updateConfigByKey(options.configKey, e7.detail.value);
-      }}" />
+    <ha-selector
+      .label=${options.label}
+      .selector=${{ navigation: {} }}
+      .value=${genericGetProperty(this._config, options.configKey) ?? ""}
+      .hass=${this.hass}
+      @value-changed=${(e7) => this.updateConfigByKey(options.configKey, e7.detail.value)}
+    ></ha-selector>
     `;
     }
     makeTextInput(options) {
@@ -2256,7 +2844,7 @@ var init_navbar_card_editor = __esm(() => {
           .disabled=${options.disabled}
           .autocomplete=${options.autocomplete}
           @input="${(e7) => {
-        this.updateConfigByKey(options.configKey, e7.target.value?.trim() == "" ? null : options.type == "number" ? parseInt(e7.target.value) : e7.target.value);
+        this.updateConfigByKey(options.configKey, e7.target.value?.trim() == "" ? null : options.type == "number" ? parseInt(e7.target.value, 10) : e7.target.value);
       }}"></ha-textfield>
       </div>
     `;
@@ -2295,15 +2883,17 @@ var init_navbar_card_editor = __esm(() => {
     makeTemplatable(options) {
       const { label, inputType, ...rest } = options;
       const value = genericGetProperty(this._config, options.configKey);
-      const isTemplate2 = typeof value === "string" && value.trim().startsWith("[[[") && value.trim().endsWith("]]]");
+      const isTemplate2 = this._isTemplateMode(options.configKey);
       const toggleMode = () => {
-        let newValue = value ? value.toString() : "";
         if (isTemplate2) {
-          newValue = cleanTemplate(newValue);
+          this._setTemplateMode(options.configKey, false);
+          const uiValue = typeof value === "string" ? (cleanTemplate(value) ?? "").trim() : "";
+          this.updateConfigByKey(options.configKey, uiValue === "" ? null : uiValue);
         } else {
-          newValue = wrapTemplate(newValue);
+          this._setTemplateMode(options.configKey, true);
+          const templateSource = typeof value === "string" ? (cleanTemplate(value) ?? "").trim() : "";
+          this.updateConfigByKey(options.configKey, templateSource === "" ? null : wrapTemplate(templateSource));
         }
-        this.updateConfigByKey(options.configKey, newValue);
       };
       const buttonLabel = isTemplate2 ? "Switch to UI input" : "Switch to template";
       const buttonIcon = isTemplate2 ? "mdi:format-text" : "mdi:code-braces";
@@ -2324,11 +2914,11 @@ var init_navbar_card_editor = __esm(() => {
           </ha-button>
         </div>
         ${isTemplate2 ? this.makeTemplateEditor({
-        label: "",
+        allowNull: true,
         configKey: options.configKey,
-        tooltip: options.tooltip,
         helper: options.templateHelper,
-        allowNull: false
+        label: "",
+        tooltip: options.tooltip
       }) : options.inputType === "string" ? this.makeTextInput({
         label: "",
         ...rest
@@ -2365,7 +2955,8 @@ var init_navbar_card_editor = __esm(() => {
           .hass=${this.hass}
           .value=${cleanTemplate(genericGetProperty(this._config, options.configKey) ?? "")}
           @value-changed=${(e7) => {
-        const templateValue = e7.target.value?.trim() == "" ? options.allowNull ? null : "[[[]]]" : wrapTemplate(e7.target.value);
+        this._setTemplateMode(options.configKey, true);
+        const templateValue = e7.target.value?.trim() == "" ? null : wrapTemplate(e7.target.value);
         this.updateConfigByKey(options.configKey, templateValue);
       }}></ha-code-editor>
         ${options.helper ? x`<div class="template-editor-helper">${options.helper}</div>` : x``}
@@ -2393,145 +2984,142 @@ var init_navbar_card_editor = __esm(() => {
       <span>${options.text}</span>
     </ha-button>`;
     }
-    makeDraggableRouteEditor(item, routeIndex, popupIndex) {
-      const isPopup = popupIndex != null;
-      const usesTemplate = !isPopup && isTemplate(item.popup);
-      const baseConfigKey = isPopup ? `routes.${routeIndex}.popup.${popupIndex}` : `routes.${routeIndex}`;
-      const onDragStart = (e7, routeIndex2, popupIndex2) => {
-        const dragData = {
-          routeIndex: routeIndex2,
-          popupIndex: popupIndex2
-        };
-        e7.dataTransfer?.setData("application/json", JSON.stringify(dragData));
-        e7.dataTransfer.effectAllowed = "move";
-        e7.currentTarget.classList.add("dragging");
-      };
-      const onDragEnd = (e7) => {
-        e7.currentTarget.classList.remove("dragging");
-      };
-      const onDragOver = (e7) => {
-        e7.preventDefault();
-        e7.dataTransfer.dropEffect = "move";
-        e7.currentTarget.classList.add("drag-over");
-      };
-      const onDragLeave = (e7) => {
-        e7.currentTarget.classList.remove("drag-over");
-      };
-      const onDrop = (e7, routeIndex2, popupIndex2) => {
-        e7.preventDefault();
-        e7.currentTarget.classList.remove("drag-over");
-        const dragData = JSON.parse(e7.dataTransfer?.getData("application/json") || "{}");
-        if (dragData.popupIndex != null !== (popupIndex2 != null))
-          return;
-        if (popupIndex2 == null) {
-          if (dragData.routeIndex === routeIndex2)
-            return;
-          const routes = [...this._config.routes];
-          const [moved] = routes.splice(dragData.routeIndex, 1);
-          routes.splice(routeIndex2, 0, moved);
-          this.updateConfig({ routes });
-        } else if (typeof popupIndex2 === "number" && typeof dragData.popupIndex === "number" && dragData.routeIndex === routeIndex2) {
-          if (dragData.popupIndex === popupIndex2)
-            return;
-          const routes = [...this._config.routes];
-          const popups = [...routes[routeIndex2].popup || []];
-          const [moved] = popups.splice(dragData.popupIndex, 1);
-          popups.splice(popupIndex2, 0, moved);
-          routes[routeIndex2] = { ...routes[routeIndex2], popup: popups };
-          this.updateConfig({ routes });
+    _createListDragHandlers(dragData) {
+      return {
+        onDragEnd: (e7) => {
+          e7.currentTarget.classList.remove("dragging");
+        },
+        onDragLeave: (e7) => {
+          e7.currentTarget.classList.remove("drag-over");
+        },
+        onDragOver: (e7) => {
+          e7.preventDefault();
+          e7.dataTransfer.dropEffect = "move";
+          e7.currentTarget.classList.add("drag-over");
+        },
+        onDragStart: (e7) => {
+          e7.dataTransfer?.setData("application/json", JSON.stringify(dragData));
+          e7.dataTransfer.effectAllowed = "move";
+          e7.currentTarget.classList.add("dragging");
         }
       };
+    }
+    _renderDraggableItem(options) {
+      const handlers = this._createListDragHandlers(options.dragData);
       return x`
       <div
-        class="draggable-route"
-        @dragover=${onDragOver}
-        @dragleave=${onDragLeave}
-        @drop=${(e7) => onDrop(e7, routeIndex, popupIndex)}>
+        class="draggable-item"
+        @dragover=${handlers.onDragOver}
+        @dragleave=${handlers.onDragLeave}
+        @drop=${options.onDrop}>
         <ha-expansion-panel outlined>
           <div
             slot="header"
-            class="route-header"
+            class="draggable-item-header"
             draggable="true"
-            @dragstart=${(e7) => onDragStart(e7, routeIndex, popupIndex)}
-            @dragend=${onDragEnd}>
+            @dragstart=${handlers.onDragStart}
+            @dragend=${handlers.onDragEnd}>
             <span class="drag-handle" title="Drag to reorder">
               <ha-icon icon="mdi:drag"></ha-icon>
             </span>
-
-            <div class="route-header-title">
-              ${isPopup ? "Popup item" : "Route"}
-            </div>
-
-            <span class="route-header-summary">
-              ${item.image != null ? x`<img src="${item.image}" class="route-header-image" />` : x`<ha-icon icon="${item.icon}"></ha-icon>`}
-              ${item.label ? processTemplate(this.hass, undefined, item.label) : ""}
-            </span>
-
+            <div class="draggable-item-header-title">${options.headerTitle}</div>
+            <span class="draggable-item-header-summary">${options.headerSummary}</span>
             <ha-icon-button
               @click=${(e7) => {
         e7.preventDefault();
         e7.stopPropagation();
-        this.removeRouteOrPopup(routeIndex, popupIndex);
+        options.onDelete();
       }}
               class="delete-btn"
-              label=${isPopup ? "Delete popup" : "Delete route"}>
-              <ha-icon icon="mdi:delete"></ha-icon
-            ></ha-icon-button>
+              label=${options.deleteLabel}>
+              <ha-icon icon="mdi:delete"></ha-icon>
+            </ha-icon-button>
           </div>
-
-          <div class="route-editor route-editor-bg">
+          <div class="draggable-item-editor">${options.body}</div>
+        </ha-expansion-panel>
+      </div>
+    `;
+    }
+    makeDraggableRouteEditor(item, routeIndex, popupIndex) {
+      const isPopup = popupIndex != null;
+      const usesTemplate = !isPopup && isTemplate(item.popup);
+      const baseConfigKey = isPopup ? `routes.${routeIndex}.popup.${popupIndex}` : `routes.${routeIndex}`;
+      const onDrop = (e7) => {
+        e7.preventDefault();
+        e7.currentTarget.classList.remove("drag-over");
+        const dragData = JSON.parse(e7.dataTransfer?.getData("application/json") || "{}");
+        if (dragData.popupIndex != null !== (popupIndex != null))
+          return;
+        if (popupIndex == null) {
+          if (dragData.routeIndex === routeIndex)
+            return;
+          const routes = [...this._config.routes];
+          const [moved] = routes.splice(dragData.routeIndex, 1);
+          routes.splice(routeIndex, 0, moved);
+          this.updateConfig({ routes });
+        } else if (typeof popupIndex === "number" && typeof dragData.popupIndex === "number" && dragData.routeIndex === routeIndex) {
+          if (dragData.popupIndex === popupIndex)
+            return;
+          const routes = [...this._config.routes];
+          const popups = [...routes[routeIndex].popup || []];
+          const [moved] = popups.splice(dragData.popupIndex, 1);
+          popups.splice(popupIndex, 0, moved);
+          routes[routeIndex] = { ...routes[routeIndex], popup: popups };
+          this.updateConfig({ routes });
+        }
+      };
+      return this._renderDraggableItem({
+        body: x`
             <div class="editor-row">
               <div class="editor-row-item">
-                ${this.makeTextInput({
-        label: "URL",
-        configKey: `${baseConfigKey}.url`,
-        type: "text",
-        placeholder: "/path/to/your/dashboard"
-      })}
+                ${this.makeNavigationPicker({
+          configKey: `${baseConfigKey}.url`,
+          label: "URL"
+        })}
               </div>
             </div>
 
             ${this.makeTemplatable({
-        inputType: "string",
-        label: "Label",
-        configKey: `${baseConfigKey}.label`,
-        templateHelper: STRING_JS_TEMPLATE_HELPER
-      })}
+          configKey: `${baseConfigKey}.label`,
+          inputType: "string",
+          label: "Label",
+          templateHelper: STRING_JS_TEMPLATE_HELPER
+        })}
             ${this.makeTemplatable({
-        inputType: "string",
-        label: "Selected color",
-        configKey: `${baseConfigKey}.selected_color`,
-        templateHelper: STRING_JS_TEMPLATE_HELPER
-      })}
+          configKey: `${baseConfigKey}.selected_color`,
+          inputType: "string",
+          label: "Selected color",
+          templateHelper: STRING_JS_TEMPLATE_HELPER
+        })}
             ${this.makeTemplatable({
-        inputType: "icon",
-        label: "Icon",
-        configKey: `${baseConfigKey}.icon`
-      })}
+          configKey: `${baseConfigKey}.icon`,
+          inputType: "icon",
+          label: "Icon"
+        })}
             ${this.makeTemplatable({
-        inputType: "icon",
-        label: "Icon selected",
-        configKey: `${baseConfigKey}.icon_selected`
-      })}
+          configKey: `${baseConfigKey}.icon_selected`,
+          inputType: "icon",
+          label: "Icon selected"
+        })}
             ${this.makeTemplatable({
-        inputType: "color",
-        label: "Icon color",
-        configKey: `${baseConfigKey}.icon_color`
-      })}
+          configKey: `${baseConfigKey}.icon_color`,
+          inputType: "color",
+          label: "Icon color"
+        })}
             ${this.makeTemplatable({
-        inputType: "string",
-        label: "Image",
-        configKey: `${baseConfigKey}.image`,
-        placeholder: "URL of the image"
-      })}
+          configKey: `${baseConfigKey}.image`,
+          inputType: "string",
+          label: "Image",
+          placeholder: "URL of the image"
+        })}
             ${this.makeTemplatable({
-        inputType: "string",
-        label: "Image selected",
-        configKey: `${baseConfigKey}.image_selected`,
-        placeholder: "URL of the image"
-      })}
+          configKey: `${baseConfigKey}.image_selected`,
+          inputType: "string",
+          label: "Image selected",
+          placeholder: "URL of the image"
+        })}
 
-            <div class="route-divider"></div>
+            <div class="editor-divider"></div>
 
             <ha-expansion-panel outlined>
               <h5 slot="header">
@@ -2540,30 +3128,30 @@ var init_navbar_card_editor = __esm(() => {
               </h5>
               <div class="editor-section">
                 ${this.makeTemplatable({
-        inputType: "string",
-        label: "Color",
-        configKey: `${baseConfigKey}.badge.color`,
-        textHelper: "Color of the badge in any CSS valid format (red, #ff0000, rgba(255,0,0,1)...)",
-        templateHelper: STRING_JS_TEMPLATE_HELPER
-      })}
+          configKey: `${baseConfigKey}.badge.color`,
+          inputType: "string",
+          label: "Color",
+          templateHelper: STRING_JS_TEMPLATE_HELPER,
+          textHelper: "Color of the badge in any CSS valid format (red, #ff0000, rgba(255,0,0,1)...)"
+        })}
                 ${this.makeTemplatable({
-        inputType: "switch",
-        label: "Show",
-        configKey: `${baseConfigKey}.badge.show`,
-        templateHelper: BOOLEAN_JS_TEMPLATE_HELPER
-      })}
+          configKey: `${baseConfigKey}.badge.show`,
+          inputType: "switch",
+          label: "Show",
+          templateHelper: BOOLEAN_JS_TEMPLATE_HELPER
+        })}
                 ${this.makeTemplatable({
-        inputType: "string",
-        label: "Count",
-        configKey: `${baseConfigKey}.badge.count`,
-        templateHelper: STRING_JS_TEMPLATE_HELPER
-      })}
+          configKey: `${baseConfigKey}.badge.count`,
+          inputType: "string",
+          label: "Count",
+          templateHelper: STRING_JS_TEMPLATE_HELPER
+        })}
                 ${this.makeTemplatable({
-        inputType: "string",
-        label: "Text color",
-        configKey: `${baseConfigKey}.badge.text_color`,
-        templateHelper: STRING_JS_TEMPLATE_HELPER
-      })}
+          configKey: `${baseConfigKey}.badge.text_color`,
+          inputType: "string",
+          label: "Text color",
+          templateHelper: STRING_JS_TEMPLATE_HELPER
+        })}
               </div>
             </ha-expansion-panel>
 
@@ -2578,45 +3166,45 @@ var init_navbar_card_editor = __esm(() => {
                         <button
                           class="editor-tab-button ${!usesTemplate ? "active" : ""}"
                           @click=${() => {
-        if (!usesTemplate)
-          return;
-        let parsedPopup = [];
-        try {
-          parsedPopup = JSON.parse(cleanTemplate(item.popup?.toString()) ?? "[]");
-        } catch (_e) {
-          parsedPopup = [];
-        }
-        this.updateConfigByKey(`${baseConfigKey}.popup`, parsedPopup);
-      }}>
+          if (!usesTemplate)
+            return;
+          let parsedPopup = [];
+          try {
+            parsedPopup = JSON.parse(cleanTemplate(item.popup?.toString()) ?? "[]");
+          } catch (_e) {
+            parsedPopup = [];
+          }
+          this.updateConfigByKey(`${baseConfigKey}.popup`, parsedPopup);
+        }}>
                           <ha-icon icon="mdi:palette"></ha-icon>
                           UI editor
                         </button>
                         <button
                           class="editor-tab-button ${usesTemplate ? "active" : ""}"
                           @click=${() => {
-        if (usesTemplate)
-          return;
-        this.updateConfigByKey(`${baseConfigKey}.popup`, wrapTemplate(JSON.stringify(item.popup ?? [], null, 2)));
-      }}>
+          if (usesTemplate)
+            return;
+          this.updateConfigByKey(`${baseConfigKey}.popup`, wrapTemplate(JSON.stringify(item.popup ?? [], null, 2)));
+        }}>
                           <ha-icon icon="mdi:code-tags"></ha-icon>
                           Use template
                         </button>
                       </div>
 
                       ${usesTemplate ? this.makeTemplateEditor({
-        label: "Popup",
-        configKey: `${baseConfigKey}.popup`,
-        helper: GENERIC_JS_TEMPLATE_HELPER
-      }) : x`<div class="routes-container">
+          configKey: `${baseConfigKey}.popup`,
+          helper: GENERIC_JS_TEMPLATE_HELPER,
+          label: "Popup"
+        }) : x`<div class="routes-container">
                               ${(item.popup ?? []).map((popupItem, index) => {
-        return this.makeDraggableRouteEditor(popupItem, routeIndex, index);
-      })}
+          return this.makeDraggableRouteEditor(popupItem, routeIndex, index);
+        })}
                             </div>
                             ${this.makeButton({
-        text: "Add Popup item",
-        icon: "mdi:plus",
-        onClick: () => this.addRouteOrPopup(routeIndex)
-      })}`}
+          icon: "mdi:plus",
+          onClick: () => this.addRouteOrPopup(routeIndex),
+          text: "Add Popup item"
+        })}`}
                     </div>
                   </ha-expansion-panel>
                 ` : x``}
@@ -2627,32 +3215,34 @@ var init_navbar_card_editor = __esm(() => {
                 Advanced features
               </h5>
               <div class="editor-section">
-                ${this.makeTemplateEditor({
-        label: "Hidden",
-        configKey: `${baseConfigKey}.hidden`,
-        helper: BOOLEAN_JS_TEMPLATE_HELPER
-      })}
-                ${!isPopup ? this.makeTemplateEditor({
-        label: "Selected",
-        configKey: `${baseConfigKey}.selected`,
-        helper: BOOLEAN_JS_TEMPLATE_HELPER
-      }) : x``}
+                ${this.makeTemplatable({
+          configKey: `${baseConfigKey}.hidden`,
+          inputType: "switch",
+          label: "Hidden",
+          templateHelper: BOOLEAN_JS_TEMPLATE_HELPER
+        })}
+                ${!isPopup ? this.makeTemplatable({
+          configKey: `${baseConfigKey}.selected`,
+          inputType: "switch",
+          label: "Selected",
+          templateHelper: BOOLEAN_JS_TEMPLATE_HELPER
+        }) : x``}
               </div>
             </ha-expansion-panel>
 
             ${Object.values(HAActions).map((type) => {
-        const key = `${baseConfigKey}.${type}`;
-        const actionValue = genericGetProperty(this._config, key);
-        const label = this._chooseLabelForAction(type);
-        return x`
+          const key = `${baseConfigKey}.${type}`;
+          const actionValue = genericGetProperty(this._config, key);
+          const label = this._chooseLabelForAction(type);
+          return x`
                 ${actionValue != null ? this.makeActionSelector({
-          actionType: type,
-          configKey: key
-        }) : x`
+            actionType: type,
+            configKey: key
+          }) : x`
                       <ha-button
-                        @click=${() => this.updateConfigByKey(key, {
-          action: "none"
-        })}
+                      @click=${() => this.updateConfigByKey(key, {
+            action: "none"
+          })}
                         style="margin-bottom: 1em;"
                         outlined
                         hasTrailingIcon>
@@ -2661,11 +3251,46 @@ var init_navbar_card_editor = __esm(() => {
                       </ha-button>
                     `}
               `;
-      })}
-          </div>
-        </ha-expansion-panel>
-      </div>
-    `;
+        })}
+      `,
+        deleteLabel: isPopup ? "Delete popup" : "Delete route",
+        dragData: { popupIndex, routeIndex },
+        headerSummary: x`
+        ${item.image != null ? x`<img src="${item.image}" class="draggable-item-header-image" />` : x`<ha-icon icon="${item.icon}"></ha-icon>`}
+        ${item.label ? processTemplate(this.hass, undefined, item.label) : ""}
+      `,
+        headerTitle: isPopup ? "Popup item" : "Route",
+        onDelete: () => this.removeRouteOrPopup(routeIndex, popupIndex),
+        onDrop
+      });
+    }
+    _chooseIconForAction(actionType) {
+      switch (actionType) {
+        case "hold_action" /* hold_action */:
+          return "mdi:gesture-tap-hold";
+        case "double_tap_action" /* double_tap_action */:
+          return "mdi:gesture-double-tap";
+        case "tap_action" /* tap_action */:
+        default:
+          return "mdi:gesture-tap";
+      }
+    }
+    _chooseLabelForAction(actionType) {
+      switch (actionType) {
+        case "tap_action" /* tap_action */:
+          return "Tap action";
+        case "hold_action" /* hold_action */:
+          return "Hold action";
+        case "double_tap_action" /* double_tap_action */:
+          return "Double tap action";
+        default:
+          return "";
+      }
+    }
+    isCustomAction(value) {
+      if (value === "none")
+        return false;
+      return Object.values(NavbarCustomActions).includes(value);
     }
     renderTemplateEditor() {
       const availableTemplates = getNavbarTemplates();
@@ -2677,20 +3302,21 @@ var init_navbar_card_editor = __esm(() => {
         </h4>
         <div class="editor-section">
           ${this.makeComboBox({
-        label: "Template",
+        allowEmptyValue: true,
         configKey: "template",
-        items: Object.entries(availableTemplates ?? {}).map(([key]) => ({
-          label: key,
-          value: key
-        })),
         helper: x`Reusable template name used for this card.
               <a
-                href="https://github.com/joseluis9595/lovelace-navbar-card?tab=readme-ov-file#template"
+                href="${DOCS_LINKS.template}"
                 target="_blank"
                 rel="noopener"
                 >Check the documentation</a
               >
-              for more info.`
+              for more info.`,
+        items: Object.entries(availableTemplates ?? {}).map(([key]) => ({
+          label: key,
+          value: key
+        })),
+        label: "Template"
       })}
         </div></ha-expansion-panel
       >
@@ -2710,7 +3336,7 @@ var init_navbar_card_editor = __esm(() => {
             Enter your CSS code here (no <code>"styles: |"</code> prefix
             needed).<br />
             <a
-              href="https://github.com/joseluis9595/lovelace-navbar-card?tab=readme-ov-file#styles"
+              href="${DOCS_LINKS.styles}"
               target="_blank"
               rel="noopener"
               >See documentation</a
@@ -2743,35 +3369,35 @@ var init_navbar_card_editor = __esm(() => {
         <div class="editor-section">
           <label class="editor-label">Reflect child state</label>
           ${this.makeSwitch({
-        label: "Display routes as selected if any of its popup items is selected",
         configKey: "layout.reflect_child_state",
-        defaultValue: DEFAULT_NAVBAR_CONFIG.layout?.reflect_child_state
+        defaultValue: DEFAULT_NAVBAR_CONFIG.layout?.reflect_child_state,
+        label: "Display routes as selected if any of its popup items is selected"
       })}
         </div>
         <div class="editor-section">
           <label class="editor-label">Auto padding</label>
           ${this.makeSwitch({
-        label: "Enable auto padding",
         configKey: "layout.auto_padding.enabled",
-        defaultValue: DEFAULT_NAVBAR_CONFIG.layout?.auto_padding?.enabled
+        defaultValue: DEFAULT_NAVBAR_CONFIG.layout?.auto_padding?.enabled,
+        label: "Enable auto padding"
       })}
           ${this.makeTextInput({
-        disabled: !autoPaddingEnabled,
-        label: "Desktop padding",
         configKey: "layout.auto_padding.desktop_px",
-        type: "number",
-        suffix: "px",
+        disabled: !autoPaddingEnabled,
+        helper: "Padding for desktop mode. 0 to disable.",
+        label: "Desktop padding",
         placeholder: DEFAULT_NAVBAR_CONFIG.layout?.auto_padding?.desktop_px?.toString(),
-        helper: "Padding for desktop mode. 0 to disable."
+        suffix: "px",
+        type: "number"
       })}
           ${this.makeTextInput({
-        disabled: !autoPaddingEnabled,
-        label: "Mobile padding",
         configKey: "layout.auto_padding.mobile_px",
-        type: "number",
-        suffix: "px",
+        disabled: !autoPaddingEnabled,
+        helper: "Padding for mobile mode. 0 to disable.",
+        label: "Mobile padding",
         placeholder: DEFAULT_NAVBAR_CONFIG.layout?.auto_padding?.mobile_px?.toString(),
-        helper: "Padding for mobile mode. 0 to disable."
+        suffix: "px",
+        type: "number"
       })}
         </div>
       </ha-expansion-panel>
@@ -2788,30 +3414,31 @@ var init_navbar_card_editor = __esm(() => {
         </h4>
         <div class="editor-section">
           ${this.makeSwitch({
-        label: "When pressing routes with URL configured",
         configKey: "haptic.url",
-        defaultValue: hapticValue
+        defaultValue: hapticValue,
+        label: "When pressing routes with URL configured"
       })}
           ${this.makeSwitch({
-        label: "When executing the 'tap_action' configured for a route",
         configKey: "haptic.tap_action",
-        defaultValue: hapticValue
+        defaultValue: hapticValue,
+        label: "When executing the 'tap_action' configured for a route"
       })}
           ${this.makeSwitch({
-        label: "When executing the 'hold_action' configured for a route",
         configKey: "haptic.hold_action",
-        defaultValue: hapticValue
+        defaultValue: hapticValue,
+        label: "When executing the 'hold_action' configured for a route"
       })}
           ${this.makeSwitch({
-        label: "When executing the 'double_tap_action' configured for a route",
         configKey: "haptic.double_tap_action",
-        defaultValue: hapticValue
+        defaultValue: hapticValue,
+        label: "When executing the 'double_tap_action' configured for a route"
       })}
         </div>
       </ha-expansion-panel>
     `;
     }
     renderMediaPlayerEditor() {
+      const players = this._config.media_player?.players ?? [];
       return x`
       <ha-expansion-panel outlined>
         <h4 slot="header">
@@ -2819,36 +3446,108 @@ var init_navbar_card_editor = __esm(() => {
           Media player
         </h4>
         <div class="editor-section">
-          ${this.makeTemplatable({
-        inputType: "entity",
-        label: "Media player entity",
-        configKey: "media_player.entity",
-        includeDomains: ["media_player"]
-      })}
           ${this.makeSwitch({
-        label: "Show album cover background",
         configKey: "media_player.album_cover_background",
-        defaultValue: DEFAULT_NAVBAR_CONFIG.media_player?.album_cover_background
+        defaultValue: DEFAULT_NAVBAR_CONFIG.media_player?.album_cover_background,
+        label: "Show album cover background"
       })}
-          ${this.makeTemplateEditor({
-        label: "Show media player",
+          ${this.makeComboBox({
+        configKey: "media_player.desktop_position",
+        defaultValue: DEFAULT_NAVBAR_CONFIG.media_player?.desktop_position,
+        items: [
+          { label: "Top left", value: "top-left" /* topLeft */ },
+          { label: "Top center", value: "top-center" /* topCenter */ },
+          { label: "Top right", value: "top-right" /* topRight */ },
+          { label: "Bottom left", value: "bottom-left" /* bottomLeft */ },
+          { label: "Bottom center", value: "bottom-center" /* bottomCenter */ },
+          { label: "Bottom right", value: "bottom-right" /* bottomRight */ }
+        ],
+        label: "Desktop position"
+      })}
+          ${this.makeTemplatable({
         configKey: "media_player.show",
-        helper: BOOLEAN_JS_TEMPLATE_HELPER
+        inputType: "switch",
+        label: "Show media player widget",
+        templateHelper: BOOLEAN_JS_TEMPLATE_HELPER
       })}
+        </div>
+        <div class="editor-section">
+          <label class="editor-label">Players</label>
+          <div class="routes-container">
+            ${players.map((player, i7) => this.makeDraggablePlayerEditor(player, i7))}
+          </div>
+          ${this.makeButton({
+        icon: "mdi:plus",
+        onClick: () => this.addMediaPlayer(),
+        text: "Add player"
+      })}
+        </div>
+      </ha-expansion-panel>
+    `;
+    }
+    makeDraggablePlayerEditor(player, playerIndex) {
+      const baseConfigKey = `media_player.players.${playerIndex}`;
+      const onDrop = (e7) => {
+        e7.preventDefault();
+        e7.currentTarget.classList.remove("drag-over");
+        const dragData = JSON.parse(e7.dataTransfer?.getData("application/json") || "{}");
+        const fromIndex = dragData.playerIndex;
+        if (typeof fromIndex !== "number" || fromIndex === playerIndex)
+          return;
+        const players = [...this._config.media_player?.players ?? []];
+        const [moved] = players.splice(fromIndex, 1);
+        players.splice(playerIndex, 0, moved);
+        this.updateConfig({
+          media_player: {
+            ...this._config.media_player,
+            players
+          }
+        });
+      };
+      return this._renderDraggableItem({
+        body: x`
+          ${this.makeTemplatable({
+          configKey: `${baseConfigKey}.entity`,
+          includeDomains: ["media_player"],
+          inputType: "entity",
+          label: "Media player entity"
+        })}
+          ${this.makeTemplateEditor({
+          configKey: `${baseConfigKey}.show`,
+          helper: BOOLEAN_JS_TEMPLATE_HELPER,
+          label: "Show"
+        })}
+          ${this.makeTemplatable({
+          configKey: `${baseConfigKey}.icon`,
+          inputType: "icon",
+          label: "Icon",
+          templateHelper: STRING_JS_TEMPLATE_HELPER
+        })}
+          ${this.makeTemplatable({
+          configKey: `${baseConfigKey}.title`,
+          inputType: "string",
+          label: "Title",
+          templateHelper: STRING_JS_TEMPLATE_HELPER
+        })}
+          ${this.makeTemplatable({
+          configKey: `${baseConfigKey}.subtitle`,
+          inputType: "string",
+          label: "Subtitle",
+          templateHelper: STRING_JS_TEMPLATE_HELPER
+        })}
           ${Object.values(HAActions).map((type) => {
-        const key = `media_player.${type}`;
-        const actionValue = genericGetProperty(this._config, key);
-        const label = this._chooseLabelForAction(type);
-        return x`
+          const key = `${baseConfigKey}.${type}`;
+          const actionValue = genericGetProperty(this._config, key);
+          const label = this._chooseLabelForAction(type);
+          return x`
               ${actionValue != null ? this.makeActionSelector({
-          actionType: type,
-          configKey: key,
-          disabledActions: ["open-popup" /* openPopup */]
-        }) : x`
+            actionType: type,
+            configKey: key
+          }) : x`
                     <ha-button
                       @click=${() => this.updateConfigByKey(key, {
-          action: "none"
-        })}
+            action: "none"
+          })}
                       style="margin-bottom: 1em;"
                       outlined
                       hasTrailingIcon>
@@ -2857,10 +3556,17 @@ var init_navbar_card_editor = __esm(() => {
                     </ha-button>
                   `}
             `;
-      })}
-        </div>
-      </ha-expansion-panel>
-    `;
+        })}
+      `,
+        deleteLabel: "Delete player",
+        dragData: { playerIndex },
+        headerSummary: x`
+        ${processTemplate(this.hass, undefined, player.entity) || "No entity"}
+      `,
+        headerTitle: `Player`,
+        onDelete: () => this.removeMediaPlayer(playerIndex),
+        onDrop
+      });
     }
     renderDesktopEditor() {
       const labelVisibility = genericGetProperty(this._config, "desktop.show_labels") ?? DEFAULT_NAVBAR_CONFIG.desktop?.show_labels;
@@ -2871,49 +3577,60 @@ var init_navbar_card_editor = __esm(() => {
           Desktop options
         </h4>
         <div class="editor-section">
+          ${this.makeComboBox({
+        configKey: "desktop.mode",
+        defaultValue: DEFAULT_NAVBAR_CONFIG.desktop?.mode,
+        items: [
+          { label: "Floating", value: "floating" },
+          { label: "Docked", value: "docked" }
+        ],
+        label: "Mode"
+      })}
           <div class="editor-row">
             <div class="editor-row-item">
               ${this.makeComboBox({
-        label: "Position",
+        configKey: "desktop.position",
+        defaultValue: DEFAULT_NAVBAR_CONFIG.desktop?.position,
         items: [
           { label: "Top", value: "top" /* top */ },
           { label: "Bottom", value: "bottom" /* bottom */ },
           { label: "Left", value: "left" /* left */ },
           { label: "Right", value: "right" /* right */ }
         ],
-        configKey: "desktop.position"
+        label: "Position"
       })}
             </div>
             <div class="editor-row-item">
               ${this.makeTextInput({
-        label: "Min width",
         configKey: "desktop.min_width",
-        type: "number",
+        helper: "Min screen width for desktop mode to be active.",
+        label: "Min width",
         suffix: "px",
-        helper: "Min screen width for desktop mode to be active."
+        type: "number"
       })}
             </div>
           </div>
           ${this.makeComboBox({
-        label: "Show labels",
+        configKey: "desktop.show_labels",
+        defaultValue: DEFAULT_NAVBAR_CONFIG.desktop?.show_labels,
         items: [
           { label: "Always", value: true },
           { label: "Never", value: false },
           { label: "Popup only", value: "popup_only" },
           { label: "Routes only", value: "routes_only" }
         ],
-        configKey: "desktop.show_labels"
+        label: "Show labels"
       })}
           ${this.makeSwitch({
-        label: "Show popup label backgrounds",
         configKey: "desktop.show_popup_label_backgrounds",
+        defaultValue: DEFAULT_NAVBAR_CONFIG.desktop?.show_popup_label_backgrounds,
         disabled: ![true, "popup_only"].includes(labelVisibility),
-        defaultValue: DEFAULT_NAVBAR_CONFIG.desktop?.show_popup_label_backgrounds
+        label: "Show popup label backgrounds"
       })}
           ${this.makeTemplateEditor({
-        label: "Hidden",
         configKey: "desktop.hidden",
-        helper: BOOLEAN_JS_TEMPLATE_HELPER
+        helper: BOOLEAN_JS_TEMPLATE_HELPER,
+        label: "Hidden"
       })}
         </div>
       </ha-expansion-panel>
@@ -2929,35 +3646,35 @@ var init_navbar_card_editor = __esm(() => {
         </h4>
         <div class="editor-section">
           ${this.makeComboBox({
-        label: "Mode",
+        configKey: "mobile.mode",
+        defaultValue: DEFAULT_NAVBAR_CONFIG.mobile?.mode,
         items: [
           { label: "Floating", value: "floating" },
           { label: "Docked", value: "docked" }
         ],
-        configKey: "mobile.mode",
-        defaultValue: DEFAULT_NAVBAR_CONFIG.mobile?.mode,
-        hideClearIcon: true
+        label: "Mode"
       })}
           ${this.makeComboBox({
-        label: "Show labels",
+        configKey: "mobile.show_labels",
+        defaultValue: DEFAULT_NAVBAR_CONFIG.mobile?.show_labels,
         items: [
           { label: "Always", value: true },
           { label: "Never", value: false },
           { label: "Popup only", value: "popup_only" },
           { label: "Routes only", value: "routes_only" }
         ],
-        configKey: "mobile.show_labels"
+        label: "Show labels"
       })}
           ${this.makeSwitch({
-        label: "Show popup label backgrounds",
         configKey: "mobile.show_popup_label_backgrounds",
+        defaultValue: DEFAULT_NAVBAR_CONFIG.mobile?.show_popup_label_backgrounds,
         disabled: ![true, "popup_only"].includes(labelVisibility),
-        defaultValue: DEFAULT_NAVBAR_CONFIG.mobile?.show_popup_label_backgrounds
+        label: "Show popup label backgrounds"
       })}
           ${this.makeTemplateEditor({
-        label: "Hidden",
         configKey: "mobile.hidden",
-        helper: BOOLEAN_JS_TEMPLATE_HELPER
+        helper: BOOLEAN_JS_TEMPLATE_HELPER,
+        label: "Hidden"
       })}
         </div>
       </ha-expansion-panel>
@@ -2985,41 +3702,13 @@ var init_navbar_card_editor = __esm(() => {
               </div>
             `)}
           ${this.makeButton({
-        text: "Add Route",
         icon: "mdi:plus",
-        onClick: () => this.addRouteOrPopup()
+        onClick: () => this.addRouteOrPopup(),
+        text: "Add Route"
       })}
         </div>
       </ha-expansion-panel>
     `;
-    }
-    _chooseIconForAction(actionType) {
-      switch (actionType) {
-        case "hold_action" /* hold_action */:
-          return "mdi:gesture-tap-hold";
-        case "double_tap_action" /* double_tap_action */:
-          return "mdi:gesture-double-tap";
-        case "tap_action" /* tap_action */:
-        default:
-          return "mdi:gesture-tap";
-      }
-    }
-    _chooseLabelForAction(actionType) {
-      switch (actionType) {
-        case "tap_action" /* tap_action */:
-          return "Tap action";
-        case "hold_action" /* hold_action */:
-          return "Hold action";
-        case "double_tap_action" /* double_tap_action */:
-          return "Double tap action";
-        default:
-          return "";
-      }
-    }
-    isCustomAction(value) {
-      if (value === "none")
-        return false;
-      return Object.values(NavbarCustomActions).includes(value);
     }
     makeActionSelector(options) {
       const ACTIONS = [
@@ -3060,21 +3749,33 @@ var init_navbar_card_editor = __esm(() => {
           </ha-icon-button>
         </h5>
         <div class="editor-section">
-          <ha-combo-box
-            label=${this._chooseLabelForAction(options.actionType)}
-            .items=${ACTIONS}
-            .value=${selected}
-            .disabled=${options.disabled}
-            @value-changed=${(e7) => {
-        const newSel = e7.detail.value;
+          <div class="editor-select-field">
+            <label class="editor-label">
+              ${this._chooseLabelForAction(options.actionType)}
+            </label>
+            <select
+              class="editor-select"
+              .value=${selected}
+              ?disabled=${options.disabled}
+              @change=${(e7) => {
+        const newSel = e7.target.value;
         if (newSel === "hass_action") {
-          this.updateConfigByKey(options.configKey, { action: "none" });
+          this.updateConfigByKey(options.configKey, {
+            action: "none"
+          });
         } else {
           this.updateConfigByKey(options.configKey, {
             action: newSel
           });
         }
-      }}></ha-combo-box>
+      }}>
+              ${ACTIONS.map((action) => x`<option
+                  value=${action.value}
+                  ?selected=${action.value === selected}>
+                  ${action.label}
+                </option>`)}
+            </select>
+          </div>
 
           ${selected === "quickbar" /* quickbar */ ? x`
                 <div class="quickbar-mode-container">
@@ -3120,9 +3821,9 @@ var init_navbar_card_editor = __esm(() => {
                 </div>
               ` : x``}
           ${selected === "custom-js-action" /* customJSAction */ ? this.makeTemplateEditor({
-        label: "Code",
         configKey: `${options.configKey}.code`,
-        helper: GENERIC_JS_TEMPLATE_HELPER
+        helper: GENERIC_JS_TEMPLATE_HELPER,
+        label: "Code"
       }) : x``}
           ${selected === "hass_action" ? x`
                 <ha-form
@@ -3130,8 +3831,8 @@ var init_navbar_card_editor = __esm(() => {
                   .data=${typeof raw === "object" ? { action: raw } : {}}
                   .schema=${[
         {
-          name: "action",
           label: this._chooseLabelForAction(options.actionType),
+          name: "action",
           required: true,
           selector: {
             ui_action: {
@@ -3147,9 +3848,9 @@ var init_navbar_card_editor = __esm(() => {
       }}></ha-form>
               ` : x``}
           ${selected === "hass_action" && ACTIONS_WITH_CUSTOM_ENTITY.includes(raw?.action) ? this.makeEntityPicker({
-        label: "",
         configKey: `${options.configKey}.entity`,
-        disabled: options.disabled
+        disabled: options.disabled,
+        label: ""
       }) : x``}
         </div>
       </ha-expansion-panel>
@@ -3157,60 +3858,39 @@ var init_navbar_card_editor = __esm(() => {
     }
     render() {
       return x`
+    ${conditionallyRender(!this._loadingComponents, () => x`
       <div class="navbar-editor">
-        ${this._config.template != null && this._config.template?.trim() != "" ? x`<ha-alert alert-type="warning"
-              >You have the <code>template</code> field configured for
-              navbar-card. Using the editor will override the props for
-              <strong>this card only</strong>, but will not update the template
-              defined in your dashboard.
-              <br />
-              <a
-                href="https://github.com/joseluis9595/lovelace-navbar-card?tab=readme-ov-file#template"
-                target="_blank"
-                rel="noopener"
-                >Check the documentation</a
-              >
-              to know how to configure your navbar-card templates.</ha-alert
-            >` : x``}
+        ${this._config.template != null && this._config.template?.trim() != "" ? x`
+              <ha-alert alert-type="warning">
+                You have the <code>template</code> field configured for
+                navbar-card. Using the editor will override the props for
+                <strong>this card only</strong>, but will not update the
+                template defined in your dashboard.
+                <br />
+                <a
+                  href="${DOCS_LINKS.template}"
+                  target="_blank"
+                  rel="noopener"
+                  >Check the documentation</a
+                >
+                to know how to configure your navbar-card templates.
+                <ha-button
+                  class="reset-overrides-button"
+                  slot="action"
+                  .disabled=${!this._hasTemplateOverrides()}
+                  @click=${this._resetToTemplateOnly}>
+                  Reset overrides
+                </ha-button>
+              </ha-alert>
+            ` : x``}
         ${this.renderTemplateEditor()} ${this.renderRoutesEditor()}
         ${this.renderDesktopEditor()} ${this.renderMobileEditor()}
         ${this.renderLayoutEditor()} ${this.renderMediaPlayerEditor()}
         ${this.renderHapticEditor()} ${this.renderStylesEditor()}
       </div>
-    `;
+    `)}`;
     }
     static styles = getEditorStyles();
-    addRouteOrPopup = (routeIndex) => {
-      let routes = [...this._config.routes ?? []];
-      const newItemData = {
-        icon: "mdi:alert-circle-outline",
-        label: "",
-        url: ""
-      };
-      if (routeIndex == null) {
-        routes = [...routes, newItemData];
-      } else {
-        const popup2 = [...routes[routeIndex].popup || [], newItemData];
-        routes[routeIndex] = { ...routes[routeIndex], popup: popup2 };
-      }
-      this.updateConfig({ routes });
-    };
-    removeRouteOrPopup = (routeIndex, popupIndex) => {
-      if (!this._config.routes || this._config.routes.length == 0)
-        return;
-      const routes = [...this._config.routes];
-      if (popupIndex == null) {
-        routes.splice(routeIndex, 1);
-      } else {
-        const popup2 = [...routes[routeIndex].popup || []];
-        popup2.splice(popupIndex, 1);
-        routes[routeIndex] = {
-          ...routes[routeIndex],
-          popup: popup2.length === 0 ? undefined : popup2
-        };
-      }
-      this.updateConfig({ routes: routes.length === 0 ? undefined : routes });
-    };
   };
   __legacyDecorateClassTS([
     n4({ attribute: false })
@@ -3220,347 +3900,23 @@ var init_navbar_card_editor = __esm(() => {
   ], NavbarCardEditor.prototype, "_config", undefined);
   __legacyDecorateClassTS([
     r5()
+  ], NavbarCardEditor.prototype, "_loadingComponents", undefined);
+  __legacyDecorateClassTS([
+    r5()
+  ], NavbarCardEditor.prototype, "_templateModeByField", undefined);
+  __legacyDecorateClassTS([
+    r5()
   ], NavbarCardEditor.prototype, "_lazyLoadedSections", undefined);
   NavbarCardEditor = __legacyDecorateClassTS([
     t3("navbar-card-editor")
   ], NavbarCardEditor);
 });
-// package.json
-var version = "1.2.1";
 
 // src/navbar-card.ts
 init_lit();
 init_decorators();
-init_types();
 
-// src/components/navbar/route/base-route.ts
-init_utils();
-
-class BaseRoute {
-  _navbarCard;
-  data;
-  _iconInstance;
-  _badgeInstance;
-  constructor(_navbarCard, data) {
-    this._navbarCard = _navbarCard;
-    this.data = data;
-  }
-  get url() {
-    return this.data.url;
-  }
-  get icon() {
-    return this._iconInstance ??= new Icon(this._navbarCard, this);
-  }
-  get badge() {
-    return this._badgeInstance ??= new Badge(this._navbarCard, this);
-  }
-  get selected_color() {
-    return processTemplate(this._navbarCard._hass, this._navbarCard, this.data.selected_color, { returnNullIfInvalid: true });
-  }
-  get label() {
-    if (!this._shouldShowLabels())
-      return null;
-    return processTemplate(this._navbarCard._hass, this._navbarCard, this.data.label) ?? " ";
-  }
-  get hidden() {
-    return processTemplate(this._navbarCard._hass, this._navbarCard, this.data.hidden);
-  }
-  get selected() {
-    return this.data.selected != null ? processTemplate(this._navbarCard._hass, this._navbarCard, this.data.selected) : window.location.pathname === this.url;
-  }
-  get tap_action() {
-    return this.data.tap_action;
-  }
-  get hold_action() {
-    return this.data.hold_action;
-  }
-  get double_tap_action() {
-    return this.data.double_tap_action;
-  }
-  _shouldShowLabels = () => {
-    const config2 = this._navbarCard.isDesktop ? this._navbarCard.config?.desktop?.show_labels : this._navbarCard.config?.mobile?.show_labels;
-    if (typeof config2 === "boolean")
-      return config2;
-    return config2 === "popup_only" && this instanceof PopupItem || config2 === "routes_only" && !(this instanceof PopupItem);
-  };
-  _shouldShowLabelBackground = () => {
-    const enabled = this._navbarCard.isDesktop ? this._navbarCard.config?.desktop?.show_popup_label_backgrounds : this._navbarCard.config?.mobile?.show_popup_label_backgrounds;
-    return !!enabled;
-  };
-}
-// src/components/navbar/badge/badge.ts
-init_lit();
-
-// src/components/color.ts
-var hexToDecimal = (hex) => parseInt(hex, 16);
-var decimalToHex = (decimal) => decimal.toString(16).padStart(2, "0");
-var isValidInt = (value) => {
-  try {
-    const parsedValue = parseInt(value);
-    if (isNaN(parsedValue))
-      return false;
-  } catch {
-    return false;
-  }
-  return true;
-};
-var hue2rgb = (p3, q, t4) => {
-  if (t4 < 0)
-    t4 += 1;
-  if (t4 > 1)
-    t4 -= 1;
-  if (t4 < 1 / 6)
-    return p3 + (q - p3) * 6 * t4;
-  if (t4 < 1 / 2)
-    return q;
-  if (t4 < 2 / 3)
-    return p3 + (q - p3) * (2 / 3 - t4) * 6;
-  return p3;
-};
-var complementaryRGBColor = (r6, g2, b3) => {
-  if (Math.max(r6, g2, b3) == Math.min(r6, g2, b3)) {
-    return { r: 255 - r6, g: 255 - g2, b: 255 - b3 };
-  } else {
-    r6 /= 255, g2 /= 255, b3 /= 255;
-    const max = Math.max(r6, g2, b3), min = Math.min(r6, g2, b3);
-    let h3 = 0;
-    const l3 = (max + min) / 2;
-    const d3 = max - min;
-    const s4 = l3 > 0.5 ? d3 / (2 - max - min) : d3 / (max + min);
-    switch (max) {
-      case r6:
-        h3 = (g2 - b3) / d3 + (g2 < b3 ? 6 : 0);
-        break;
-      case g2:
-        h3 = (b3 - r6) / d3 + 2;
-        break;
-      case b3:
-        h3 = (r6 - g2) / d3 + 4;
-        break;
-    }
-    h3 = Math.round(h3 * 60 + 180) % 360;
-    h3 /= 360;
-    const q = l3 < 0.5 ? l3 * (1 + s4) : l3 + s4 - l3 * s4;
-    const p3 = 2 * l3 - q;
-    r6 = hue2rgb(p3, q, h3 + 1 / 3);
-    g2 = hue2rgb(p3, q, h3);
-    b3 = hue2rgb(p3, q, h3 - 1 / 3);
-    return {
-      r: Math.round(r6 * 255),
-      g: Math.round(g2 * 255),
-      b: Math.round(b3 * 255)
-    };
-  }
-};
-
-class Color {
-  static colorCache = new Map;
-  r = 0;
-  g = 0;
-  b = 0;
-  a = 255;
-  constructor(data) {
-    if (data instanceof Color) {
-      this.r = data.r;
-      this.g = data.g;
-      this.b = data.b;
-      this.a = data.a;
-    } else if (typeof data == "string") {
-      if (data.startsWith("#")) {
-        this._parseHexString(data);
-      } else if (data.startsWith("rgb(")) {
-        this._parseRGBString(data);
-      } else if (data.startsWith("rgba(")) {
-        this._parseRGBAString(data);
-      } else if (isValidInt(data)) {
-        this._parseHexString(`#${data}`);
-      } else {
-        try {
-          this._readColorFromDOM(data);
-        } catch {
-          throw Error(`Format not supported for color string: "${data}"`);
-        }
-      }
-    } else if (Array.isArray(data)) {
-      this._parseColorArray(data);
-    } else {
-      throw Error(`Format not supported for color: "${typeof data}"`);
-    }
-  }
-  static from(color) {
-    const normalizedColor = color.toLowerCase().trim();
-    if (!this.colorCache.has(normalizedColor)) {
-      this.colorCache.set(normalizedColor, new Color(normalizedColor));
-    }
-    return this.colorCache.get(normalizedColor);
-  }
-  _readColorFromDOM(color) {
-    const d3 = document.createElement("div");
-    d3.style.color = color;
-    document.body.appendChild(d3);
-    const parsedColor = window.getComputedStyle(d3).color;
-    this._parseRGBString(parsedColor);
-  }
-  _parseColorArray(data) {
-    const colorArray = data.map((x2) => parseInt(x2));
-    if (colorArray.length < 3) {
-      throw Error(`Invalid array format color string: "${data}"
-Supported formats: [r,g,b] | [r,g,b,a]`);
-    }
-    this.r = colorArray[0];
-    this.g = colorArray[1];
-    this.b = colorArray[2];
-    this.a = colorArray.length > 3 ? colorArray[3] : this.a;
-  }
-  _parseRGBString(data) {
-    const colorString = data.replace("rgb(", "").replace(")", "");
-    const colorComponents = colorString.split(",");
-    if (data.indexOf("rgb(") == -1 || colorComponents.length != 3) {
-      throw Error(`Invalid 'rgb(r,g,b)' format for color string: "${data}"`);
-    }
-    this.r = parseInt(colorComponents[0]);
-    this.g = parseInt(colorComponents[1]);
-    this.b = parseInt(colorComponents[2]);
-  }
-  _parseRGBAString(data) {
-    const colorString = data.replace("rgba(", "").replace(")", "");
-    const colorComponents = colorString.split(",");
-    if (data.indexOf("rgba(") == -1 || colorComponents.length != 4) {
-      throw Error(`Invalid 'rgba(r,g,b,a)' format for color string: "${data}"`);
-    }
-    this.r = parseInt(colorComponents[0]);
-    this.g = parseInt(colorComponents[1]);
-    this.b = parseInt(colorComponents[2]);
-    this.a = parseInt(colorComponents[3]);
-  }
-  _parseHexString(data) {
-    const colorString = data.replace("#", "");
-    switch (colorString.length) {
-      case 3:
-        this.r = hexToDecimal(colorString.slice(0, 1) + colorString.slice(0, 1));
-        this.g = hexToDecimal(colorString.slice(1, 2) + colorString.slice(1, 2));
-        this.b = hexToDecimal(colorString.slice(2, 3) + colorString.slice(2, 3));
-        break;
-      case 6:
-        this.r = hexToDecimal(colorString.slice(0, 2));
-        this.g = hexToDecimal(colorString.slice(2, 4));
-        this.b = hexToDecimal(colorString.slice(4, 6));
-        break;
-      case 8:
-        this.r = hexToDecimal(colorString.slice(0, 2));
-        this.g = hexToDecimal(colorString.slice(2, 4));
-        this.b = hexToDecimal(colorString.slice(4, 6));
-        this.a = hexToDecimal(colorString.slice(6, 8));
-        break;
-      default:
-        throw Error(`Invalid hex format for color string: "${data}"`);
-    }
-  }
-  opacity(opacity) {
-    this.a = Math.max(0, Math.min(opacity * 255, 255));
-    return this;
-  }
-  complementary() {
-    const { r: r6, g: g2, b: b3 } = complementaryRGBColor(this.r, this.g, this.b);
-    return new Color([r6, g2, b3, this.a]);
-  }
-  shade(percent) {
-    let R2 = this.r * (100 + percent) / 100;
-    let G = this.g * (100 + percent) / 100;
-    let B2 = this.b * (100 + percent) / 100;
-    R2 = R2 < 255 ? R2 : 255;
-    G = G < 255 ? G : 255;
-    B2 = B2 < 255 ? B2 : 255;
-    R2 = Math.round(R2);
-    G = Math.round(G);
-    B2 = Math.round(B2);
-    const brightness = Math.round((R2 * 299 + G * 587 + B2 * 114) / 1000);
-    if (brightness == 0)
-      return this.complementary();
-    if (brightness < 80 && percent < 100)
-      return this.shade(percent + 50);
-    return new Color([R2, G, B2]);
-  }
-  contrastingColor() {
-    return new Color(this.luma() >= 165 ? "#000" : "#fff");
-  }
-  luma() {
-    return 0.2126 * this.r + 0.7152 * this.g + 0.0722 * this.b;
-  }
-  rgb() {
-    return { r: this.r, g: this.g, b: this.b };
-  }
-  rgba() {
-    return { r: this.r, g: this.g, b: this.b, a: this.a };
-  }
-  rgbaString() {
-    return `rgba(${this.r}, ${this.g}, ${this.b}, ${this.a})`;
-  }
-  hex() {
-    return `#${decimalToHex(this.r)}${decimalToHex(this.g)}${decimalToHex(this.b)}`;
-  }
-  hexa() {
-    return `#${decimalToHex(this.a)}${decimalToHex(this.r)}${decimalToHex(this.g)}${decimalToHex(this.b)}`;
-  }
-  array() {
-    return [this.r, this.g, this.b, this.a];
-  }
-}
-var option = new Option;
-var isColor = (value) => {
-  if (typeof value !== "string")
-    return false;
-  option.style.color = value;
-  return option.style.color !== "";
-};
-// src/components/navbar/badge/badge.ts
-init_utils();
-
-class Badge {
-  _navbarCard;
-  _route;
-  constructor(_navbarCard, _route) {
-    this._navbarCard = _navbarCard;
-    this._route = _route;
-  }
-  get show() {
-    const badge = this._route.data.badge;
-    if (!badge)
-      return false;
-    if (badge.show) {
-      return processTemplate(this._navbarCard._hass, this._navbarCard, badge.show) ?? false;
-    }
-    if (badge.template) {
-      return processBadgeTemplate(this._navbarCard._hass, badge.template);
-    }
-    return false;
-  }
-  get count() {
-    return processTemplate(this._navbarCard._hass, this._navbarCard, this._route.data.badge?.count) ?? null;
-  }
-  get backgroundColor() {
-    return processTemplate(this._navbarCard._hass, this._navbarCard, this._route.data.badge?.color) ?? "red";
-  }
-  get textColor() {
-    return processTemplate(this._navbarCard._hass, this._navbarCard, this._route.data.badge?.text_color ?? this._route.data.badge?.textColor) ?? null;
-  }
-  get contrastingColor() {
-    return this.textColor ?? Color.from(this.backgroundColor).contrastingColor().hex();
-  }
-  render() {
-    if (!this._route.badge || !this.show)
-      return x``;
-    const hasCounter = this.count != null;
-    return x`
-      <div
-        class="badge ${this._route.selected ? "active" : ""} ${hasCounter ? "with-counter" : ""}"
-        style="background-color:${this.backgroundColor}; color:${this.contrastingColor}">
-        ${this.count ?? ""}
-      </div>
-    `;
-  }
-}
-// src/components/navbar/icon/icon.ts
+// src/components/media-player.ts
 init_lit();
 
 // node_modules/lit-html/directives/class-map.js
@@ -3612,99 +3968,6 @@ var e6 = e5(class extends i5 {
     return T;
   }
 });
-// src/components/navbar/icon/icon.ts
-init_utils();
-class Icon {
-  _navbarCard;
-  _route;
-  constructor(_navbarCard, _route) {
-    this._navbarCard = _navbarCard;
-    this._route = _route;
-  }
-  get icon() {
-    return processTemplate(this._navbarCard._hass, this._navbarCard, this._route.data.icon);
-  }
-  get image() {
-    return processTemplate(this._navbarCard._hass, this._navbarCard, this._route.data.image);
-  }
-  get iconSelected() {
-    return processTemplate(this._navbarCard._hass, this._navbarCard, this._route.data.icon_selected);
-  }
-  get imageSelected() {
-    return processTemplate(this._navbarCard._hass, this._navbarCard, this._route.data.image_selected);
-  }
-  get iconColor() {
-    try {
-      const rawValue = processTemplate(this._navbarCard._hass, this._navbarCard, this._route.data.icon_color);
-      if (!isColor(rawValue))
-        return null;
-      return rawValue;
-    } catch (_err) {
-      return null;
-    }
-  }
-  render() {
-    const isSelected = this._route.selected;
-    const resolvedImage = this.image;
-    const resolvedImageSelected = this.imageSelected;
-    const resolvedIcon = this.icon;
-    const resolvedIconSelected = this.iconSelected;
-    const resolvedIconColor = this.iconColor;
-    if (!resolvedImage && !resolvedIcon) {
-      return x``;
-    }
-    return resolvedImage ? x` <img
-          class=${e6({
-      image: true,
-      active: isSelected
-    })}
-          src="${isSelected && resolvedImageSelected ? resolvedImageSelected : resolvedImage}"
-          alt="${this._route.label || ""}" />` : x` <ha-icon
-          class=${e6({
-      icon: true,
-      active: isSelected
-    })}
-          style="--icon-primary-color: ${resolvedIconColor ?? "inherit"}"
-          icon="${isSelected && resolvedIconSelected ? resolvedIconSelected : resolvedIcon}"></ha-icon>`;
-  }
-}
-// src/components/navbar/route/route.ts
-init_lit();
-
-// node_modules/lit-html/directives/style-map.js
-init_lit_html();
-var n5 = "important";
-var i6 = " !" + n5;
-var o6 = e5(class extends i5 {
-  constructor(t5) {
-    if (super(t5), t5.type !== t4.ATTRIBUTE || t5.name !== "style" || t5.strings?.length > 2)
-      throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.");
-  }
-  render(t5) {
-    return Object.keys(t5).reduce((e7, r6) => {
-      const s4 = t5[r6];
-      return s4 == null ? e7 : e7 + `${r6 = r6.includes("-") ? r6 : r6.replace(/(?:^(webkit|moz|ms|o)|)(?=[A-Z])/g, "-$&").toLowerCase()}:${s4};`;
-    }, "");
-  }
-  update(e7, [r6]) {
-    const { style: s4 } = e7.element;
-    if (this.ft === undefined)
-      return this.ft = new Set(Object.keys(r6)), this.render(r6);
-    for (const t5 of this.ft)
-      r6[t5] == null && (this.ft.delete(t5), t5.includes("-") ? s4.removeProperty(t5) : s4[t5] = null);
-    for (const t5 in r6) {
-      const e8 = r6[t5];
-      if (e8 != null) {
-        this.ft.add(t5);
-        const r7 = typeof e8 == "string" && e8.endsWith(i6);
-        t5.includes("-") || r7 ? s4.setProperty(t5, r7 ? e8.slice(0, -11) : e8, r7 ? n5 : "") : s4[t5] = e8;
-      }
-    }
-    return T;
-  }
-});
-// src/components/navbar/route/route.ts
-init_utils();
 // src/lib/event-detection.ts
 init_action_handler();
 var LONG_PRESS_DELAY = 500;
@@ -3731,28 +3994,28 @@ class EventDetectionDirective extends i5 {
     this.abortController?.abort();
     this.abortController = new AbortController;
     const { signal } = this.abortController;
-    if (!config2.tap && !config2.hold && !config2.doubleTap)
+    if (!(config2.tap || config2.hold || config2.doubleTap))
       return;
     this.boundHandlers.tap = config2.tap ? (ev, target) => executeAction({
-      context: config2.context,
-      target: target ?? ev.currentTarget,
       action: config2.tap,
       actionType: "tap",
-      data: { route: config2.route, popupItem: config2.popupItem }
+      context: config2.context,
+      data: { popupItem: config2.popupItem, route: config2.route },
+      target: target ?? ev.currentTarget
     }) : undefined;
     this.boundHandlers.hold = config2.hold ? (ev, target) => executeAction({
-      context: config2.context,
-      target: target ?? ev.currentTarget,
       action: config2.hold,
       actionType: "hold",
-      data: { route: config2.route, popupItem: config2.popupItem }
+      context: config2.context,
+      data: { popupItem: config2.popupItem, route: config2.route },
+      target: target ?? ev.currentTarget
     }) : undefined;
     this.boundHandlers.doubleTap = config2.doubleTap ? (ev, target) => executeAction({
-      context: config2.context,
-      target: target ?? ev.currentTarget,
       action: config2.doubleTap,
       actionType: "double_tap",
-      data: { route: config2.route, popupItem: config2.popupItem }
+      context: config2.context,
+      data: { popupItem: config2.popupItem, route: config2.route },
+      target: target ?? ev.currentTarget
     }) : undefined;
     if (this.boundHandlers.hold) {
       const startHold = (ev) => {
@@ -3811,86 +4074,671 @@ class EventDetectionDirective extends i5 {
 }
 var eventDetection = e5(EventDetectionDirective);
 
-// src/components/navbar/route/route.ts
-class Route extends BaseRoute {
-  _routeData;
-  _popupInstance;
-  constructor(_navbarCard, _routeData) {
-    super(_navbarCard, _routeData);
-    this._routeData = _routeData;
-    this._validateRoute();
+// src/components/media-player.ts
+init_types();
+init_utils();
+var CAROUSEL_GAP = 12;
+
+class MediaPlayer {
+  _navbarCard;
+  _activeIndex = 0;
+  _trackPointerId = null;
+  _dragStartX = 0;
+  _dragOffset = 0;
+  _isDragging = false;
+  constructor(_navbarCard) {
+    this._navbarCard = _navbarCard;
   }
-  get popup() {
-    return this._popupInstance ??= new Popup(this._navbarCard, processTemplate(this._navbarCard._hass, this._navbarCard, this._routeData.popup) ?? this._routeData.popup ?? this._routeData.submenu ?? []);
+  get desktop_position() {
+    return this._navbarCard.config?.media_player?.desktop_position ?? DEFAULT_NAVBAR_CONFIG.media_player.desktop_position;
   }
-  get isSelfOrChildActive() {
-    if (this._navbarCard.config?.layout?.reflect_child_state && !this.selected) {
-      return this.popup.items.some((item) => item.selected);
+  isVisible = () => {
+    const config2 = this._navbarCard.config?.media_player;
+    const players = config2?.players ?? [];
+    if (players.length === 0)
+      return { visible: false };
+    if (config2?.show != null) {
+      const widgetVisible = processTemplate(this._navbarCard._hass, this._navbarCard, config2.show);
+      if (!widgetVisible)
+        return { visible: false };
     }
-    return this.selected;
+    for (const player of players) {
+      const result = this._isPlayerVisible(player);
+      if (result.visible || result.error)
+        return result;
+    }
+    return { visible: false };
+  };
+  render = (options) => {
+    const { visible } = this.isVisible();
+    if (!visible)
+      return x``;
+    const allPlayers = this._navbarCard.config?.media_player?.players ?? [];
+    const visiblePlayers = allPlayers.filter((p3) => this._isPlayerVisible(p3).visible);
+    this._activeIndex = Math.max(0, Math.min(this._activeIndex, visiblePlayers.length - 1));
+    if (visiblePlayers.length <= 1) {
+      return this._renderSingle(visiblePlayers[0], options);
+    }
+    return this._renderCarousel(visiblePlayers, options);
+  };
+  _isPlayerVisible(player) {
+    const entity = this._resolveEntity(player);
+    const state2 = this._navbarCard._hass.states[entity ?? ""];
+    if (!(state2 && entity)) {
+      return { error: `Entity not found "${entity}"`, visible: true };
+    }
+    if (player.show != null) {
+      return {
+        visible: processTemplate(this._navbarCard._hass, this._navbarCard, player.show)
+      };
+    }
+    return { visible: ["playing", "paused"].includes(state2.state) };
   }
-  render() {
-    if (this.hidden)
-      return null;
-    const isActive = this.isSelfOrChildActive;
+  _resolveEntity(player) {
+    return processTemplate(this._navbarCard._hass, this._navbarCard, player.entity);
+  }
+  _resolveIcon(player) {
+    return player.icon ? processTemplate(this._navbarCard._hass, this._navbarCard, player.icon) : null;
+  }
+  _resolveTitle(player, state2) {
+    return player.title ? processTemplate(this._navbarCard._hass, this._navbarCard, player.title) : state2.attributes.media_title ?? "";
+  }
+  _resolveSubtitle(player, state2) {
+    return player.subtitle ? processTemplate(this._navbarCard._hass, this._navbarCard, player.subtitle) : state2.attributes.media_artist ?? "";
+  }
+  _handlePlayPause = (e7, entity) => {
+    e7.preventDefault();
+    e7.stopPropagation();
+    const state2 = this._navbarCard._hass.states[entity];
+    if (!state2)
+      return;
+    const action = state2.state === "playing" ? "media_pause" : "media_play";
+    this._navbarCard._hass.callService("media_player", action, {
+      entity_id: entity
+    });
+  };
+  _handleSkipNext = (e7, entity) => {
+    e7.preventDefault();
+    e7.stopPropagation();
+    this._navbarCard._hass.callService("media_player", "media_next_track", {
+      entity_id: entity
+    });
+  };
+  _onPointerDown = (e7) => {
+    if (e7.button !== 0)
+      return;
+    this._trackPointerId = e7.pointerId;
+    this._dragStartX = e7.clientX;
+    this._dragOffset = 0;
+    this._isDragging = false;
+  };
+  _onPointerMove = (e7) => {
+    if (e7.pointerId !== this._trackPointerId)
+      return;
+    const dx = e7.clientX - this._dragStartX;
+    if (!this._isDragging) {
+      if (Math.abs(dx) < 10)
+        return;
+      this._isDragging = true;
+      e7.currentTarget.setPointerCapture(e7.pointerId);
+    }
+    e7.preventDefault();
+    const count = this._navbarCard.config?.media_player?.players?.length ?? 0;
+    const atEdge = this._activeIndex === 0 && dx > 0 || this._activeIndex === count - 1 && dx < 0;
+    this._dragOffset = atEdge ? dx * 0.2 : dx;
+    this._navbarCard.requestUpdate();
+  };
+  _onPointerUp = (e7) => {
+    if (e7.pointerId !== this._trackPointerId)
+      return;
+    this._trackPointerId = null;
+    if (!this._isDragging)
+      return;
+    const el = e7.currentTarget;
+    el.releasePointerCapture(e7.pointerId);
+    const threshold = el.offsetWidth * 0.3;
+    const count = this._navbarCard.config?.media_player?.players?.length ?? 0;
+    if (this._dragOffset < -threshold && this._activeIndex < count - 1) {
+      this._activeIndex++;
+    } else if (this._dragOffset > threshold && this._activeIndex > 0) {
+      this._activeIndex--;
+    }
+    this._dragOffset = 0;
+    this._isDragging = false;
+    this._navbarCard.requestUpdate();
+  };
+  _onPointerCancel = (e7) => {
+    if (e7.pointerId !== this._trackPointerId)
+      return;
+    this._trackPointerId = null;
+    this._isDragging = false;
+    this._dragOffset = 0;
+    this._navbarCard.requestUpdate();
+  };
+  _renderSingle(player, options) {
+    const entity = this._resolveEntity(player);
+    const state2 = this._navbarCard._hass.states[entity ?? ""];
+    if (!(state2 && entity)) {
+      return x`<ha-card class="media-player error">
+        <ha-alert alert-type="error">Entity not found "${entity}"</ha-alert>
+      </ha-card>`;
+    }
+    const deviceClass = this._navbarCard.isDesktop ? "desktop" : "mobile";
     return x`
-      <div
-        class=${e6({
-      route: true,
-      active: isActive
-    })}
-        style=${o6({
-      "--navbar-primary-color": this.selected_color ?? null
-    })}
+      <ha-card
+        class="${e6({
+      "media-player": true,
+      "position-absolute": !options.isInsideNavbar,
+      [(this.desktop_position ?? DEFAULT_NAVBAR_CONFIG.media_player.desktop_position).toString()]: true,
+      [deviceClass]: true
+    })}"
         ${eventDetection({
       context: this._navbarCard,
-      route: this,
-      tap: this.tap_action ?? {
-        action: "navigate",
-        navigation_path: this.url ?? ""
-      },
-      hold: this.hold_action,
-      doubleTap: this.double_tap_action
+      doubleTap: player.double_tap_action,
+      hold: player.hold_action,
+      tap: player.tap_action ?? { action: "more-info", entity }
     })}>
+        ${this._renderCardContent(player, entity, state2)}
+      </ha-card>
+    `;
+  }
+  _renderCarousel(players, options) {
+    const deviceClass = this._navbarCard.isDesktop ? "desktop" : "mobile";
+    const pct = -(this._activeIndex * 100);
+    const gapPx = -(this._activeIndex * CAROUSEL_GAP) + this._dragOffset;
+    const transition = this._isDragging ? "none" : "transform 0.3s ease-out";
+    const transform = `translateX(calc(${pct}% + ${gapPx}px))`;
+    return x`
+      <div
+        class="${e6({
+      "media-player-carousel": true,
+      "position-absolute": !options.isInsideNavbar,
+      [(this.desktop_position ?? DEFAULT_NAVBAR_CONFIG.media_player.desktop_position).toString()]: true,
+      [deviceClass]: true
+    })}">
         <div
-          class=${e6({
-      button: true,
-      active: isActive
-    })}
-          style=${o6({
-      "--navbar-primary-color": this.selected_color ?? null
-    })}>
-          ${this.icon.render()}
-          <ha-ripple></ha-ripple>
-          ${this.badge.render()}
+          class="media-player-viewport"
+          @pointerdown=${this._onPointerDown}
+          @pointermove=${this._onPointerMove}
+          @pointerup=${this._onPointerUp}
+          @pointercancel=${this._onPointerCancel}>
+          <div
+            class="media-player-track"
+            style="transform: ${transform}; transition: ${transition}">
+            ${players.map((p3) => this._renderSlide(p3))}
+          </div>
         </div>
-        ${this.label ? x`<div
-              class=${e6({
-      label: true,
-      active: isActive
-    })}>
-              ${this.label}
-            </div>` : x``}
+        <div class="media-player-dots">
+          ${players.map((_2, i6) => x`<span
+                class="${e6({
+      active: i6 === this._activeIndex,
+      "media-player-dot": true
+    })}"></span>`)}
+        </div>
       </div>
     `;
   }
-  _validateRoute() {
-    if (!this.data.icon && !this.data.image) {
-      throw new Error('Each route must have either an "icon" or "image" property configured');
+  _renderSlide(player) {
+    const entity = this._resolveEntity(player);
+    const state2 = this._navbarCard._hass.states[entity ?? ""];
+    if (!(state2 && entity)) {
+      return x`<ha-card class="media-player error">
+        <ha-alert alert-type="error">Entity not found "${entity}"</ha-alert>
+      </ha-card>`;
     }
-    if (!this._routeData.popup && !this.tap_action && !this.hold_action && !this.url && !this.double_tap_action) {
-      throw new Error("Each route must have at least one actionable property (url, popup, tap_action, hold_action, double_tap_action)");
-    }
-    if (this.tap_action && !this.tap_action.action) {
-      throw new Error('"tap_action" must have an "action" property');
-    }
-    if (this.hold_action && !this.hold_action.action) {
-      throw new Error('"hold_action" must have an "action" property');
-    }
-    if (this.double_tap_action && !this.double_tap_action.action) {
-      throw new Error('"double_tap_action" must have an "action" property');
+    return x`
+      <ha-card
+        class="media-player"
+        ${eventDetection({
+      context: this._navbarCard,
+      doubleTap: player.double_tap_action,
+      hold: player.hold_action,
+      tap: player.tap_action ?? { action: "more-info", entity }
+    })}>
+        ${this._renderCardContent(player, entity, state2)}
+      </ha-card>
+    `;
+  }
+  _renderCardContent(player, entity, state2) {
+    const image = state2.attributes.entity_picture_local ?? state2.attributes.entity_picture;
+    const pos = state2.attributes.media_position;
+    const dur = state2.attributes.media_duration;
+    const progress = pos != null && dur != null && dur > 0 ? pos / dur : null;
+    const icon = this._resolveIcon(player);
+    const title = this._resolveTitle(player, state2);
+    const subtitle = this._resolveSubtitle(player, state2);
+    const albumBg = this._navbarCard.config?.media_player?.album_cover_background ?? DEFAULT_NAVBAR_CONFIG.media_player.album_cover_background;
+    return x`
+      <div
+        class="media-player-bg"
+        style=${albumBg ? `background-image: url(${state2.attributes.entity_picture});` : ""}></div>
+      ${progress != null ? x`<div class="media-player-progress-bar">
+              <div
+                class="media-player-progress-bar-fill"
+                style="width: ${progress * 100}%"></div>
+            </div>` : x``}
+      ${image && !icon ? x`<img
+              class="media-player-image"
+              src=${image}
+              alt=${title || ""} />` : x`<ha-icon
+              class="media-player-image media-player-icon-fallback"
+              icon=${icon ?? "mdi:music"}></ha-icon>`}
+      <div class="media-player-info">
+        <span class="media-player-title">${title || ""}</span>
+        <span class="media-player-artist">${subtitle || ""}</span>
+      </div>
+      <button
+        class="navbar-icon-button media-player-button media-player-button-play-pause primary"
+        appearance="accent"
+        variant="brand"
+        @click=${(e7) => this._handlePlayPause(e7, entity)}
+        @pointerdown=${preventEventDefault}
+        @pointerup=${preventEventDefault}>
+        <ha-icon
+          icon=${state2.state === "playing" ? "mdi:pause" : "mdi:play"}></ha-icon>
+      </button>
+      <button
+        class="navbar-icon-button media-player-button media-player-button-skip"
+        appearance="plain"
+        variant="neutral"
+        @click=${(e7) => this._handleSkipNext(e7, entity)}
+        @pointerdown=${preventEventDefault}
+        @pointerup=${preventEventDefault}>
+        <ha-icon icon="mdi:skip-next"></ha-icon>
+      </button>
+    `;
+  }
+}
+
+// src/components/navbar/badge/badge.ts
+init_lit();
+
+// src/components/color.ts
+var hexToDecimal = (hex) => parseInt(hex, 16);
+var decimalToHex = (decimal) => decimal.toString(16).padStart(2, "0");
+var isValidInt = (value) => {
+  try {
+    const parsedValue = parseInt(value, 10);
+    if (Number.isNaN(parsedValue))
+      return false;
+  } catch {
+    return false;
+  }
+  return true;
+};
+var hue2rgb = (p3, q, t5) => {
+  let adjustedT = t5;
+  if (adjustedT < 0)
+    adjustedT += 1;
+  if (adjustedT > 1)
+    adjustedT -= 1;
+  if (adjustedT < 1 / 6)
+    return p3 + (q - p3) * 6 * adjustedT;
+  if (adjustedT < 1 / 2)
+    return q;
+  if (adjustedT < 2 / 3)
+    return p3 + (q - p3) * (2 / 3 - adjustedT) * 6;
+  return p3;
+};
+var complementaryRGBColor = (r6, g2, b3) => {
+  if (Math.max(r6, g2, b3) === Math.min(r6, g2, b3)) {
+    return { b: 255 - b3, g: 255 - g2, r: 255 - r6 };
+  }
+  let rNorm = r6 / 255;
+  let gNorm = g2 / 255;
+  let bNorm = b3 / 255;
+  const max = Math.max(rNorm, gNorm, bNorm);
+  const min = Math.min(rNorm, gNorm, bNorm);
+  const d3 = max - min;
+  const l3 = (max + min) / 2;
+  const s4 = l3 > 0.5 ? d3 / (2 - max - min) : d3 / (max + min);
+  let h3 = 0;
+  switch (max) {
+    case rNorm:
+      h3 = (gNorm - bNorm) / d3 + (gNorm < bNorm ? 6 : 0);
+      break;
+    case gNorm:
+      h3 = (bNorm - rNorm) / d3 + 2;
+      break;
+    case bNorm:
+      h3 = (rNorm - gNorm) / d3 + 4;
+      break;
+  }
+  h3 = Math.round(h3 * 60 + 180) % 360 / 360;
+  const q = l3 < 0.5 ? l3 * (1 + s4) : l3 + s4 - l3 * s4;
+  const p3 = 2 * l3 - q;
+  rNorm = hue2rgb(p3, q, h3 + 1 / 3);
+  gNorm = hue2rgb(p3, q, h3);
+  bNorm = hue2rgb(p3, q, h3 - 1 / 3);
+  return {
+    b: Math.round(bNorm * 255),
+    g: Math.round(gNorm * 255),
+    r: Math.round(rNorm * 255)
+  };
+};
+
+class Color {
+  static colorCache = new Map;
+  r = 0;
+  g = 0;
+  b = 0;
+  a = 255;
+  constructor(data) {
+    if (data instanceof Color) {
+      this.r = data.r;
+      this.g = data.g;
+      this.b = data.b;
+      this.a = data.a;
+    } else if (typeof data == "string") {
+      if (data.startsWith("#")) {
+        this._parseHexString(data);
+      } else if (data.startsWith("rgb(")) {
+        this._parseRGBString(data);
+      } else if (data.startsWith("rgba(")) {
+        this._parseRGBAString(data);
+      } else if (isValidInt(data)) {
+        this._parseHexString(`#${data}`);
+      } else {
+        try {
+          this._readColorFromDOM(data);
+        } catch {
+          throw Error(`Format not supported for color string: "${data}"`);
+        }
+      }
+    } else if (Array.isArray(data)) {
+      this._parseColorArray(data);
+    } else {
+      throw Error(`Format not supported for color: "${typeof data}"`);
     }
   }
+  static from(color) {
+    const normalizedColor = color.toLowerCase().trim();
+    const cached = Color.colorCache.get(normalizedColor);
+    if (cached) {
+      return cached;
+    }
+    const newColor = new Color(normalizedColor);
+    Color.colorCache.set(normalizedColor, newColor);
+    return newColor;
+  }
+  _readColorFromDOM(color) {
+    const d3 = document.createElement("div");
+    d3.style.color = color;
+    document.body.appendChild(d3);
+    const parsedColor = window.getComputedStyle(d3).color;
+    this._parseRGBString(parsedColor);
+  }
+  _parseColorArray(data) {
+    const colorArray = data.map((x2) => parseInt(x2, 10));
+    if (colorArray.length < 3) {
+      throw Error(`Invalid array format color string: "${data}"
+Supported formats: [r,g,b] | [r,g,b,a]`);
+    }
+    this.r = colorArray[0];
+    this.g = colorArray[1];
+    this.b = colorArray[2];
+    this.a = colorArray.length > 3 ? colorArray[3] : this.a;
+  }
+  _parseRGBString(data) {
+    const colorString = data.replace("rgb(", "").replace(")", "");
+    const colorComponents = colorString.split(",");
+    if (data.indexOf("rgb(") == -1 || colorComponents.length != 3) {
+      throw Error(`Invalid 'rgb(r,g,b)' format for color string: "${data}"`);
+    }
+    this.r = parseInt(colorComponents[0], 10);
+    this.g = parseInt(colorComponents[1], 10);
+    this.b = parseInt(colorComponents[2], 10);
+  }
+  _parseRGBAString(data) {
+    const colorString = data.replace("rgba(", "").replace(")", "");
+    const colorComponents = colorString.split(",");
+    if (data.indexOf("rgba(") == -1 || colorComponents.length != 4) {
+      throw Error(`Invalid 'rgba(r,g,b,a)' format for color string: "${data}"`);
+    }
+    this.r = parseInt(colorComponents[0], 10);
+    this.g = parseInt(colorComponents[1], 10);
+    this.b = parseInt(colorComponents[2], 10);
+    this.a = parseInt(colorComponents[3], 10);
+  }
+  _parseHexString(data) {
+    const colorString = data.replace("#", "");
+    switch (colorString.length) {
+      case 3:
+        this.r = hexToDecimal(colorString.slice(0, 1) + colorString.slice(0, 1));
+        this.g = hexToDecimal(colorString.slice(1, 2) + colorString.slice(1, 2));
+        this.b = hexToDecimal(colorString.slice(2, 3) + colorString.slice(2, 3));
+        break;
+      case 6:
+        this.r = hexToDecimal(colorString.slice(0, 2));
+        this.g = hexToDecimal(colorString.slice(2, 4));
+        this.b = hexToDecimal(colorString.slice(4, 6));
+        break;
+      case 8:
+        this.r = hexToDecimal(colorString.slice(0, 2));
+        this.g = hexToDecimal(colorString.slice(2, 4));
+        this.b = hexToDecimal(colorString.slice(4, 6));
+        this.a = hexToDecimal(colorString.slice(6, 8));
+        break;
+      default:
+        throw Error(`Invalid hex format for color string: "${data}"`);
+    }
+  }
+  opacity(opacity) {
+    this.a = Math.max(0, Math.min(opacity * 255, 255));
+    return this;
+  }
+  complementary() {
+    const { r: r6, g: g2, b: b3 } = complementaryRGBColor(this.r, this.g, this.b);
+    return new Color([r6, g2, b3, this.a]);
+  }
+  shade(percent) {
+    let R2 = this.r * (100 + percent) / 100;
+    let G = this.g * (100 + percent) / 100;
+    let B2 = this.b * (100 + percent) / 100;
+    R2 = R2 < 255 ? R2 : 255;
+    G = G < 255 ? G : 255;
+    B2 = B2 < 255 ? B2 : 255;
+    R2 = Math.round(R2);
+    G = Math.round(G);
+    B2 = Math.round(B2);
+    const brightness = Math.round((R2 * 299 + G * 587 + B2 * 114) / 1000);
+    if (brightness == 0)
+      return this.complementary();
+    if (brightness < 80 && percent < 100)
+      return this.shade(percent + 50);
+    return new Color([R2, G, B2]);
+  }
+  contrastingColor() {
+    return new Color(this.luma() >= 165 ? "#000" : "#fff");
+  }
+  luma() {
+    return 0.2126 * this.r + 0.7152 * this.g + 0.0722 * this.b;
+  }
+  rgb() {
+    return { b: this.b, g: this.g, r: this.r };
+  }
+  rgba() {
+    return { a: this.a, b: this.b, g: this.g, r: this.r };
+  }
+  rgbaString() {
+    return `rgba(${this.r}, ${this.g}, ${this.b}, ${this.a})`;
+  }
+  hex() {
+    return `#${decimalToHex(this.r)}${decimalToHex(this.g)}${decimalToHex(this.b)}`;
+  }
+  hexa() {
+    return `#${decimalToHex(this.a)}${decimalToHex(this.r)}${decimalToHex(this.g)}${decimalToHex(this.b)}`;
+  }
+  array() {
+    return [this.r, this.g, this.b, this.a];
+  }
+}
+var option = new Option;
+var isColor = (value) => {
+  if (typeof value !== "string")
+    return false;
+  option.style.color = value;
+  return option.style.color !== "";
+};
+// src/components/navbar/badge/badge.ts
+init_utils();
+
+class Badge {
+  _navbarCard;
+  _route;
+  constructor(_navbarCard, _route) {
+    this._navbarCard = _navbarCard;
+    this._route = _route;
+  }
+  get show() {
+    const badge = this._route.data.badge;
+    if (!badge)
+      return false;
+    if (badge.show) {
+      return processTemplate(this._navbarCard._hass, this._navbarCard, badge.show) ?? false;
+    }
+    if (badge.template) {
+      return processBadgeTemplate(this._navbarCard._hass, badge.template);
+    }
+    return false;
+  }
+  get count() {
+    return processTemplate(this._navbarCard._hass, this._navbarCard, this._route.data.badge?.count) ?? null;
+  }
+  get backgroundColor() {
+    return processTemplate(this._navbarCard._hass, this._navbarCard, this._route.data.badge?.color) ?? "red";
+  }
+  get textColor() {
+    return processTemplate(this._navbarCard._hass, this._navbarCard, this._route.data.badge?.text_color ?? this._route.data.badge?.textColor) ?? null;
+  }
+  get contrastingColor() {
+    return this.textColor ?? Color.from(this.backgroundColor).contrastingColor().hex();
+  }
+  render() {
+    if (!(this._route.badge && this.show))
+      return x``;
+    const hasCounter = this.count != null;
+    return x`
+      <div
+        class="badge ${this._route.selected ? "active" : ""} ${hasCounter ? "with-counter" : ""}"
+        style="background-color:${this.backgroundColor}; color:${this.contrastingColor}">
+        ${this.count ?? ""}
+      </div>
+    `;
+  }
+}
+// src/components/navbar/icon/icon.ts
+init_lit();
+init_utils();
+
+class Icon {
+  _navbarCard;
+  _route;
+  constructor(_navbarCard, _route) {
+    this._navbarCard = _navbarCard;
+    this._route = _route;
+  }
+  get icon() {
+    return processTemplate(this._navbarCard._hass, this._navbarCard, this._route.data.icon);
+  }
+  get image() {
+    return processTemplate(this._navbarCard._hass, this._navbarCard, this._route.data.image);
+  }
+  get iconSelected() {
+    return processTemplate(this._navbarCard._hass, this._navbarCard, this._route.data.icon_selected);
+  }
+  get imageSelected() {
+    return processTemplate(this._navbarCard._hass, this._navbarCard, this._route.data.image_selected);
+  }
+  get iconColor() {
+    try {
+      const rawValue = processTemplate(this._navbarCard._hass, this._navbarCard, this._route.data.icon_color);
+      if (!isColor(rawValue))
+        return null;
+      return rawValue;
+    } catch (_err) {
+      return null;
+    }
+  }
+  render() {
+    const isSelected = this._route.selected;
+    const resolvedImage = this.image;
+    const resolvedImageSelected = this.imageSelected;
+    const resolvedIcon = this.icon;
+    const resolvedIconSelected = this.iconSelected;
+    const resolvedIconColor = this.iconColor;
+    if (!(resolvedImage || resolvedIcon)) {
+      return x``;
+    }
+    return resolvedImage ? x` <img
+          class=${e6({
+      active: isSelected,
+      image: true
+    })}
+          src="${isSelected && resolvedImageSelected ? resolvedImageSelected : resolvedImage}"
+          alt="${this._route.label || ""}" />` : x` <ha-icon
+          class=${e6({
+      active: isSelected,
+      icon: true
+    })}
+          style="--icon-primary-color: ${resolvedIconColor ?? "inherit"}"
+          icon="${isSelected && resolvedIconSelected ? resolvedIconSelected : resolvedIcon}"></ha-icon>`;
+  }
+}
+// src/components/navbar/route/base-route.ts
+init_utils();
+
+class BaseRoute {
+  _navbarCard;
+  data;
+  _iconInstance;
+  _badgeInstance;
+  constructor(_navbarCard, data) {
+    this._navbarCard = _navbarCard;
+    this.data = data;
+  }
+  get url() {
+    return this.data.url;
+  }
+  get icon() {
+    return this._iconInstance ??= new Icon(this._navbarCard, this);
+  }
+  get badge() {
+    return this._badgeInstance ??= new Badge(this._navbarCard, this);
+  }
+  get selected_color() {
+    return processTemplate(this._navbarCard._hass, this._navbarCard, this.data.selected_color, { returnNullIfInvalid: true });
+  }
+  get label() {
+    if (!this._shouldShowLabels())
+      return null;
+    return processTemplate(this._navbarCard._hass, this._navbarCard, this.data.label) ?? " ";
+  }
+  get hidden() {
+    return processTemplate(this._navbarCard._hass, this._navbarCard, this.data.hidden);
+  }
+  get selected() {
+    return this.data.selected != null ? processTemplate(this._navbarCard._hass, this._navbarCard, this.data.selected) : matchesCurrentNavigationPath(this.url);
+  }
+  get tap_action() {
+    return this.data.tap_action;
+  }
+  get hold_action() {
+    return this.data.hold_action;
+  }
+  get double_tap_action() {
+    return this.data.double_tap_action;
+  }
+  _shouldShowLabels = () => {
+    const config2 = this._navbarCard.isDesktop ? this._navbarCard.config?.desktop?.show_labels : this._navbarCard.config?.mobile?.show_labels;
+    if (typeof config2 === "boolean")
+      return config2;
+    return config2 === "popup_only" && this instanceof PopupItem || config2 === "routes_only" && !(this instanceof PopupItem);
+  };
+  _shouldShowLabelBackground = () => {
+    const enabled = this._navbarCard.isDesktop ? this._navbarCard.config?.desktop?.show_popup_label_backgrounds : this._navbarCard.config?.mobile?.show_popup_label_backgrounds;
+    return !!enabled;
+  };
 }
 // src/components/navbar/route/popup/popup.ts
 init_lit();
@@ -3898,12 +4746,10 @@ init_types();
 
 class Popup {
   _navbarCard;
-  _popupItemData;
   _popupItems = [];
   _backdropClickListener;
   constructor(_navbarCard, _popupItemData) {
     this._navbarCard = _navbarCard;
-    this._popupItemData = _popupItemData;
     _popupItemData.forEach((_itemData, _index) => {
       this._popupItems.push(new PopupItem(this._navbarCard, this, _itemData, _index));
     });
@@ -3917,6 +4763,7 @@ class Popup {
   open(target) {
     const anchorRect = target.getBoundingClientRect();
     const { style, labelPositionClassName, popupDirectionClassName } = this._getPopupStyles(anchorRect, !this._navbarCard.isDesktop ? "mobile" : this._navbarCard.config?.desktop?.position ?? "bottom" /* bottom */);
+    const popupStaggerStep = this._getPopupStaggerStepSeconds(this.items.length);
     this._navbarCard.focusedPopup = x`
       <div class="navbar-popup-backdrop"></div>
       <div
@@ -3928,7 +4775,7 @@ class Popup {
       mobile: !this._navbarCard.isDesktop,
       popuplabelbackground: this._shouldShowLabelBackground()
     })}
-        style="${style}">
+        style="${style}; --popup-item-stagger-step: ${popupStaggerStep}s;">
         ${this.items.map((popupItem) => popupItem.render(popupDirectionClassName, labelPositionClassName)).filter((x2) => x2 != null)}
       </div>
     `;
@@ -3973,59 +4820,67 @@ class Popup {
     const enabled = this._navbarCard.isDesktop ? this._navbarCard.config?.desktop?.show_popup_label_backgrounds : this._navbarCard.config?.mobile?.show_popup_label_backgrounds;
     return !!enabled;
   };
+  _getPopupStaggerStepSeconds(itemsCount) {
+    const maxTotalStaggerDelaySeconds = 0.25;
+    const minStepSeconds = 0.01;
+    const maxStepSeconds = 0.05;
+    const staggeredTransitions = Math.max(itemsCount - 1, 1);
+    const dynamicStep = maxTotalStaggerDelaySeconds / staggeredTransitions;
+    return Math.max(minStepSeconds, Math.min(maxStepSeconds, dynamicStep));
+  }
   _getPopupStyles(anchorRect, position) {
     const { top, left, x: x2, width, height } = anchorRect;
     const windowWidth = window.innerWidth;
     const positions = {
-      top: {
-        style: i`
-          top: ${top + height}px;
-          left: ${x2}px;
-        `,
-        label: "label-right",
-        dir: "open-bottom"
-      },
+      bottom: null,
       left: {
+        dir: "open-right",
+        label: "label-bottom",
         style: i`
           top: ${top}px;
           left: ${x2 + width}px;
-        `,
-        label: "label-bottom",
-        dir: "open-right"
+        `
       },
+      mobile: null,
       right: {
+        dir: "open-left",
+        label: "label-bottom",
         style: i`
           top: ${top}px;
           right: ${windowWidth - x2}px;
-        `,
-        label: "label-bottom",
-        dir: "open-left"
+        `
       },
-      bottom: null,
-      mobile: null
+      top: {
+        dir: "open-bottom",
+        label: "label-right",
+        style: i`
+          top: ${top + height}px;
+          left: ${x2}px;
+        `
+      }
     };
     if (positions[position]) {
       return {
-        style: positions[position].style,
         labelPositionClassName: positions[position].label,
-        popupDirectionClassName: positions[position].dir
+        popupDirectionClassName: positions[position].dir,
+        style: positions[position].style
       };
     }
     const isRightSide = x2 > windowWidth / 2;
     return isRightSide ? {
+      labelPositionClassName: "label-left",
+      popupDirectionClassName: "open-up",
       style: i`
             top: ${top}px;
             right: ${windowWidth - x2 - width}px;
-          `,
-      labelPositionClassName: "label-left",
-      popupDirectionClassName: "open-up"
+          `
     } : {
+      labelPositionClassName: "label-right",
+      popupDirectionClassName: "open-up",
       style: i`
             top: ${top}px;
             left: ${left}px;
-          `,
-      labelPositionClassName: "label-right",
-      popupDirectionClassName: "open-up"
+          `
     };
   }
   _onPopupKeyDownListener = (e7) => {
@@ -4037,6 +4892,40 @@ class Popup {
 }
 // src/components/navbar/route/popup/popup-item.ts
 init_lit();
+
+// node_modules/lit-html/directives/style-map.js
+init_lit_html();
+var n5 = "important";
+var i6 = " !" + n5;
+var o6 = e5(class extends i5 {
+  constructor(t5) {
+    if (super(t5), t5.type !== t4.ATTRIBUTE || t5.name !== "style" || t5.strings?.length > 2)
+      throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.");
+  }
+  render(t5) {
+    return Object.keys(t5).reduce((e7, r6) => {
+      const s4 = t5[r6];
+      return s4 == null ? e7 : e7 + `${r6 = r6.includes("-") ? r6 : r6.replace(/(?:^(webkit|moz|ms|o)|)(?=[A-Z])/g, "-$&").toLowerCase()}:${s4};`;
+    }, "");
+  }
+  update(e7, [r6]) {
+    const { style: s4 } = e7.element;
+    if (this.ft === undefined)
+      return this.ft = new Set(Object.keys(r6)), this.render(r6);
+    for (const t5 of this.ft)
+      r6[t5] == null && (this.ft.delete(t5), t5.includes("-") ? s4.removeProperty(t5) : s4[t5] = null);
+    for (const t5 in r6) {
+      const e8 = r6[t5];
+      if (e8 != null) {
+        this.ft.add(t5);
+        const r7 = typeof e8 == "string" && e8.endsWith(i6);
+        t5.includes("-") || r7 ? s4.setProperty(t5, r7 ? e8.slice(0, -11) : e8, r7 ? n5 : "") : s4[t5] = e8;
+      }
+    }
+    return T;
+  }
+});
+// src/components/navbar/route/popup/popup-item.ts
 class PopupItem extends BaseRoute {
   _parentPopup;
   _index;
@@ -4057,21 +4946,21 @@ class PopupItem extends BaseRoute {
       "popup-item": true,
       [popupDirectionClassName]: true,
       [labelPositionClassName]: true,
-      popuplabelbackground: showLabelBackground,
-      active: this.selected
+      active: this.selected,
+      popuplabelbackground: showLabelBackground
     })}
       style=${o6({
       "--index": this._index
     })}
       ${eventDetection({
       context: this._navbarCard,
+      doubleTap: this.double_tap_action,
+      hold: this.hold_action,
       popupItem: this,
       tap: this.tap_action ?? {
         action: "navigate",
         navigation_path: this.url ?? ""
-      },
-      hold: this.hold_action,
-      doubleTap: this.double_tap_action
+      }
     })}>
       <div
         class=${e6({
@@ -4087,151 +4976,105 @@ class PopupItem extends BaseRoute {
     </div>`;
   }
 }
-// src/navbar-card.ts
-init_utils();
-init_styles();
-
-// src/components/media-player.ts
+// src/components/navbar/route/route.ts
 init_lit();
 init_utils();
-class MediaPlayer {
-  _navbarCard;
-  constructor(_navbarCard) {
-    this._navbarCard = _navbarCard;
+
+class Route extends BaseRoute {
+  _routeData;
+  _popupInstance;
+  constructor(_navbarCard, _routeData) {
+    super(_navbarCard, _routeData);
+    this._routeData = _routeData;
+    this._validateRoute();
   }
-  get tap_action() {
-    return this._navbarCard.config?.media_player?.tap_action;
+  get popup() {
+    return this._popupInstance ??= new Popup(this._navbarCard, processTemplate(this._navbarCard._hass, this._navbarCard, this._routeData.popup) ?? this._routeData.popup ?? this._routeData.submenu ?? []);
   }
-  get hold_action() {
-    return this._navbarCard.config?.media_player?.hold_action;
-  }
-  get double_tap_action() {
-    return this._navbarCard.config?.media_player?.double_tap_action;
-  }
-  shouldShowMediaPlayer = () => {
-    const config2 = this._navbarCard.config?.media_player;
-    if (!config2?.entity)
-      return { visible: false };
-    if (this._navbarCard.isDesktop)
-      return { visible: false };
-    const entity = this._getEntity();
-    const state2 = this._navbarCard._hass.states[entity ?? ""];
-    if (!state2)
-      return { visible: true, error: `Entity not found "${entity}"` };
-    if (config2.show != null) {
-      return {
-        visible: processTemplate(this._navbarCard._hass, this._navbarCard, config2.show)
-      };
+  get isSelfOrChildActive() {
+    if (this._navbarCard.config?.layout?.reflect_child_state && !this.selected) {
+      return this.popup.items.some((item) => item.selected);
     }
-    return { visible: ["playing", "paused"].includes(state2.state) };
-  };
-  _getEntity() {
-    return processTemplate(this._navbarCard._hass, this._navbarCard, this._navbarCard.config?.media_player?.entity);
+    return this.selected;
   }
-  _handleMediaPlayerSkipNextClick = (e7) => {
-    e7.preventDefault();
-    e7.stopPropagation();
-    const entity = this._getEntity();
-    if (entity) {
-      this._navbarCard._hass.callService("media_player", "media_next_track", {
-        entity_id: entity
-      });
-    }
-  };
-  _handleMediaPlayerPlayPauseClick = (e7) => {
-    e7.preventDefault();
-    e7.stopPropagation();
-    const entity = this._getEntity();
-    if (!entity)
-      return;
-    const state2 = this._navbarCard._hass.states[entity];
-    if (!state2)
-      return;
-    const action = state2.state === "playing" ? "media_pause" : "media_play";
-    this._navbarCard._hass.callService("media_player", action, {
-      entity_id: entity
-    });
-  };
-  render = () => {
-    const { visible, error } = this.shouldShowMediaPlayer();
-    if (!visible)
-      return x``;
-    const entity = this._getEntity();
-    if (!entity)
-      return x``;
-    if (error) {
-      return x`<ha-card class="media-player error">
-        <ha-alert alert-type="error"> ${error} </ha-alert>
-      </ha-card>`;
-    }
-    const mediaPlayerState = this._navbarCard._hass.states[entity];
-    const mediaPlayerImage = mediaPlayerState.attributes.entity_picture;
-    const progress = mediaPlayerState.attributes.media_position != null ? mediaPlayerState.attributes.media_position / mediaPlayerState.attributes.media_duration : null;
+  render() {
+    if (this.hidden)
+      return null;
+    const isActive = this.isSelfOrChildActive;
     return x`
-      <ha-card
-        class="media-player"
+      <div
+        class=${e6({
+      active: isActive,
+      route: true
+    })}
+        style=${o6({
+      "--navbar-primary-color": this.selected_color ?? null
+    })}
         ${eventDetection({
       context: this._navbarCard,
-      tap: this.tap_action ?? {
-        action: "more-info",
-        entity
-      },
+      doubleTap: this.double_tap_action,
       hold: this.hold_action,
-      doubleTap: this.double_tap_action
+      route: this,
+      tap: this.tap_action ?? {
+        action: "navigate",
+        navigation_path: this.url ?? ""
+      }
     })}>
         <div
-          class="media-player-bg"
-          style=${this._navbarCard.config?.media_player?.album_cover_background ? `background-image: url(${mediaPlayerState.attributes.entity_picture});` : ""}></div>
-        ${progress != null ? x` <div class="media-player-progress-bar">
-              <div
-                class="media-player-progress-bar-fill"
-                style="width: ${progress * 100}%"></div>
-            </div>` : x``}
-        ${mediaPlayerImage ? x`<img
-              class="media-player-image"
-              src=${mediaPlayerImage}
-              alt=${mediaPlayerState.attributes.media_title} />` : x`<ha-icon
-              class="media-player-image media-player-icon-fallback"
-              icon="mdi:music"></ha-icon>`}
-        <div class="media-player-info">
-          <span class="media-player-title"
-            >${mediaPlayerState.attributes.media_title}</span
-          >
-          <span class="media-player-artist"
-            >${mediaPlayerState.attributes.media_artist}</span
-          >
+          class=${e6({
+      active: isActive,
+      button: true
+    })}
+          style=${o6({
+      "--navbar-primary-color": this.selected_color ?? null
+    })}>
+          ${this.icon.render()}
+          <ha-ripple></ha-ripple>
+          ${this.badge.render()}
         </div>
-        <button
-          class="navbar-icon-button media-player-button media-player-button-play-pause primary"
-          appearance="accent"
-          variant="brand"
-          @click=${this._handleMediaPlayerPlayPauseClick}
-          @pointerdown=${preventEventDefault}
-          @pointerup=${preventEventDefault}>
-          <ha-icon
-            icon=${mediaPlayerState.state === "playing" ? "mdi:pause" : "mdi:play"}></ha-icon>
-        </button>
-        <button
-          class="navbar-icon-button media-player-button media-player-button-skip"
-          appearance="plain"
-          variant="neutral"
-          @click=${this._handleMediaPlayerSkipNextClick}
-          @pointerdown=${preventEventDefault}
-          @pointerup=${preventEventDefault}>
-          <ha-icon icon="mdi:skip-next"></ha-icon>
-        </button>
-      </ha-card>
+        ${this.label ? x`<div
+              class=${e6({
+      active: isActive,
+      label: true
+    })}>
+              ${this.label}
+            </div>` : x``}
+      </div>
     `;
-  };
+  }
+  _validateRoute() {
+    if (!(this.data.icon || this.data.image)) {
+      throw new Error('Each route must have either an "icon" or "image" property configured');
+    }
+    if (!(this._routeData.popup || this.tap_action || this.hold_action || this.url || this.double_tap_action)) {
+      throw new Error("Each route must have at least one actionable property (url, popup, tap_action, hold_action, double_tap_action)");
+    }
+    if (this.tap_action && !this.tap_action.action) {
+      throw new Error('"tap_action" must have an "action" property');
+    }
+    if (this.hold_action && !this.hold_action.action) {
+      throw new Error('"hold_action" must have an "action" property');
+    }
+    if (this.double_tap_action && !this.double_tap_action.action) {
+      throw new Error('"double_tap_action" must have an "action" property');
+    }
+  }
 }
+// src/navbar-card.ts
+init_styles();
+init_types();
+init_utils();
+init_docs_links();
+// package.json
+var version = "1.6.0";
 
 // src/navbar-card.ts
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: "navbar-card",
+  description: "Full-width bottom nav on mobile and flexible desktop nav that can be placed on any side.",
   name: "Navbar card",
   preview: true,
-  description: "Full-width bottom nav on mobile and flexible desktop nav that can be placed on any side."
+  type: "navbar-card"
 });
 
 class NavbarCard extends i4 {
@@ -4239,17 +5082,33 @@ class NavbarCard extends i4 {
     super(...arguments);
     this._routes = [];
     this.focusedPopup = null;
+    this.widgetVisibility = {};
   }
   _mediaPlayer = new MediaPlayer(this);
   set hass(hass) {
     this._hass = hass;
-    const { visible } = this._mediaPlayer.shouldShowMediaPlayer();
-    if (this._showMediaPlayer !== visible) {
-      this._showMediaPlayer = visible;
+    const { visible } = this._mediaPlayer.isVisible();
+    const prevMediaPlayerPosition = this.widgetVisibility.media_player ?? null;
+    const nextMediaPlayerPosition = visible ? this._mediaPlayer.desktop_position : null;
+    if (visible) {
+      this.widgetVisibility.media_player = nextMediaPlayerPosition;
+    } else {
+      this.widgetVisibility.media_player = null;
+    }
+    if (prevMediaPlayerPosition !== nextMediaPlayerPosition) {
+      forceDashboardPadding({
+        autoPadding: this.config?.layout?.auto_padding,
+        desktop: this.config?.desktop ?? DEFAULT_NAVBAR_CONFIG.desktop,
+        mobile: this.config?.mobile ?? DEFAULT_NAVBAR_CONFIG.mobile,
+        widgetPositions: this.widgetVisibility
+      });
     }
   }
   get isInEditMode() {
     return !!this._inEditDashboardMode || !!this._inEditCardMode || !!this._inPreviewMode;
+  }
+  get desktopPosition() {
+    return mapStringToEnum(DesktopPosition, this.config?.desktop?.position) ?? "bottom" /* bottom */;
   }
   static getStubConfig() {
     return STUB_CONFIG;
@@ -4267,10 +5126,10 @@ class NavbarCard extends i4 {
     this._checkDesktop();
     injectStyles(this, getDefaultStyles(), this.config?.styles ? r(this.config.styles) : i``);
     forceDashboardPadding({
+      autoPadding: this.config?.layout?.auto_padding,
       desktop: this.config?.desktop ?? DEFAULT_NAVBAR_CONFIG.desktop,
       mobile: this.config?.mobile ?? DEFAULT_NAVBAR_CONFIG.mobile,
-      auto_padding: this.config?.layout?.auto_padding,
-      show_media_player: this._showMediaPlayer ?? false
+      widgetPositions: this.widgetVisibility
     });
   }
   disconnectedCallback() {
@@ -4280,57 +5139,67 @@ class NavbarCard extends i4 {
     this.focusedPopup = null;
   }
   setConfig(config2) {
+    let mergedConfig = config2;
     if (config2?.template) {
       const templates = getNavbarTemplates();
       if (templates) {
         const templateConfig = templates[config2.template];
         if (templateConfig) {
-          config2 = deepMergeKeepArrays(templateConfig, config2);
+          mergedConfig = deepMergeKeepArrays(templateConfig, config2);
         }
       } else {
         console.warn(`[navbar-card] No templates configured in this dashboard. Please refer to "templates" documentation for more information.
 
-https://github.com/joseluis9595/lovelace-navbar-card?tab=readme-ov-file#templates
+${DOCS_LINKS.template}
 `);
       }
     }
-    if (!config2.routes) {
+    if (!mergedConfig.routes) {
       throw new Error('"routes" param is required for navbar card');
     }
-    if (JSON.stringify(config2) === JSON.stringify(this.config))
+    if (JSON.stringify(mergedConfig) === JSON.stringify(this.config))
       return;
-    this._routes = config2.routes.map((route2) => new Route(this, route2));
-    this.config = config2;
+    this._routes = mergedConfig.routes.map((route2) => new Route(this, route2));
+    this.config = mergedConfig;
   }
   updated(_changedProperties) {
     super.updated(_changedProperties);
-    if (_changedProperties.has("_showMediaPlayer")) {
-      forceDashboardPadding({
-        desktop: this.config?.desktop ?? DEFAULT_NAVBAR_CONFIG.desktop,
-        mobile: this.config?.mobile ?? DEFAULT_NAVBAR_CONFIG.mobile,
-        auto_padding: this.config?.layout?.auto_padding,
-        show_media_player: this._showMediaPlayer ?? false
-      });
-    }
   }
   render() {
     if (!this.config || this._shouldHide())
       return x``;
-    const desktopPosition = mapStringToEnum(DesktopPosition, this.config.desktop?.position) ?? "bottom" /* bottom */;
     const deviceClass = this.isDesktop ? "desktop" : "mobile";
     const editClass = this.isInEditMode ? "edit-mode" : "";
     const mobileModeClass = this.config.mobile?.mode === "floating" ? "floating" : "";
+    const desktopModeClass = this.isDesktop && this.config.desktop?.mode === "docked" ? "docked" : "";
+    const shouldRenderMediaPlayerInsideNavbar = this._shouldRenderMediaPlayerInsideNavbar();
     return x`
+      ${!shouldRenderMediaPlayerInsideNavbar ? this._mediaPlayer.render({
+      isInsideNavbar: false
+    }) : x``}
       <div
-        class="navbar ${editClass} ${deviceClass} ${desktopPosition} ${mobileModeClass}">
-        ${this._mediaPlayer.render()}
+        class="navbar ${editClass} ${deviceClass} ${this.desktopPosition} ${mobileModeClass} ${desktopModeClass}">
+        ${shouldRenderMediaPlayerInsideNavbar ? this._mediaPlayer.render({
+      isInsideNavbar: true
+    }) : x``}
         <ha-card
-          class="navbar-card ${deviceClass} ${desktopPosition} ${mobileModeClass}">
+          class="navbar-card ${deviceClass} ${this.desktopPosition} ${mobileModeClass} ${desktopModeClass}">
           ${this._routes.map((route2) => route2.render()).filter(Boolean)}
         </ha-card>
       </div>
       ${this.focusedPopup ?? x``}
     `;
+  }
+  _shouldRenderMediaPlayerInsideNavbar() {
+    if (!this.isDesktop)
+      return true;
+    if (this.isInEditMode)
+      return true;
+    if (this.hidden)
+      return false;
+    const mediaPlayerDesktopPosition = this._mediaPlayer.desktop_position;
+    const navbarPosition = this.desktopPosition;
+    return navbarPosition === "bottom" /* bottom */ && mediaPlayerDesktopPosition === "bottom-center" /* bottomCenter */ || navbarPosition === "top" /* top */ && mediaPlayerDesktopPosition === "top-center" /* topCenter */;
   }
   _checkDesktop = () => {
     this.isDesktop = (window.innerWidth || 0) >= (this.config?.desktop?.min_width ?? 768);
@@ -4366,9 +5235,6 @@ __legacyDecorateClassTS([
 ], NavbarCard.prototype, "config", undefined);
 __legacyDecorateClassTS([
   r5()
-], NavbarCard.prototype, "_showMediaPlayer", undefined);
-__legacyDecorateClassTS([
-  r5()
 ], NavbarCard.prototype, "_routes", undefined);
 __legacyDecorateClassTS([
   r5()
@@ -4376,6 +5242,9 @@ __legacyDecorateClassTS([
 __legacyDecorateClassTS([
   r5()
 ], NavbarCard.prototype, "isDesktop", undefined);
+__legacyDecorateClassTS([
+  r5()
+], NavbarCard.prototype, "widgetVisibility", undefined);
 NavbarCard = __legacyDecorateClassTS([
   t3("navbar-card")
 ], NavbarCard);

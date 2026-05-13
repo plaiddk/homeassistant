@@ -1,0 +1,14 @@
+- sensor:
+    - name: "Cheapest 3 Hours"
+      unique_id: sensor_cheapest_3_hours
+      state: >-
+        {% set l = state_attr('sensor.nordpool_kwh_dk1_dkk_3_10_025', 'raw_today') | sort(attribute='value') %}
+        {{ (now() >= l[0].start and now() <= l[0].end) or
+           (now() >= l[1].start and now() <= l[1].end) or
+           (now() >= l[2].start and now() <= l[2].end) }}
+
+    - name: "Cheapest 1 Hour"
+      unique_id: sensor_cheapest_1_hour
+      state: >-
+        {% set l = state_attr('sensor.nordpool_kwh_dk1_dkk_3_10_025', 'raw_today') | sort(attribute='value') %}
+        {{ (now() >= l[0].start and now() <= l[0].end) }}

@@ -66,6 +66,14 @@
         },
         "description": "Log in op de Movahome cloud."
       },
+      "trouver": {
+        "data": {
+          "username": "Gebruikersnaam",
+          "password": "Wachtwoord",
+          "country": "Serverland"
+        },
+        "description": "Log in op de Trouver cloud."
+      },
       "devices": {
         "data": {
           "devices": "Ondersteunde Apparaten"
@@ -141,10 +149,10 @@
       },
       "cleaning_mode": {
         "state": {
-          "sweeping": "Vegen",
+          "sweeping": "Stofzuigen",
           "mopping": "Dweilen",
-          "sweeping_and_mopping": "Vegen en dweilen",
-          "mopping_after_sweeping": "Dweilen na vegen"
+          "sweeping_and_mopping": "Stofzuigen en dweilen",
+          "mopping_after_sweeping": "Dweilen na stofzuigen"
         }
       },
       "carpet_sensitivity": {
@@ -205,7 +213,10 @@
         "state": {
           "none": "Geen",
           "tile": "Vloertegel",
-          "wood": "Houten vloer"
+          "wood": "Houten vloer",
+          "low_pile_carpet": "Laagpolig tapijt",
+          "medium_pile_carpet": "Middelhoogpolig tapijt",
+          "carpet": "Tapijt"
         }
       },
       "voice_assistant_language": {
@@ -213,7 +224,43 @@
           "default": "Standaard",
           "english": "Engels",
           "german": "Duits",
-          "chinese": "Chinees"
+          "chinese": "Chinees",
+          "russian": "Russisch",
+          "italian": "Italiaans",
+          "french": "Frans",
+          "korean": "Koreaans"
+        }
+      },
+      "mop_pressure": {
+        "state": {
+          "light": "Licht",
+          "normal": "Normaal"
+        }
+      },
+      "mop_temperature": {
+        "state": {
+          "normal": "Normaal",
+          "warm": "Warm"
+        }
+      },
+      "low_lying_area_frequency": {
+        "state": {
+          "weekly": "Wekelijks",
+          "daily": "Dagelijks"
+        }
+      },
+      "scraper_frequency": {
+        "state": {
+          "off": "Uit",
+          "weekly": "Wekelijks",
+          "daily": "Dagelijks"
+        }
+      },
+      "auto_lds_coverage": {
+        "state": {
+          "off": "Uit",
+          "security": "Beveiliging",
+          "extreme": "Extreem"
         }
       },
       "order": {
@@ -225,7 +272,8 @@
         "state": {
           "by_area": "Per Gebied",
           "by_time": "Per Tijd",
-          "by_room": "Per Kamer"
+          "by_room": "Per Kamer",
+          "intelligent": "Intelligent"
         }
       },
       "mop_clean_frequency": {
@@ -238,7 +286,9 @@
           "off": "Uit",
           "standard": "Standaard",
           "high_frequency": "Hoge Frequentie",
-          "low_frequency": "Lage Frequentie"
+          "low_frequency": "Lage Frequentie",
+          "custom_frequency": "Aangepaste frequentie",
+          "intelligent": "Intelligent"
         }
       },
       "floor_material_direction": {
@@ -279,7 +329,8 @@
           "normal": "Normaal",
           "mild": "Mild",
           "warm": "Warm",
-          "hot": "Heet"
+          "hot": "Heet",
+          "max": "Maximaal"
         }
       },
       "auto_recleaning": {
@@ -317,7 +368,7 @@
       "state": {
         "state": {
           "unknown": "Onbekend",
-          "sweeping": "Vegen",
+          "sweeping": "Stofzuigen",
           "charging": "Opladen",
           "error": "Fout",
           "idle": "Inactief",
@@ -328,7 +379,7 @@
           "washing": "Wassen",
           "returning_to_wash": "Terugkeren om te wassen",
           "building": "Bouwen",
-          "sweeping_and_mopping": "Vegen en dweilen",
+          "sweeping_and_mopping": "Stofzuigen en dweilen",
           "charging_completed": "Opladen voltooid",
           "upgrading": "Upgraden",
           "clean_summon": "Oproepen om schoon te maken",
@@ -350,12 +401,24 @@
           "returning_to_drain": "Terugkeren om te legen",
           "draining": "Legen",
           "auto_water_draining": "Automatisch water legen",
-          "shortcut_task": "Snelkoppelingstaak",
-          "streaming": "Streamen",
-          "streaming_paused": "Streamen gepauzeerd",
+          "emptying": "Leegmaken",
+          "dust_bag_drying": "Stofzak drogen",
+          "dust_bag_drying_paused": "Drogen stofzak gepauzeerd",
+          "heading_to_extra_cleaning": "Op weg naar extra reiniging",
+          "extra_cleaning": "Extra reiniging",
+          "finding_pet_paused": "Huisdier zoeken gepauzeerd",
+          "finding_pet": "Huisdier zoeken",
           "shortcut": "Snelkoppeling",
           "monitoring": "Monitoren",
-          "monitoring_paused": "Monitoren gepauzeerd"
+          "monitoring_paused": "Monitoren gepauzeerd",
+          "initial_deep_cleaning": "Initiële diepe reiniging",
+          "initial_deep_cleaning_paused": "Initiële diepe reiniging gepauzeerd",
+          "sanitizing": "Desinfecteren",
+          "sanitizing_with_dry": "Desinfecteren met drogen",
+          "changing_mop": "Dweil vervangen",
+          "changing_mop_paused": "Dweil vervangen gepauzeerd",
+          "floor_maintaining": "Vloeronderhoud",
+          "floor_maintaining_paused": "Vloeronderhoud gepauzeerd"
         }
       },
       "status": {
@@ -545,7 +608,40 @@
           "dirty_tank_not_installed": "De gebruikte watertank van de robot is niet geïnstalleerd.",
           "robot_in_hidden_room": "Verborgen gebied. Verplaats de robot naar het juiste gebied en probeer opnieuw.",
           "washboard_not_working": "Washboard werkt niet.",
-          "return_to_charge_failed": "Terugkeren om op te laden is mislukt."
+          "return_to_charge_failed": "Terugkeren om op te laden is mislukt.",
+          "lds_failed_to_lift": "LDS-module kon niet worden opgetild.",
+          "robot_stuck": "LDS kan hier niet worden opgetild voor positionering.",
+          "robot_stuck_repeat": "Verplaats de robot naar een open gebied en hervat de taak.",
+          "slippery_floor": "Gladde vloer. Probeer het later opnieuw.",
+          "check_mop_install": "Controleer of de dweil correct is geïnstalleerd.",
+          "dirty_water_tank_full": "Abnormaal waterpeil in vuilwatertank.",
+          "retractable_leg_stuck": "Controleer of de intrekbare poten verstrikt zijn geraakt.",
+          "internal_error": "Storing door interne fout. Probeer de robot opnieuw op te starten.",
+          "robot_stuck_on_tables": "Robot zit vast tussen tafels en stoelen.",
+          "robot_stuck_on_passage": "Robot zit vast in smalle doorgang.",
+          "robot_stuck_on_threshold": "Robot zit vast op drempel/afstapje.",
+          "robot_stuck_on_low_lying_area": "Robot zit vast in laag gebied.",
+          "robot_stuck_on_ramp": "Robot heeft gevaarlijke hellingen gedetecteerd.",
+          "robot_stuck_on_obstacle": "Robot heeft obstakels gedetecteerd.",
+          "robot_stuck_on_pet": "Robot heeft mensen of huisdieren gedetecteerd.",
+          "robot_stuck_on_slippery_surface": "Robot zit vast door uitglijden.",
+          "robot_stuck_on_carpet": "Robot glijdt uit op tapijt",
+          "drainage_failed": "Abnormale afvoer uit vuilwatertank",
+          "mop_not_detected": "Dweil niet gedetecteerd.",
+          "mop_holder_error": "Fout aantal/plaatsing dweilhouder in station.",
+          "dock_error": "Stationfout.",
+          "wash_failed": "Wassen van vuile dweil mislukt.",
+          "robot_stuck_on_curtain": "Robot glijdt uit in gordijngebied",
+          "edge_mop_stop_rotate": "Randdweil is gestopt met draaien.",
+          "edge_mop_detached": "Randdweil is losgeraakt.",
+          "chassis_lift_malfunction": "Storing chassisheffing.",
+          "mop_cover_error": "Controleer op vuil bij de dweilrol en afdekking.",
+          "roller_mop_error": "Controleer op vuil bij de dweilrol en afdekking.",
+          "onboard_water_tank_empty": "Laag waterpeil in schoonwatertank van robot.",
+          "onboard_dirty_water_tank_full": "Vuilwatertank van robot is vol.",
+          "mop_not_installed": "Dweil niet geïnstalleerd.",
+          "fluffing_roller_error": "Fout pluizenroller.",
+          "blocked_by_obstacle": "Robot geblokkeerd door obstakel."
         }
       },
       "charging_status": {
@@ -672,7 +768,27 @@
           "water_stain": "Water vlek schoonmaak",
           "water_stain_paused": "Water vlek schoonmaak gepauzeerd",
           "boosted_edge_cleaning": "Boosted randreiniging",
-          "hair_compressing": "Haar comprimeren"
+          "hair_compressing": "Haar comprimeren",
+          "large_particle_cleaning": "Reiniging grote deeltjes",
+          "intensive_stain_cleaning": "Intensieve vlekkenreiniging",
+          "stain_cleaning": "Vlekkenreiniging",
+          "initial_deep_cleaning": "Initiële diepe reiniging",
+          "initial_deep_cleaning_paused": "Initiële diepe reiniging gepauzeerd",
+          "mop_pad_heating": "Mop‑pad verwarming",
+          "cleaning_after_mapping": "Reiniging na mapping",
+          "small_particle_cleaning": "Reiniging kleine deeltjes",
+          "changing_mop": "Dweil vervangen",
+          "changing_mop_paused": "Dweil vervangen gepauzeerd",
+          "floor_maintaining": "Vloeronderhoud",
+          "floor_maintaining_paused": "Vloeronderhoud gepauzeerd",
+          "wood_floor_maintaining": "Houten vloer onderhoud"
+        }
+      },
+      "dust_bag_drying_status": {
+        "state": {
+          "idle": "Inactief",
+          "drying": "Drogen",
+          "paused": "Gepauzeerd"
         }
       }
     }
@@ -1006,7 +1122,7 @@
           "name": "Tapijtreiniging",
           "description": "Aangepaste tapijtreinigingsinstelling voor elk tapijt."
         },
-        "carpet_settings": {
+        "carpet_preferences": {
           "name": "Tapijtinstellingen",
           "description": "Aangepaste tapijtinstellingen voor elk tapijt met een array van ingeschakelde instellingen."
         }
@@ -1054,6 +1170,16 @@
         }
       }
     },
+    "vacuum_delete_shortcut": {
+      "name": "Snelkoppeling verwijderen",
+      "description": "Verwijder een snelkoppeling. (Alleen op ondersteunde apparaten)",
+      "fields": {
+        "shortcut_id": {
+          "name": "Snelkoppeling ID",
+          "description": "ID van de snelkoppeling."
+        }
+      }
+    },
     "vacuum_set_carpet_area": {
       "name": "Tapijtgebied Instellen",
       "description": "Definieer tapijten en genegeerde tapijten. (Alleen op ondersteunde apparaten)",
@@ -1062,7 +1188,7 @@
           "name": "Tapijten",
           "description": "Tapijtgebieden."
         },
-        "ignored_carpets": {
+        "deleted_carpets": {
           "name": "Genegeerde Tapijten",
           "description": "Genegeerde tapijtgebieden om automatisch gedetecteerde tapijten te verwijderen."
         }

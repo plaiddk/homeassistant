@@ -5,32 +5,40 @@ from __future__ import annotations
 import logging
 
 from aiohttp import ClientResponseError, InvalidUrlClientError
-
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.util.ssl import get_default_context
+
 from myskoda import (
-    MySkoda,
     AuthorizationFailedError,
+    MySkoda,
 )
-from myskoda.myskoda import TRACE_CONFIG
 from myskoda.auth.authorization import (
     CSRFError,
-    TermsAndConditionsError,
     MarketingConsentError,
+    TermsAndConditionsError,
+    TokenExpiredError,
 )
+from myskoda.myskoda import TRACE_CONFIG
 
-
-from .const import CONF_USERNAME, CONF_PASSWORD, COORDINATORS, DOMAIN, VINLIST
+from .const import (
+    CONF_FCM_TOKEN,
+    CONF_PASSWORD,
+    CONF_REFRESH_TOKEN,
+    CONF_USERNAME,
+    CONF_VINLIST,
+    COORDINATORS,
+    DOMAIN,
+)
 from .coordinator import MySkodaConfigEntry, MySkodaDataUpdateCoordinator
 from .error_handlers import handle_aiohttp_error
 from .issues import (
     async_create_tnc_issue,
-    async_delete_tnc_issue,
     async_delete_spin_issue,
+    async_delete_tnc_issue,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -63,13 +71,34 @@ def myskoda_instantiate(
     return MySkoda(session, get_default_context(), mqtt_enabled=mqtt_enabled)
 
 
+async def auto_connect(myskoda: MySkoda, entry: MySkodaConfigEntry) -> None:
+    """Figure out if we can use the refresh token or if we should fall back to username/password. Then attempt to authenticate."""
+
+    connect_kwargs = {
+        "email": entry.data[CONF_USERNAME],
+        "password": entry.data[CONF_PASSWORD],
+        "refresh_token": entry.data.get(CONF_REFRESH_TOKEN),
+        "fcm_token": entry.data.get(CONF_FCM_TOKEN),
+    }
+    _LOGGER.debug(
+        "Authorizing with %s",
+        "refresh token'" if connect_kwargs["refresh_token"] else "username/password",
+    )
+    try:
+        await myskoda.connect(**connect_kwargs)
+    except TokenExpiredError:
+        _LOGGER.debug("Refresh token is expired. Falling back to username/password")
+        connect_kwargs.pop("refresh_token")
+        await myskoda.connect(**connect_kwargs)
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: MySkodaConfigEntry) -> bool:
     """Set up MySkoda integration from a config entry."""
 
     myskoda = myskoda_instantiate(hass, entry, mqtt_enabled=False)
 
     try:
-        await myskoda.connect(entry.data[CONF_USERNAME], entry.data[CONF_PASSWORD])
+        await auto_connect(myskoda, entry)
     except AuthorizationFailedError as exc:
         _LOGGER.debug("Authorization with MySkoda failed.")
         raise ConfigEntryAuthFailed from exc
@@ -90,18 +119,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: MySkodaConfigEntry) -> b
         _LOGGER.exception("Login with MySkoda failed for an unknown reason.")
         return False
 
+    # At this point we are fully connected and authorized
+
     async_delete_tnc_issue(hass, entry.entry_id)
     async_delete_spin_issue(hass, entry.entry_id)
 
     coordinators: dict[str, MySkodaDataUpdateCoordinator] = {}
-    cached_vins: list = entry.data.get(VINLIST, [])
+    cached_vins: list = entry.data.get(CONF_VINLIST, [])
 
     try:
         vehicles = await myskoda.list_vehicle_vins()
         if vehicles and vehicles != cached_vins:
             _LOGGER.info("New vehicles detected. Storing new vehicle list in cache")
             entry_data = {**entry.data}
-            entry_data[VINLIST] = vehicles
+            entry_data[CONF_VINLIST] = vehicles
             hass.config_entries.async_update_entry(entry, data=entry_data)
     except Exception:
         if cached_vins:
@@ -112,6 +143,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: MySkodaConfigEntry) -> b
             pass
         else:
             raise
+
+    if entry.data.get(CONF_REFRESH_TOKEN):
+        current_refresh_token = await myskoda.get_refresh_token()
+        if current_refresh_token != entry.data[CONF_REFRESH_TOKEN]:
+            _LOGGER.debug(
+                "Refresh token updated during initialization. Storing new token in configuration."
+            )
+            new_data = {**entry.data}
+            new_data[CONF_REFRESH_TOKEN] = current_refresh_token
+            hass.config_entries.async_update_entry(entry, data=new_data)
 
     for vin in vehicles:
         coordinator = MySkodaDataUpdateCoordinator(hass, entry, myskoda, vin)
@@ -129,10 +170,25 @@ async def async_setup_entry(hass: HomeAssistant, entry: MySkodaConfigEntry) -> b
 
 async def async_unload_entry(hass: HomeAssistant, entry: MySkodaConfigEntry) -> bool:
     """Unload a config entry."""
+
     coordinators: dict[str, MySkodaDataUpdateCoordinator] = hass.data[DOMAIN][
         entry.entry_id
     ].get(COORDINATORS, {})
     for coord in coordinators.values():
+        if entry.data.get(CONF_REFRESH_TOKEN):
+            current_refresh_token = await coord.myskoda.get_refresh_token()
+            if current_refresh_token != entry.data[CONF_REFRESH_TOKEN]:
+                _LOGGER.info("Saving authorization refresh token before shutdown")
+                entry_data = {**entry.data}
+                entry_data[CONF_REFRESH_TOKEN] = current_refresh_token
+                hass.config_entries.async_update_entry(entry, data=entry_data)
+        if coord.myskoda.fcm_token and coord.myskoda.fcm_token != entry.data.get(
+            CONF_FCM_TOKEN
+        ):
+            _LOGGER.info("Saving FCM token before shutdown")
+            entry_data = {**entry.data}
+            entry_data[CONF_FCM_TOKEN] = coord.myskoda.fcm_token
+            hass.config_entries.async_update_entry(entry, data=entry_data)
         await coord.myskoda.disconnect()
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
@@ -151,7 +207,7 @@ async def async_migrate_entry(hass: HomeAssistant, entry: MySkodaConfigEntry) ->
     """Handle MySkoda config-entry schema migrations."""
 
     _LOGGER.debug(
-        "Migrating config entry %s from v%s.%s",
+        "Starting migration of config entry %s from v%s.%s",
         entry.entry_id,
         entry.version,
         entry.minor_version,
@@ -163,17 +219,27 @@ async def async_migrate_entry(hass: HomeAssistant, entry: MySkodaConfigEntry) ->
     # - Major increase: Removing options or rewriting entities/devices
     if entry.version > 2:
         _LOGGER.error(
-            "Configuration for %s is too new. This can happen if you downgraded your HA install. Automatic configuration migration aborted.",
+            "Configuration for %s is too new. This can happen if you downgraded your HA install or integration. Automatic configuration migration aborted.",
             DOMAIN,
         )
         return False
 
+    entry_data = {**entry.data}
+
     # We will likely need to contact myskoda, so make a connection and authenticate
     try:
         myskoda = myskoda_instantiate(hass, entry, mqtt_enabled=False)
-        await myskoda.connect(entry.data["email"], entry.data["password"])
+        await auto_connect(myskoda, entry)
     except AuthorizationFailedError as exc:
         raise ConfigEntryAuthFailed("Log in failed for %s: %s", DOMAIN, exc)
+    except (TermsAndConditionsError, MarketingConsentError) as exc:
+        _LOGGER.error(
+            "Terms or marketing consent missing. Log out and back in with official MySkoda app, "
+            "or https://skodaid.vwgroup.io, to accept the new conditions. Error: %s",
+            exc,
+        )
+        async_create_tnc_issue(hass, entry.entry_id)
+        raise ConfigEntryNotReady from exc
     except Exception as exc:
         _LOGGER.exception("Login with %s failed: %s", DOMAIN, exc)
         return False
@@ -198,7 +264,6 @@ async def async_migrate_entry(hass: HomeAssistant, entry: MySkodaConfigEntry) ->
                 minor_version=new_minor_version,
                 unique_id=unique_id,
             )
-            return True
 
         else:
             _LOGGER.debug(
@@ -208,8 +273,6 @@ async def async_migrate_entry(hass: HomeAssistant, entry: MySkodaConfigEntry) ->
                 entry, version=new_version, minor_version=new_minor_version
             )
 
-            return True
-
     if entry.version == 2:
         if entry.minor_version < 2:
             # v2.1 does not have the vinlist. Add it.
@@ -218,10 +281,8 @@ async def async_migrate_entry(hass: HomeAssistant, entry: MySkodaConfigEntry) ->
             new_version = 2
             new_minor_version = 2
 
-            entry_data = {**entry.data}
-
             vinlist = await myskoda.list_vehicle_vins()
-            entry_data[VINLIST] = vinlist
+            entry_data[CONF_VINLIST] = vinlist
             _LOGGER.debug("Add vinlist %s to entry %s", vinlist, entry.entry_id)
 
             hass.config_entries.async_update_entry(
@@ -231,7 +292,7 @@ async def async_migrate_entry(hass: HomeAssistant, entry: MySkodaConfigEntry) ->
                 data=entry_data,
             )
 
-            return True
+        vinlist = entry_data[CONF_VINLIST]
         if entry.minor_version < 3:
             # Remove unneeded generate_fixtures button
             _LOGGER.info(
@@ -240,9 +301,6 @@ async def async_migrate_entry(hass: HomeAssistant, entry: MySkodaConfigEntry) ->
 
             new_version = 2
             new_minor_version = 3
-
-            entry_data = {**entry.data}
-            vinlist = entry_data[VINLIST]
 
             hass_er = er.async_get(hass)
             entry_entities = er.async_entries_for_config_entry(hass_er, entry.entry_id)
@@ -263,8 +321,90 @@ async def async_migrate_entry(hass: HomeAssistant, entry: MySkodaConfigEntry) ->
                 data=entry_data,
             )
 
-            return True
+        if entry.minor_version < 4:
+            # Rename "locked" binary sensor to "lock" to prevent confusion
+            _LOGGER.info(
+                "Starting migration to config schema 2.4, renaming _locked to _lock"
+            )
 
-    # Add any more migrations here
+            new_version = 2
+            new_minor_version = 4
 
-    return False
+            hass_er = er.async_get(hass)
+            entry_entities = er.async_entries_for_config_entry(hass_er, entry.entry_id)
+
+            old_entities = []
+            old_entities.extend(f"{vin}_charger_locked" for vin in vinlist)
+            old_entities.extend(f"{vin}_doors_locked" for vin in vinlist)
+            old_entities.extend(f"{vin}_locked" for vin in vinlist)
+
+            for entity in entry_entities:
+                if entity.unique_id in old_entities:
+                    if entity.unique_id.endswith(("charger_locked", "doors_locked")):
+                        new_unique_id = entity.unique_id.replace("locked", "lock")
+                    else:
+                        new_unique_id = entity.unique_id.replace(
+                            "locked", "vehicle_lock"
+                        )
+                    _LOGGER.debug(
+                        "Renaming entity %s to %s", entity.unique_id, new_unique_id
+                    )
+                    try:
+                        hass_er.async_update_entity(
+                            entity.entity_id, new_unique_id=new_unique_id
+                        )
+                    except ValueError:
+                        _LOGGER.error(
+                            "Failure migrating %s: Entity already exists when updating entity %s to new unique_id %s",
+                            entry.entry_id,
+                            entity.entity_id,
+                            new_unique_id,
+                        )
+                        return False
+
+            hass.config_entries.async_update_entry(
+                entry,
+                version=new_version,
+                minor_version=new_minor_version,
+                data=entry_data,
+            )
+
+        if entry.minor_version < 5:
+            # Add support for refresh_token
+            _LOGGER.info(
+                "Starting migration to config schema 2.5, adding support for refresh_token"
+            )
+
+            new_version = 2
+            new_minor_version = 5
+
+            if entry.data.get(CONF_REFRESH_TOKEN):
+                _LOGGER.warning(
+                    "Found refresh token present, this should not happen. Possible data corruption. Please open an issue for this with the integration developers"
+                )
+                return False
+            else:
+                current_refresh_token = await myskoda.get_refresh_token()
+                entry_data[CONF_REFRESH_TOKEN] = current_refresh_token
+                _LOGGER.debug(
+                    "Saving current refresh token as initial token: %s",
+                    current_refresh_token,
+                )
+                hass.config_entries.async_update_entry(
+                    entry,
+                    version=new_version,
+                    minor_version=new_minor_version,
+                    data=entry_data,
+                )
+
+        # Add any more minor migrations here. Minor migrations only add or change data. Removals are major.
+
+    # Add any more major migrations here
+
+    _LOGGER.info(
+        "Config migration finished. Now at schema version v%s.%s",
+        entry.version,
+        entry.minor_version,
+    )
+
+    return True

@@ -14,6 +14,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import DiscoveryInfoType  # pyright: ignore [reportAttributeAccessIssue]
 from homeassistant.util import Throttle
+from homeassistant.exceptions import ServiceValidationError
+
+from aiohttp import ClientResponseError
 
 from myskoda.models.charging import (
     Charging,
@@ -85,14 +88,20 @@ class MySkodaSwitch(MySkodaEntity, SwitchEntity):
         all_capabilities_present = all(
             self.vehicle.has_capability(cap) for cap in self.required_capabilities()
         )
-        readonly = self.coordinator.entry.options.get(CONF_READONLY)
 
-        return all_capabilities_present and not readonly
+        return all_capabilities_present
 
     @property
     def available(self) -> bool:
         """Return whether the switch is available to operate."""
         return self._is_enabled
+
+    def _ensure_not_readonly(self):
+        if self.coordinator.entry.options.get(CONF_READONLY):
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="readonly_mode",
+            )
 
     def _disable_switch(self):
         """Turn switch availability off."""
@@ -106,6 +115,7 @@ class MySkodaSwitch(MySkodaEntity, SwitchEntity):
 
     async def _flip_switch(self, to_call: Coroutine):
         """Flip the switch by executing to_call."""
+        self._ensure_not_readonly()
         if not self._is_enabled:
             return
 
@@ -142,7 +152,7 @@ class WindowHeatingSwitch(MySkodaSwitch):
                 await self._flip_switch(myskoda.start_window_heating(vin))
             else:
                 await self._flip_switch(myskoda.stop_window_heating(vin))
-        except OperationFailedError as exc:
+        except (ClientResponseError, OperationFailedError) as exc:
             _LOGGER.error("Failed to turn window heating %s: %s", action, exc)
         _LOGGER.info("Window heating successfully turned %s", action)
 
@@ -209,7 +219,7 @@ class BatteryCareMode(ChargingSwitch):
                 await self._flip_switch(myskoda.set_battery_care_mode(vin, True))
             else:
                 await self._flip_switch(myskoda.set_battery_care_mode(vin, False))
-        except OperationFailedError as exc:
+        except (ClientResponseError, OperationFailedError) as exc:
             _LOGGER.error("Failed to turn battery care mode %s: %s", action, exc)
         _LOGGER.info("Battery care mode successfully turned %s", action)
 
@@ -246,7 +256,7 @@ class ReducedCurrent(ChargingSwitch):
         action = "on" if turn_on else "off"
         try:
             await self._flip_switch(myskoda.set_reduced_current_limit(vin, turn_on))
-        except OperationFailedError as exc:
+        except (ClientResponseError, OperationFailedError) as exc:
             _LOGGER.error("Failed to turn reduced current limit %s: %s", action, exc)
         _LOGGER.info("Reduced current limit successfully turned %s", action)
 
@@ -282,7 +292,7 @@ class EnableCharging(ChargingSwitch):
                 await self._flip_switch(myskoda.start_charging(vin))
             else:
                 await self._flip_switch(myskoda.stop_charging(vin))
-        except OperationFailedError as exc:
+        except (ClientResponseError, OperationFailedError) as exc:
             _LOGGER.error("Failed to turn charging heating %s: %s", action, exc)
         _LOGGER.info("Charging successfully turned %s", action)
 
@@ -316,7 +326,7 @@ class AutoUnlockPlug(ChargingSwitch):
         action = "on" if turn_on else "off"
         try:
             await self._flip_switch(myskoda.set_auto_unlock_plug(vin, turn_on))
-        except OperationFailedError as exc:
+        except (ClientResponseError, OperationFailedError) as exc:
             _LOGGER.error("Failed to turn auto unlock plug %s: %s", action, exc)
         _LOGGER.info("Auto unlock plug successfully turned %s", action)
 
@@ -355,7 +365,7 @@ class AcAtUnlock(MySkodaSwitch):
         action = "on" if turn_on else "off"
         try:
             await self._flip_switch(myskoda.set_ac_at_unlock(vin, settings))
-        except OperationFailedError as exc:
+        except (ClientResponseError, OperationFailedError) as exc:
             _LOGGER.error("Failed to turn AC at Unlock %s: %s", action, exc)
         _LOGGER.info("AC at Unlock successfully turned %s", action)
 
@@ -398,7 +408,7 @@ class AcWithoutExternalPower(MySkodaSwitch):
             await self._flip_switch(
                 myskoda.set_ac_without_external_power(vin, settings)
             )
-        except OperationFailedError as exc:
+        except (ClientResponseError, OperationFailedError) as exc:
             _LOGGER.error(
                 "Failed to turn AC without external power %s: %s", action, exc
             )
@@ -442,7 +452,7 @@ class AcSeatHeatingFrontLeft(MySkodaSwitch):
         action = "on" if turn_on else "off"
         try:
             await self._flip_switch(myskoda.set_seats_heating(vin, settings))
-        except OperationFailedError as exc:
+        except (ClientResponseError, OperationFailedError) as exc:
             _LOGGER.error(
                 "Failed to turn frontLeft seat heating with AC %s: %s", action, exc
             )
@@ -486,7 +496,7 @@ class AcSeatHeatingFrontRight(MySkodaSwitch):
         action = "on" if turn_on else "off"
         try:
             await self._flip_switch(myskoda.set_seats_heating(vin, settings))
-        except OperationFailedError as exc:
+        except (ClientResponseError, OperationFailedError) as exc:
             _LOGGER.error(
                 "Failed to turn frontright seat heating with AC %s: %s", action, exc
             )
@@ -527,7 +537,7 @@ class AcWindowHeating(MySkodaSwitch):
         action = "on" if turn_on else "off"
         try:
             await self._flip_switch(myskoda.set_windows_heating(vin, settings))
-        except OperationFailedError as exc:
+        except (ClientResponseError, OperationFailedError) as exc:
             _LOGGER.error("Failed to turn window heating with AC %s: %s", action, exc)
         _LOGGER.info("Window heating with AC successfully turned %s", action)
 
@@ -584,7 +594,7 @@ class DepartureTimerSwitch(MySkodaSwitch):
             timer.enabled = turn_on
             try:
                 await self._flip_switch(myskoda.set_departure_timer(self.vin, timer))
-            except OperationFailedError as exc:
+            except (ClientResponseError, OperationFailedError) as exc:
                 _LOGGER.error(
                     "Failed to turn Departure Timer %s %s: %s",
                     self.timer_id,
@@ -703,7 +713,7 @@ class ACTimerSwitch(MySkodaSwitch):
             timer.enabled = turn_on
             try:
                 await self._flip_switch(myskoda.set_ac_timer(self.vin, timer))
-            except OperationFailedError as exc:
+            except (ClientResponseError, OperationFailedError) as exc:
                 _LOGGER.error(
                     "Failed to turn AirConditioning timer %s %s: %s",
                     self.timer_id,
