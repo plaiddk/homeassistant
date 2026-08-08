@@ -7,8 +7,8 @@ from typing import Any
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
@@ -16,7 +16,7 @@ from homeassistant.helpers.update_coordinator import (
     UpdateFailed,
 )
 
-from .client import EasyIQClient
+from .client import EasyIQAuthError, EasyIQClient
 from .const import (
     CONF_WEEKPLAN,
     CONF_WEEKPLAN_INTERVAL,
@@ -33,6 +33,8 @@ from .const import (
     DEFAULT_HOMEWORK_DAYS,
     DOMAIN,
 )
+from .mitid_auth import MitIDAuthError
+from .update_policy import should_update_data_type
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -48,6 +50,7 @@ async def async_setup_entry(
     
     # Create sensor entities
     entities = []
+    status_message = "Loaded"
     
     # Check if we have data and children
     if coordinator.data and "children" in coordinator.data and coordinator.data["children"]:
@@ -68,8 +71,9 @@ async def async_setup_entry(
                 _LOGGER.info("Added weekplan sensor for child: %s", child_name)
     else:
         _LOGGER.warning("No children data found in coordinator. Data: %s", coordinator.data)
-        # Create a placeholder sensor to show the integration is loaded but has issues
-        entities.append(EasyIQStatusSensor(coordinator, "No children found"))
+        status_message = "No children found"
+
+    entities.append(EasyIQStatusSensor(coordinator, status_message))
     
     _LOGGER.info("Adding %d entities to Home Assistant", len(entities))
     async_add_entities(entities)
@@ -125,19 +129,24 @@ class EasyIQDataUpdateCoordinator(DataUpdateCoordinator):
     def _should_update_data_type(self, data_type: str) -> bool:
         """Check if a specific data type should be updated based on its interval."""
         try:
+            should_update = should_update_data_type(
+                data_type,
+                self.update_intervals,
+                self.last_updates,
+            )
+
             if data_type not in self.update_intervals:
                 _LOGGER.debug(f"Data type {data_type} not in update_intervals, updating by default")
-                return True
+                return should_update
                 
             last_update = self.last_updates.get(data_type)
             if last_update is None:
                 _LOGGER.debug(f"No last update time for {data_type}, updating")
-                return True
+                return should_update
                 
             interval = self.update_intervals[data_type]
             time_since_update = (datetime.now() - last_update).total_seconds()
             
-            should_update = time_since_update >= interval
             if should_update:
                 _LOGGER.debug(f"Should update {data_type}: {time_since_update:.1f}s >= {interval}s")
             else:
@@ -193,11 +202,16 @@ class EasyIQDataUpdateCoordinator(DataUpdateCoordinator):
                 "weekplan_data": self.client.weekplan_data,
                 "homework_data": getattr(self.client, 'homework_data', {}),
                 "presence_data": getattr(self.client, 'presence_data', {}),
+                "update_diagnostics": getattr(self.client, 'update_diagnostics', {}),
+                "calendar_diagnostics": getattr(self.client, 'calendar_diagnostics', {}),
                 "last_updates": self.last_updates.copy(),
                 "update_intervals": self.update_intervals.copy(),
             }
             _LOGGER.debug(f"Coordinator updated data successfully: {len(data['children'])} children")
             return data
+        except (EasyIQAuthError, MitIDAuthError) as err:
+            _LOGGER.error("Authentication failed while updating EasyIQ data: %s", err)
+            raise ConfigEntryAuthFailed from err
         except Exception as err:
             _LOGGER.error(f"Error updating coordinator data: {err}", exc_info=True)
             # Return partial data to keep integration running instead of failing completely
@@ -208,6 +222,8 @@ class EasyIQDataUpdateCoordinator(DataUpdateCoordinator):
                 "weekplan_data": getattr(self.client, 'weekplan_data', {}),
                 "homework_data": getattr(self.client, 'homework_data', {}),
                 "presence_data": getattr(self.client, 'presence_data', {}),
+                "update_diagnostics": getattr(self.client, 'update_diagnostics', {}),
+                "calendar_diagnostics": getattr(self.client, 'calendar_diagnostics', {}),
                 "last_updates": self.last_updates.copy(),
                 "update_intervals": self.update_intervals.copy(),
             }
@@ -244,9 +260,13 @@ class EasyIQChildSensor(CoordinatorEntity, SensorEntity):
         }
         
         if weekplan_data:
+            calendar_diagnostics = self.coordinator.data.get("calendar_diagnostics", {}).get(self._child_id, {})
             attributes.update({
                 "week": weekplan_data.get('week', 'Unknown'),
                 "events_count": len(weekplan_data.get('events', [])),
+                "raw_event_count": weekplan_data.get('raw_event_count', len(weekplan_data.get('raw_data', []))),
+                "event_type_counts": weekplan_data.get('event_type_counts', {}),
+                "calendar_diagnostics": calendar_diagnostics,
                 "html_content": weekplan_data.get('html_content', ''),
                 "last_updated": weekplan_data.get('last_updated', 'Unknown')
             })
@@ -289,11 +309,18 @@ class EasyIQWeekplanSensor(CoordinatorEntity, SensorEntity):
         # Only include essential information
         limited_weekplan = {}
         if isinstance(weekplan_data, dict):
+            calendar_diagnostics = self.coordinator.data.get("calendar_diagnostics", {}).get(self._child_id, {})
             # Include only the most recent events (limit to 10)
             events = weekplan_data.get("events", [])
             if isinstance(events, list):
                 limited_weekplan["events"] = events[:10]
                 limited_weekplan["total_events"] = len(events)
+            limited_weekplan["raw_event_count"] = weekplan_data.get(
+                "raw_event_count",
+                len(weekplan_data.get("raw_data", [])),
+            )
+            limited_weekplan["event_type_counts"] = weekplan_data.get("event_type_counts", {})
+            limited_weekplan["calendar_diagnostics"] = calendar_diagnostics
             
             # Include summary information
             limited_weekplan["last_updated"] = weekplan_data.get("last_updated")
@@ -318,16 +345,33 @@ class EasyIQStatusSensor(CoordinatorEntity, SensorEntity):
     @property
     def state(self) -> str | None:
         """Return the state of the sensor."""
+        if self.coordinator.data:
+            children_count = len(self.coordinator.data.get("children", []))
+            calendar_diagnostics = self.coordinator.data.get("calendar_diagnostics", {})
+            calendar_events = 0
+            if isinstance(calendar_diagnostics, dict):
+                for child_diagnostic in calendar_diagnostics.values():
+                    if isinstance(child_diagnostic, dict):
+                        calendar_events += int(
+                            child_diagnostic.get("business_day_event_count", 0) or 0
+                        )
+            return f"{children_count} children, {calendar_events} calendar events"
         return self._status_message
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return the state attributes."""
+        if not self.coordinator.data:
+            return {
+                "coordinator_data_available": False,
+                "last_update_success": self.coordinator.last_update_success,
+                "last_exception": str(self.coordinator.last_exception) if self.coordinator.last_exception else None,
+            }
+
         return {
-            "coordinator_data": str(self.coordinator.data),
+            "children_count": len(self.coordinator.data.get("children", [])),
+            "update_diagnostics": self.coordinator.data.get("update_diagnostics", {}),
+            "calendar_diagnostics": self.coordinator.data.get("calendar_diagnostics", {}),
             "last_update_success": self.coordinator.last_update_success,
             "last_exception": str(self.coordinator.last_exception) if self.coordinator.last_exception else None,
         }
-
-
-

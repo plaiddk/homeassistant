@@ -45,7 +45,7 @@ APIS = {
     'wastewatch': interface.WasteWatchAPI,
     'herning': interface.AffaldWebAPI,
     'ikastbrande': interface.IkastBrandeAPI,
-    'silkeborg': interface.SilkeborgAPI,
+    'affaldonlineweb': interface.AffaldOnlineWeb,
     'kolding': interface.InfovisionAPI,
 }
 
@@ -306,13 +306,11 @@ class GarbageCollection:
             elif self._api_type == "herning":
                 garbage_data = await self._api.get_garbage_data(address_id)
                 for item in garbage_data:
-                    fraction_name = re.sub(r'^\d+\s*', '', item['Beholder-id'])
-                    weekday, weeks = self._api.get_weekday_and_weeks(item)
-                    for [w, y] in weeks:
-                        _pickup_date = weekday_week_to_date(weekday, w, year=y)
+                    for [w, y] in item['weeks']:
+                        _pickup_date = weekday_week_to_date(item['day'], w, year=y)
                         if not _pickup_date:
                             raise RuntimeWarning(f'Failed to convert date for Herning, "{item}"')
-                        self.update_pickup_event(fraction_name, address_id, _pickup_date)
+                        self.update_pickup_event(item['fraction'], address_id, _pickup_date)
             elif self._api_type == "ikastbrande":
                 garbage_data = await self._api.get_garbage_data(address_id)
                 for item in garbage_data:
@@ -320,7 +318,7 @@ class GarbageCollection:
                         _pickup_date = item['Tømningsdag']
                         fraction_name = item['Materiel']
                         self.update_pickup_event(fraction_name, address_id, _pickup_date)
-            elif self._api_type == "silkeborg":
+            elif self._api_type == "affaldonlineweb":
                 garbage_data = await self._api.get_garbage_data(address_id)
                 for item in garbage_data:
                     if item['Tømningsdag']:

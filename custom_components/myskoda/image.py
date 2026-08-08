@@ -1,6 +1,7 @@
 """Images for the MySkoda integration."""
 
 import logging
+from datetime import UTC, datetime, timedelta
 
 import httpx
 from homeassistant.components.image import (
@@ -19,7 +20,7 @@ from homeassistant.helpers.typing import (
 
 from myskoda.models.info import ViewPoint, ViewType
 
-from .const import COORDINATORS, DOMAIN
+from .const import CACHE_CLOCK_SKEW_TOLERANCE_IN_HOURS
 from .coordinator import MySkodaConfigEntry, MySkodaDataUpdateCoordinator
 from .entity import MySkodaEntity
 
@@ -35,16 +36,12 @@ async def async_setup_entry(
     """Set up the image platform."""
 
     entities = []
-    for vin in hass.data[DOMAIN][config.entry_id][COORDINATORS]:
+    for vin, coordinator in config.runtime_data.items():
         for SensorClass in [
             MainRenderImage,
             LightStatusImage,
         ]:
-            entities.append(
-                SensorClass(
-                    hass.data[DOMAIN][config.entry_id][COORDINATORS][vin], vin, hass
-                )
-            )
+            entities.append(SensorClass(coordinator, vin, hass))
 
     async_add_entities(entities)
 
@@ -100,11 +97,20 @@ class StatusImage(MySkodaImage):
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
         if status := self.vehicle.status:
-            if status.car_captured_timestamp != self._attr_image_last_updated:
-                _LOGGER.debug("Image updated. Flushing caches.")
-
-                self._cached_image = None
-                self._attr_image_last_updated = status.car_captured_timestamp
+            if ts := status.car_captured_timestamp:
+                threshold = datetime.now(UTC) + timedelta(
+                    hours=CACHE_CLOCK_SKEW_TOLERANCE_IN_HOURS
+                )
+                if ts > threshold:
+                    _LOGGER.warning(
+                        "Timestamp %s is more than %sh ahead; possible vehicle clock issue.",
+                        ts,
+                        CACHE_CLOCK_SKEW_TOLERANCE_IN_HOURS,
+                    )
+                elif ts != self._attr_image_last_updated:
+                    _LOGGER.debug("Image updated. Flushing caches.")
+                    self._cached_image = None
+                    self._attr_image_last_updated = ts
         super()._handle_coordinator_update()
 
 

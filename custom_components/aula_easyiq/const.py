@@ -13,7 +13,7 @@ EasyIQ integration, version: %s
 This is a custom integration for EasyIQ
 Based on the Aula component with fixes for EasyIQ integration issues
 If you have any issues with this you need to open an issue here:
-https://github.com/easyiq/easyiq-ha/issues
+https://github.com/esbenwiberg/easyiq/issues
 -------------------------------------------------------------------
 """
 
@@ -35,10 +35,23 @@ EASYIQ_WIDGETS = {
 }
 
 # Configuration keys
+CONF_FIXTURE_BASE_URL = "fixture_base_url"
 CONF_SCHOOLSCHEDULE = "schoolschedule"
 CONF_WEEKPLAN = "weekplan"
 CONF_HOMEWORK = "homework"
 CONF_PRESENCE = "presence"
+
+# MitID/Aula token authentication keys
+CONF_MITID_USERNAME = "mitid_username"
+CONF_AUTH_METHOD = "auth_method"
+CONF_ACCESS_TOKEN = "access_token"
+CONF_REFRESH_TOKEN = "refresh_token"
+CONF_TOKEN_EXPIRES_AT = "token_expires_at"
+CONF_REAUTH_REQUIRED = "reauth_required"
+CONF_AUTH_SESSION_ID = "auth_session_id"
+AUTH_METHOD_MITID = "mitid"
+
+# Legacy keys retained only to identify and migrate old entries.
 CONF_USERNAME = "username"
 CONF_PASSWORD = "password"
 

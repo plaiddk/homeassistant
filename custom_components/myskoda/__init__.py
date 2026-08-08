@@ -10,19 +10,21 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
+from homeassistant.helpers.typing import ConfigType
 from homeassistant.util.ssl import get_default_context
 
 from myskoda import (
     AuthorizationFailedError,
     MySkoda,
 )
+from myskoda.models.common import Vin
+from myskoda.myskoda import TRACE_CONFIG
 from myskoda.auth.authorization import (
     CSRFError,
     MarketingConsentError,
     TermsAndConditionsError,
     TokenExpiredError,
 )
-from myskoda.myskoda import TRACE_CONFIG
 
 from .const import (
     CONF_FCM_TOKEN,
@@ -30,10 +32,10 @@ from .const import (
     CONF_REFRESH_TOKEN,
     CONF_USERNAME,
     CONF_VINLIST,
-    COORDINATORS,
     DOMAIN,
 )
 from .coordinator import MySkodaConfigEntry, MySkodaDataUpdateCoordinator
+from .device_action import async_setup_actions
 from .error_handlers import handle_aiohttp_error
 from .issues import (
     async_create_tnc_issue,
@@ -54,6 +56,17 @@ PLATFORMS: list[Platform] = [
     Platform.LOCK,
     Platform.BUTTON,
 ]
+
+
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """Set up the MySkoda integration (called once per HA run).
+
+    Registers actions here rather than in `async_setup_entry`, since this
+    hook always fires exactly once regardless of the number of config
+    entries, avoiding double-registration or lingering-after-unload issues.
+    """
+    async_setup_actions(hass)
+    return True
 
 
 def myskoda_instantiate(
@@ -124,7 +137,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: MySkodaConfigEntry) -> b
     async_delete_tnc_issue(hass, entry.entry_id)
     async_delete_spin_issue(hass, entry.entry_id)
 
-    coordinators: dict[str, MySkodaDataUpdateCoordinator] = {}
+    coordinators: dict[Vin, MySkodaDataUpdateCoordinator] = {}
     cached_vins: list = entry.data.get(CONF_VINLIST, [])
 
     try:
@@ -159,8 +172,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: MySkodaConfigEntry) -> b
         await coordinator.async_config_entry_first_refresh()
         coordinators[vin] = coordinator
 
-    hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = {COORDINATORS: coordinators}
+    entry.runtime_data = coordinators
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
@@ -171,9 +183,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: MySkodaConfigEntry) -> b
 async def async_unload_entry(hass: HomeAssistant, entry: MySkodaConfigEntry) -> bool:
     """Unload a config entry."""
 
-    coordinators: dict[str, MySkodaDataUpdateCoordinator] = hass.data[DOMAIN][
-        entry.entry_id
-    ].get(COORDINATORS, {})
+    coordinators: dict[Vin, MySkodaDataUpdateCoordinator] = entry.runtime_data
     for coord in coordinators.values():
         if entry.data.get(CONF_REFRESH_TOKEN):
             current_refresh_token = await coord.myskoda.get_refresh_token()
@@ -190,11 +200,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: MySkodaConfigEntry) -> 
             entry_data[CONF_FCM_TOKEN] = coord.myskoda.fcm_token
             hass.config_entries.async_update_entry(entry, data=entry_data)
         await coord.myskoda.disconnect()
-    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-    if unload_ok:
-        hass.data[DOMAIN].pop(entry.entry_id)
-
-    return unload_ok
+    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
 
 async def _async_update_listener(hass: HomeAssistant, entry: MySkodaConfigEntry):

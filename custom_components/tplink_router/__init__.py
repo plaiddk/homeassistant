@@ -6,9 +6,10 @@ from homeassistant.const import (
     CONF_VERIFY_SSL,
     Platform,
 )
+from datetime import datetime
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.config_entries import ConfigEntry
-from .const import DOMAIN, DEFAULT_USER, EVENT_NEW_SMS
+from .const import DOMAIN, DEFAULT_USER, EVENT_NEW_SMS, CONF_CLIENT_CLASS
 import logging
 from .coordinator import TPLinkRouterCoordinator
 from homeassistant.helpers import device_registry
@@ -28,15 +29,31 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     host = entry.data[CONF_HOST]
     if not (host.startswith('http://') or host.startswith('https://')):
         host = "http://{}".format(host)
-    verify_ssl = entry.data[CONF_VERIFY_SSL] if CONF_VERIFY_SSL in entry.data else True
-    client = await TPLinkRouterCoordinator.get_client(
-        hass=hass,
-        host=host,
-        password=entry.data[CONF_PASSWORD],
-        username=entry.data.get(CONF_USERNAME, DEFAULT_USER),
-        logger=_LOGGER,
-        verify_ssl=verify_ssl
-    )
+    verify_ssl = entry.data[CONF_VERIFY_SSL] if CONF_VERIFY_SSL in entry.data else False
+    client_class = entry.data.get(CONF_CLIENT_CLASS)
+    if not client_class:
+        client = await TPLinkRouterCoordinator.get_client(
+            hass=hass,
+            host=host,
+            password=entry.data[CONF_PASSWORD],
+            username=entry.data.get(CONF_USERNAME, DEFAULT_USER),
+            logger=_LOGGER,
+            verify_ssl=verify_ssl
+        )
+        new_data = dict(entry.data)
+        new_data[CONF_CLIENT_CLASS] = client.__class__.__name__
+        hass.config_entries.async_update_entry(
+            entry,
+            data=new_data,
+        )
+    else:
+        client = TPLinkRouterCoordinator.get_client_by_class(client_class)(
+            host=host,
+            password=entry.data[CONF_PASSWORD],
+            username=entry.data.get(CONF_USERNAME, DEFAULT_USER),
+            logger=_LOGGER,
+            verify_ssl=verify_ssl
+        )
 
     def callback():
         firm = client.get_firmware()
@@ -48,22 +65,54 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 lte_stat = client.get_lte_status()
             except Exception:
                 pass
-        vpn_stat = None
-        if hasattr(client, "get_vpn_client_status"):
+        # Check if router is vpn_server compatible
+        vpn_server_stat = None
+        if hasattr(client, "get_vpn_status"):
             try:
-                vpn_stat = client.get_vpn_client_status()
+                vpn_server_stat = client.get_vpn_status()
             except Exception:
                 pass
-        return firm, stat, lte_stat, vpn_stat
+        # Check if router is vpn_client compatible
+        vpn_client_stat = None
+        if hasattr(client, "get_vpn_client_status"):
+            try:
+                vpn_client_stat = client.get_vpn_client_status()
+            except Exception:
+                pass
+        # Check if router is serving_cells compatible
+        serving_cells = None
+        if hasattr(client, "get_lte_serving_cells"):
+            try:
+                serving_cells = client.get_lte_serving_cells()
+            except Exception:
+                pass
+        sms_list = None
+        if hasattr(client, "get_sms") and lte_stat is not None:
+            try:
+                sms_list = client.get_sms()
+            except Exception:
+                pass
+        return firm, stat, lte_stat, vpn_server_stat, vpn_client_stat, serving_cells, sms_list
 
-    firmware, status, lte_status, vpn_status = await hass.async_add_executor_job(
+    (
+        firmware,
+        status,
+        lte_status,
+        vpn_server_stat,
+        vpn_client_status,
+        serving_cells,
+        sms_list,
+    ) = await hass.async_add_executor_job(
         TPLinkRouterCoordinator.request, client, callback
     )
     # Create device coordinator and fetch data
     coordinator = TPLinkRouterCoordinator(hass, client, entry.data[CONF_SCAN_INTERVAL], firmware, status,
-                                          lte_status, _LOGGER, entry.entry_id, vpn_status)
+                                          lte_status, _LOGGER, entry.entry_id, vpn_server_stat, vpn_client_status,
+                                          serving_cells)
 
-    await coordinator.async_config_entry_first_refresh()
+    if sms_list is not None:
+        coordinator._process_sms_list(sms_list)
+        coordinator._last_update_time = datetime.now()
     _async_add_listeners(hass, coordinator)
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 
@@ -80,6 +129,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     if unload_ok:
         hass.data[DOMAIN].pop(entry.entry_id)
+        if not hass.data[DOMAIN] and hass.services.has_service(DOMAIN, "send_sms"):
+            hass.services.async_remove(DOMAIN, "send_sms")
     return unload_ok
 
 
@@ -113,8 +164,10 @@ def register_services(hass: HomeAssistant, coord: TPLinkRouterCoordinator) -> No
             return
 
         def callback():
-            coord.router.send_sms(service.data.get("number"), service.data.get("text"))
-        await hass.async_add_executor_job(TPLinkRouterCoordinator.request, coord.router, callback)
+            coordinator.router.send_sms(service.data.get("number"), service.data.get("text"))
+        await hass.async_add_executor_job(
+            TPLinkRouterCoordinator.request, coordinator.router, callback
+        )
 
     if not hass.services.has_service(DOMAIN, 'send_sms'):
         hass.services.async_register(DOMAIN, 'send_sms', send_sms_service)

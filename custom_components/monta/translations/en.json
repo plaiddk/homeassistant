@@ -15,6 +15,14 @@
           "scan_interval_wallet": "How often to fetch wallet data. Recommended: 600 seconds (10 minutes)",
           "scan_interval_transactions": "How often to fetch transaction data. Recommended: 600 seconds (10 minutes)"
         }
+      },
+      "reauth_confirm": {
+        "title": "Reauthenticate Monta",
+        "description": "The credentials for {name} are no longer accepted. Create or copy a new Client ID and Client Secret in CPMS: https://portal2.monta.app/applications",
+        "data": {
+          "client_id": "Client ID",
+          "client_secret": "Client Secret"
+        }
       }
     },
     "error": {
@@ -23,7 +31,8 @@
       "unknown": "Unknown error occurred."
     },
     "abort": {
-      "already_configured": "Device is already configured"
+      "already_configured": "Device is already configured",
+      "reauth_successful": "Monta reconnected with the new credentials"
     }
   },
   "options": {
@@ -58,8 +67,8 @@
       "name": "Start charging",
       "fields": {
         "charge_point_id": {
-          "name": "Charge Point ID",
-          "description": "The ID of the charger."
+          "name": "Charger",
+          "description": "The charger. Pick one from the list, or pass the numeric Monta charge point ID."
         }
       }
     },
@@ -68,8 +77,8 @@
       "name": "Stop charging",
       "fields": {
         "charge_point_id": {
-          "name": "Charge Point ID",
-          "description": "The ID of the charger."
+          "name": "Charger",
+          "description": "The charger. Pick one from the list, or pass the numeric Monta charge point ID."
         }
       }
     }
@@ -119,6 +128,15 @@
           "failed": "Failed",
           "cancelled": "Cancelled"
         }
+      },
+      "charge_cost": {
+        "name": "Last Charge Cost"
+      },
+      "charge_meter_reading": {
+        "name": "Meter Reading"
+      },
+      "charge_energy": {
+        "name": "Charge Energy"
       }
     }
   }

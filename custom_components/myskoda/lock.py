@@ -22,7 +22,6 @@ from myskoda.mqtt import OperationFailedError
 
 from .const import (
     API_COOLDOWN_IN_SECONDS,
-    COORDINATORS,
     CONF_SPIN,
     DOMAIN,
     CONF_READONLY,
@@ -45,7 +44,7 @@ async def async_setup_entry(
         available_entities=[
             DoorLock,
         ],
-        coordinators=hass.data[DOMAIN][config.entry_id][COORDINATORS],
+        coordinators=config.runtime_data,
         async_add_entities=async_add_entities,
     )
 
@@ -101,7 +100,15 @@ class DoorLock(MySkodaLock):
     @property
     def is_locked(self) -> bool | None:
         if status := self.vehicle.status:
-            return status.overall.doors_locked == DoorLockedState.LOCKED
+            match status.overall.doors_locked:
+                case DoorLockedState.LOCKED:
+                    return True
+                case (
+                    DoorLockedState.UNLOCKED
+                    | DoorLockedState.OPENED
+                    | DoorLockedState.TRUNK_OPENED
+                ):
+                    return False
 
     @Throttle(timedelta(seconds=API_COOLDOWN_IN_SECONDS))
     async def _async_lock_unlock(self, lock: bool, spin: str, **kwargs):  # noqa: D102

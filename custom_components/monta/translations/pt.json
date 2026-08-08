@@ -15,12 +15,23 @@
           "scan_interval_wallet": "Com que frequência buscar dados da carteira. Recomendado: 600 segundos (10 minutos)",
           "scan_interval_transactions": "Com que frequência buscar dados de transações. Recomendado: 600 segundos (10 minutos)"
         }
+      },
+      "reauth_confirm": {
+        "title": "Autenticar novamente a Monta",
+        "description": "As credenciais de {name} já não são aceites. Crie ou copie um novo ID e segredo do cliente no CPMS: https://portal2.monta.app/applications",
+        "data": {
+          "client_id": "ID do cliente",
+          "client_secret": "Segredo do cliente"
+        }
       }
     },
     "error": {
       "auth": "ID do cliente/segredo do cliente está incorreto.",
       "connection": "Não foi possível ligar ao servidor.",
       "unknown": "Ocorreu um erro desconhecido."
+    },
+    "abort": {
+      "reauth_successful": "A Monta foi ligada novamente com as novas credenciais"
     }
   },
   "options": {
@@ -50,8 +61,8 @@
       "name": "Iniciar carregamento",
       "fields": {
         "charge_point_id": {
-          "name": "ID do ponto de carregamento",
-          "description": "O ID do carregador."
+          "name": "Carregador",
+          "description": "O carregador. Escolha um da lista ou indique o ID numérico do ponto de carregamento da Monta."
         }
       }
     },
@@ -60,8 +71,8 @@
       "name": "Parar carregamento",
       "fields": {
         "charge_point_id": {
-          "name": "ID do ponto de carregamento",
-          "description": "O ID do carregador."
+          "name": "Carregador",
+          "description": "O carregador. Escolha um da lista ou indique o ID numérico do ponto de carregamento da Monta."
         }
       }
     }
@@ -111,6 +122,15 @@
           "failed": "Falhou",
           "cancelled": "Cancelado"
         }
+      },
+      "charge_cost": {
+        "name": "Custo do Último Carregamento"
+      },
+      "charge_meter_reading": {
+        "name": "Leitura do Medidor"
+      },
+      "charge_energy": {
+        "name": "Energia do Carregamento"
       }
     }
   }

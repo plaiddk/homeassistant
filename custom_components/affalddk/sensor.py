@@ -16,7 +16,8 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.const import ATTR_DATE, ATTR_NAME, ATTR_ENTITY_PICTURE, UnitOfTime
+from homeassistant.const import ATTR_DATE, ATTR_NAME, ATTR_ENTITY_PICTURE, UnitOfTime, STATE_UNKNOWN
+from homeassistant.helpers import entity_registry
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
@@ -216,6 +217,11 @@ SENSOR_TYPES: tuple[AffaldDKSensorEntityDescription, ...] = (
 _LOGGER = logging.getLogger(__name__)
 
 
+def unique_id(config, description):
+    """Sensor unique ID."""
+    return f"{config.data[CONF_ADDRESS_ID]} {description.key}"
+
+
 async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
@@ -229,12 +235,15 @@ async def async_setup_entry(
     if coordinator.data.pickup_events == {}:
         return
 
-    entities: list[AffaldDKSensor[Any]] = [
-        AffaldDKSensor(coordinator, description, config_entry)
-        for description in SENSOR_TYPES
-        if coordinator.data.pickup_events.get(description.key) is not None
-    ]
+    entity_registry_instance = entity_registry.async_get(hass)
 
+    entities: list[AffaldDKSensor[Any]] = []
+    for description in SENSOR_TYPES:
+        entity_id = entity_registry_instance.async_get_entity_id(
+            "sensor", DOMAIN, unique_id(config_entry, description)
+        )
+        if description.key in coordinator.data.pickup_events or entity_id:
+            entities.append(AffaldDKSensor(coordinator, description, config_entry))
     async_add_entities(entities, False)
 
 
@@ -274,13 +283,13 @@ class AffaldDKSensor(CoordinatorEntity[DataUpdateCoordinator], SensorEntity):
             model=f"Kommune: {config.data[CONF_MUNICIPALITY]}",
             model_id=f"ID: {config.data[CONF_ADDRESS_ID]}",
         )
-        self._attr_unique_id = f"{config.data[CONF_ADDRESS_ID]} {description.key}"
+        self._attr_unique_id = unique_id(config, description)
 
     @property
     def event(self) -> PickupEvents | None:
         """Return current event or None."""
         if self._coordinator.data.pickup_events:
-            return self._coordinator.data.pickup_events[self.entity_description.key]
+            return self._coordinator.data.pickup_events.get(self.entity_description.key)
         return None
 
     @property
@@ -295,6 +304,7 @@ class AffaldDKSensor(CoordinatorEntity[DataUpdateCoordinator], SensorEntity):
                 if _pickup_days == 1:
                     return "dag" if self._da else "day"
             return "dage" if self._da else "days"
+        return None
 
     @property
     def native_value(self) -> StateType:
@@ -306,6 +316,7 @@ class AffaldDKSensor(CoordinatorEntity[DataUpdateCoordinator], SensorEntity):
             _pickup_days = (pickup_time - current_time).days
             if pickup_time:
                 return _pickup_days
+        return STATE_UNKNOWN
 
     @property
     def icon(self) -> str | None:

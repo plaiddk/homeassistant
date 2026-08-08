@@ -678,3 +678,74 @@
 
         '
   mode: single
+- id: '1783541235441'
+  alias: Ferie - Tænd lys
+  description: 'Tænder udvalgte lys under ferien '
+  triggers:
+  - at: '18:17:00'
+    trigger: time
+  conditions:
+  - condition: template
+    value_template: '{{ now().year == 2026 and now().month == 7 and 11 <= now().day
+      <= 25 }}
+
+      '
+  actions:
+  - target:
+      entity_id:
+      - light.spisebord
+      - light.lillestue
+      - light.lillebad
+      - light.storbad
+    action: light.turn_on
+  mode: single
+- id: '1783541308671'
+  alias: Ferie - Sluk lys
+  description: Slukker ferielys
+  triggers:
+  - at: '23:45:00'
+    trigger: time
+  conditions:
+  - condition: template
+    value_template: '{{ now().year == 2026 and now().month == 7 and 11 <= now().day
+      <= 25 }}
+
+      '
+  actions:
+  - target:
+      entity_id:
+      - light.spisebord
+      - light.lillestue
+      - light.lillebad
+      - light.storbad
+    action: light.turn_off
+  mode: single
+- id: '1783680111656'
+  alias: 'Ferie - Tænd Samsung TV '
+  description: ''
+  triggers:
+  - at: '22:05:00'
+    trigger: time
+  conditions:
+  - condition: template
+    value_template: "{{ now().date() >= strptime('2026-07-11', '%Y-%m-%d').date()\n
+      \  and now().date() <= strptime('2026-07-25', '%Y-%m-%d').date() }}\n"
+  actions:
+  - target:
+      entity_id: media_player.samsung_7_series_49_ue49mu7005
+    action: media_player.turn_on
+  mode: single
+- id: '1783680141192'
+  alias: Ferie - Sluk Samsung TV
+  triggers:
+  - at: '23:57:00'
+    trigger: time
+  conditions:
+  - condition: template
+    value_template: "{{ now().date() >= strptime('2026-07-11', '%Y-%m-%d').date()\n
+      \  and now().date() <= strptime('2026-07-25', '%Y-%m-%d').date() }}\n"
+  actions:
+  - target:
+      entity_id: media_player.samsung_7_series_49_ue49mu7005
+    action: media_player.turn_off
+  mode: single

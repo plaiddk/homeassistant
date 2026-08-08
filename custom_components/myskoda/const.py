@@ -1,12 +1,10 @@
 """Constants for the MySkoda integration."""
 
 DOMAIN = "myskoda"
-COORDINATORS = "coordinators"
 
 # Timing information
 DEFAULT_FETCH_INTERVAL_IN_MINUTES = 30
 API_COOLDOWN_IN_SECONDS = 30.0
-MQTT_FCM_TOKEN_REFRESH_EVERY_ATTEMPTS = 10
 MQTT_RECONNECT_INTERVAL_IN_SECONDS = 300
 
 # Configuration information
@@ -26,6 +24,10 @@ CONF_VINLIST = "vins"
 MAX_STORED_OPERATIONS = 2
 MAX_STORED_SERVICE_EVENTS = 2
 
-# Santiy boundaries
+# Sanity boundaries
 OUTSIDE_TEMP_MIN_BOUND = -50
 OUTSIDE_TEMP_MAX_BOUND = 60
+CACHE_CLOCK_SKEW_TOLERANCE_IN_HOURS = 4
+
+# Services / Actions
+SERVICE_SET_PREFERRED_CHARGING_TIME = "set_preferred_charging_time"

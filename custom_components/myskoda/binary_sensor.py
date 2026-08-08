@@ -8,24 +8,26 @@ from homeassistant.components.binary_sensor import (
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import DiscoveryInfoType  # pyright: ignore [reportAttributeAccessIssue]
+from homeassistant.helpers.typing import (
+    DiscoveryInfoType,  # pyright: ignore [reportAttributeAccessIssue]
+)
 
 from myskoda import common
 from myskoda.models.air_conditioning import AirConditioning
 from myskoda.models.common import (
+    ChargerLockedState,
     DoorLockedState,
     OnOffState,
     OpenState,
-    ChargerLockedState,
 )
 from myskoda.models.info import CapabilityId
+from myskoda.models.position import ErrorType
 from myskoda.models.status import DoorWindowState, Status
 from myskoda.models.vehicle_connection_status import VehicleConnectionStatus
 
-from .const import COORDINATORS, DOMAIN
 from .coordinator import MySkodaConfigEntry
-from .entity import MySkodaEntity
-from .utils import add_supported_entities
+from .entity import MySkodaChargingProfileEntity, MySkodaEntity
+from .utils import add_supported_charging_profile_entities, add_supported_entities
 
 
 async def async_setup_entry(
@@ -59,7 +61,12 @@ async def async_setup_entry(
             VehicleInMotion,
             VehicleReachable,
         ],
-        coordinators=hass.data[DOMAIN][config.entry_id][COORDINATORS],
+        coordinators=config.runtime_data,
+        async_add_entities=async_add_entities,
+    )
+    add_supported_charging_profile_entities(
+        available_entities=[ChargingProfileActive],
+        coordinators=config.runtime_data,
         async_add_entities=async_add_entities,
     )
 
@@ -137,7 +144,8 @@ class Locked(StatusBinarySensor):
     @property
     def is_on(self) -> bool | None:  # noqa: D102
         if status := self._status():
-            return not status.overall.locked == DoorLockedState.LOCKED
+            if (locked := status.overall.locked) != DoorLockedState.UNKNOWN:
+                return locked != DoorLockedState.LOCKED
 
 
 class DoorsLocked(StatusBinarySensor):
@@ -152,7 +160,8 @@ class DoorsLocked(StatusBinarySensor):
     @property
     def is_on(self) -> bool | None:  # noqa: D102
         if status := self._status():
-            return not status.overall.doors_locked == DoorLockedState.LOCKED
+            if (locked := status.overall.doors_locked) != DoorLockedState.UNKNOWN:
+                return locked != DoorLockedState.LOCKED
 
 
 class DoorsOpen(StatusBinarySensor):
@@ -425,8 +434,12 @@ class VehicleReachable(VehicleConnectionBinarySensor):
             return not cs.unreachable
 
 
-class VehicleInMotion(VehicleConnectionBinarySensor):
-    """Vehicle in motion status."""
+class VehicleInMotion(MySkodaBinarySensor):
+    """Vehicle in motion status.
+
+    Prefer using the newer connection_status which explicitly reports the vehicle is in motion.
+    Fall back to positions errors.
+    """
 
     entity_description = BinarySensorEntityDescription(
         key="vehicle_in_motion",
@@ -434,10 +447,20 @@ class VehicleInMotion(VehicleConnectionBinarySensor):
         translation_key="vehicle_in_motion",
     )
 
+    def is_supported(self) -> bool:
+        return self.has_any_capability(
+            [CapabilityId.READINESS, CapabilityId.PARKING_POSITION]
+        )
+
     @property
     def is_on(self) -> bool | None:
-        if cs := self._connection_status():
-            return cs.in_motion
+        if connection_status := self.vehicle.connection_status:
+            return connection_status.in_motion
+
+        if positions := self.vehicle.positions:
+            if any(e.type is ErrorType.VEHICLE_IN_MOTION for e in positions.errors):
+                return True
+            return False
 
 
 class VehicleBatteryProtection(VehicleConnectionBinarySensor):
@@ -453,3 +476,20 @@ class VehicleBatteryProtection(VehicleConnectionBinarySensor):
     def is_on(self) -> bool | None:
         if cs := self._connection_status():
             return cs.battery_protection_limit_on
+
+
+class ChargingProfileActive(MySkodaChargingProfileEntity, BinarySensorEntity):
+    """Whether this charging profile is currently active for the vehicle's position."""
+
+    entity_description = BinarySensorEntityDescription(
+        key="charging_profile_active",
+        device_class=BinarySensorDeviceClass.RUNNING,
+        translation_key="charging_profile_active",
+    )
+
+    @property
+    def is_on(self) -> bool | None:  # noqa: D102
+        profiles = self.vehicle.charging_profiles
+        if not profiles or not profiles.current_vehicle_position_profile:
+            return False
+        return profiles.current_vehicle_position_profile.id == self.profile_id

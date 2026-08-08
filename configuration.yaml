@@ -2,13 +2,6 @@
 default_config:
   #bluetooth:
 ######################################
-# Home Assistant setup
-http:
-  use_x_forwarded_for: true
-  trusted_proxies:
-    - 127.0.0.1
-    - 192.168.1.0/24
-    - 100.64.0.0/10 # <- WireGuard network
 
 homeassistant:
   internal_url: http://192.168.1.159:8123

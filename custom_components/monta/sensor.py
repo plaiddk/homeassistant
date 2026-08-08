@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 from homeassistant.components.sensor import (
-    ENTITY_ID_FORMAT,
     SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
@@ -15,7 +14,6 @@ from homeassistant.components.sensor import (
 from homeassistant.const import (
     UnitOfEnergy,
 )
-from homeassistant.helpers.entity import generate_entity_id
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
@@ -28,8 +26,12 @@ from .coordinator import (
     MontaTransactionCoordinator,
     MontaWalletCoordinator,
 )
-from .entity import MontaEntity
-from .utils import snake_case
+from .entity import (
+    MontaEntity,
+    account_device_info,
+    account_unique_id,
+    charge_point_unique_id,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -55,10 +57,24 @@ class MontaSensorEntityDescription(
 ):
     """Describes MontaSensor sensor entity."""
 
+    unit_fn: Callable[[Any], str | None] | None = None
+
 
 def last_charge_state(data: ChargePoint) -> str | None:
     """Process state for last charge (if available)."""
     return data.charges[0].state if len(data.charges) > 0 else None
+
+
+def last_charge_cost(data: ChargePoint) -> float | None:
+    """Process cost for last charge (if available)."""
+    return data.charges[0].cost if data.charges else None
+
+
+def last_charge_currency(data: ChargePoint) -> str | None:
+    """Process currency for last charge (if available)."""
+    if data.charges and data.charges[0].currency:
+        return data.charges[0].currency.identifier.upper()
+    return None
 
 
 def last_charge_extra_attributes(data: ChargePoint) -> dict[str, Any] | None:
@@ -68,6 +84,23 @@ def last_charge_extra_attributes(data: ChargePoint) -> dict[str, Any] | None:
         return data.charges[0].to_dict()
 
     return None
+
+
+def charge_meter_reading(data: ChargePoint) -> float | None:
+    """Process the meter reading, including the charge in progress.
+
+    lastMeterReadingKwh only refreshes once the cable is unplugged, so derive
+    the reading from the newest charge and fall back to the charge point's own
+    value when that charge carries no meter data.
+    """
+    if data.charges and (start := data.charges[0].start_meter_kwh) is not None:
+        return start + (data.charges[0].consumed_kwh or 0)
+    return data.last_meter_reading_kwh
+
+
+def charge_consumed_kwh(data: ChargePoint) -> float | None:
+    """Process energy delivered by the newest charge, while it is running."""
+    return data.charges[0].consumed_kwh if data.charges else None
 
 
 def wallet_credit_extra_attribute(data: Wallet) -> dict[str, Any] | None:
@@ -134,12 +167,43 @@ CHARGE_POINT_ENTITY_DESCRIPTIONS: tuple[MontaSensorEntityDescription, ...] = (
         value_fn=last_charge_state,
         extra_state_attributes_fn=last_charge_extra_attributes,
     ),
+    MontaSensorEntityDescription(  # pylint: disable=unexpected-keyword-arg
+        key="charge_cost",
+        translation_key="charge_cost",
+        icon="mdi:cash",
+        device_class=SensorDeviceClass.MONETARY,
+        value_fn=last_charge_cost,
+        unit_fn=last_charge_currency,
+        extra_state_attributes_fn=None,
+    ),
+    MontaSensorEntityDescription(  # pylint: disable=unexpected-keyword-arg
+        key="charge_meter_reading",
+        translation_key="charge_meter_reading",
+        icon="mdi:counter",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        suggested_display_precision=3,
+        value_fn=charge_meter_reading,
+        extra_state_attributes_fn=None,
+    ),
+    MontaSensorEntityDescription(  # pylint: disable=unexpected-keyword-arg
+        key="charge_energy",
+        translation_key="charge_energy",
+        icon="mdi:lightning-bolt",
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        suggested_display_precision=3,
+        value_fn=charge_consumed_kwh,
+        extra_state_attributes_fn=None,
+    ),
 )
 
 WALLET_ENTITY_DESCRIPTIONS: tuple[MontaSensorEntityDescription, ...] = (
     MontaSensorEntityDescription(  # pylint: disable=unexpected-keyword-arg
-        key="monta-wallet-amount",
-        name="Monta - Personal Wallet",
+        key="wallet_amount",
+        name="Personal wallet",
         icon="mdi:wallet",
         device_class=SensorDeviceClass.MONETARY,
         value_fn=lambda data: data.balance.amount if data.balance else None,
@@ -149,8 +213,8 @@ WALLET_ENTITY_DESCRIPTIONS: tuple[MontaSensorEntityDescription, ...] = (
 
 TRANSACTION_ENTITY_DESCRIPTIONS: tuple[MontaSensorEntityDescription, ...] = (
     MontaSensorEntityDescription(  # pylint: disable=unexpected-keyword-arg
-        key="monta-latest-wallet-transactions",
-        name="Monta - Latest Wallet Transactions",
+        key="latest_wallet_transactions",
+        name="Latest wallet transactions",
         icon="mdi:wallet-outline",
         value_fn=lambda data: data,
         extra_state_attributes_fn=None,
@@ -202,7 +266,7 @@ class MontaChargePointSensor(MontaEntity, SensorEntity):
     def __init__(
         self,
         coordinator: MontaChargePointCoordinator,
-        _: ConfigEntry,
+        entry: ConfigEntry,
         entity_description: MontaSensorEntityDescription,
         charge_point_id: int,
     ) -> None:
@@ -210,11 +274,18 @@ class MontaChargePointSensor(MontaEntity, SensorEntity):
         super().__init__(coordinator, charge_point_id)
 
         self.entity_description = entity_description
-        self._attr_unique_id = generate_entity_id(
-            ENTITY_ID_FORMAT,
-            f"{charge_point_id}_{snake_case(entity_description.key)}",
-            [str(charge_point_id)],
+        self._attr_unique_id = charge_point_unique_id(
+            entry.entry_id, charge_point_id, entity_description.key,
         )
+
+    @property
+    def native_unit_of_measurement(self) -> str | None:
+        """Return the unit of measurement of the sensor."""
+        if self.entity_description.unit_fn:
+            return self.entity_description.unit_fn(
+                self.coordinator.data[self.charge_point_id],
+            )
+        return self.entity_description.native_unit_of_measurement
 
     @property
     def native_value(self) -> StateType:
@@ -248,18 +319,17 @@ class MontaWalletSensor(CoordinatorEntity[MontaWalletCoordinator], SensorEntity)
     def __init__(
         self,
         coordinator: MontaWalletCoordinator,
-        _: ConfigEntry,
+        entry: ConfigEntry,
         entity_description: MontaSensorEntityDescription,
     ) -> None:
         """Initialize the sensor class."""
         super().__init__(coordinator)
 
         self.entity_description = entity_description
-        self._attr_unique_id = generate_entity_id(
-            ENTITY_ID_FORMAT,
-            f"monta_{snake_case(entity_description.key)}",
-            ["personal_monta_wallet"],
+        self._attr_unique_id = account_unique_id(
+            entry.entry_id, entity_description.key,
         )
+        self._attr_device_info = account_device_info(entry)
 
     @property
     def native_unit_of_measurement(self) -> str | None:
@@ -300,18 +370,17 @@ class MontaTransactionsSensor(
     def __init__(
         self,
         coordinator: MontaTransactionCoordinator,
-        _: ConfigEntry,
+        entry: ConfigEntry,
         entity_description: MontaSensorEntityDescription,
     ) -> None:
         """Initialize the sensor class."""
         super().__init__(coordinator)
 
         self.entity_description = entity_description
-        self._attr_unique_id = generate_entity_id(
-            ENTITY_ID_FORMAT,
-            f"monta_{snake_case(entity_description.key)}",
-            ["monta_latest_transactions"],
+        self._attr_unique_id = account_unique_id(
+            entry.entry_id, entity_description.key,
         )
+        self._attr_device_info = account_device_info(entry)
 
     @property
     def native_value(self) -> StateType:
