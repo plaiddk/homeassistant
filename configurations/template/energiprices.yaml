@@ -2,10 +2,12 @@
     - name: "Today Mean Price"
       unique_id: sensor_today_mean_price
       unit_of_measurement: "DKK/kWh"
+      availability: "{{ state_attr('sensor.energi_data_service', 'today_mean') is number }}"
       state: "{{ state_attr('sensor.energi_data_service', 'today_mean') }}"
     - name: "Tomorrow Min Price"
       unique_id: sensor_tomorrow_min_price
       unit_of_measurement: "DKK/kWh"
+      availability: "{{ (state_attr('sensor.energi_data_service', 'tomorrow_min') or {}).price is defined }}"
       state: "{{ state_attr('sensor.energi_data_service', 'tomorrow_min').price }}"
     - name: "Finish In Relative"
       unique_id: sensor_finish_in_relative

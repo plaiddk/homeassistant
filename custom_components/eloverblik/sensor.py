@@ -11,6 +11,7 @@ from homeassistant.components.recorder.statistics import (
 )
 from homeassistant.components.recorder.models import (
     StatisticData,
+    StatisticMeanType,
     StatisticMetaData
 )
 from homeassistant.config_entries import ConfigEntry
@@ -21,6 +22,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.util import Throttle
+from homeassistant.util.unit_conversion import EnergyConverter
 from homeassistant.helpers.entity import Entity
 from pyeloverblik.models import TimeSeries
 from .__init__ import HassEloverblik, MIN_TIME_BETWEEN_UPDATES
@@ -294,7 +296,8 @@ class EloverblikStatistic(SensorEntity):
             source=RECORDER_DOMAIN,
             statistic_id=self.entity_id,
             unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-            has_mean=False,
+            unit_class=EnergyConverter.UNIT_CLASS,
+            mean_type=StatisticMeanType.NONE,
             has_sum=True,
         )
 

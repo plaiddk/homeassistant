@@ -136,6 +136,24 @@ STATE_UNAVAILABLE: Final = "unavailable"
 STATE_OFF: Final = "off"
 STATE_CLEANING: Final = "cleaning"
 STATE_DOCKED: Final = "docked"
+STATE_REMOTE_PICKUP: Final = "remote_pickup"
+STATE_ARRANGING_ITEMS: Final = "arranging_items"
+STATE_PET_GUARDING: Final = "pet_guarding"
+STATE_PET_GUARDING_PAUSED: Final = "pet_guarding_paused"
+STATE_INSTALLING_MOP: Final = "installing_mop"
+STATE_UNINSTALLING_MOP: Final = "uninstalling_mop"
+STATE_INTELLIGENT_RECHARGING: Final = "intelligent_recharging"
+STATE_ASSISTED_CLEANING: Final = "assisted_cleaning"
+STATE_ENTERING_DOCK: Final = "entering_dock"
+STATE_LEAVING_DOCK: Final = "leaving_dock"
+STATE_NAVIGATING_TO_CLIMBER: Final = "navigating_to_climber"
+STATE_DOCKING_TO_CLIMBER: Final = "docking_to_climber"
+STATE_CLIMBER_DOCKED: Final = "climber_docked"
+STATE_CLIMBER_NAVIGATING: Final = "climber_navigating"
+STATE_CLIMBING_STAIRS: Final = "climbing_stairs"
+STATE_CLIMBING_STAIRS_COMPLETED: Final = "climbing_stairs_completed"
+STATE_CLIMBER_AT_DOCK: Final = "climber_at_dock"
+STATE_CLIMBER_LEAVING_DOCK: Final = "climber_leaving_dock"
 
 TASK_STATUS_COMPLETED: Final = "completed"
 TASK_STATUS_AUTO_CLEANING: Final = "cleaning"
@@ -165,6 +183,17 @@ TASK_STATUS_PET_FINDING: Final = "pet_finding"
 TASK_STATUS_AUTO_CLEANING_WASHING_PAUSED: Final = "auto_cleaning_washing_paused"
 TASK_STATUS_AREA_CLEANING_WASHING_PAUSED: Final = "area_cleaning_washing_paused"
 TASK_STATUS_CUSTOM_CLEANING_WASHING_PAUSED: Final = "custom_cleaning_washing_paused"
+TASK_STATUS_PICKING_UP_ITEM: Final = "picking_up_item"
+TASK_STATUS_PICKING_UP_ITEM_PAUSED: Final = "picking_up_item_paused"
+TASK_STATUS_PICKING_UP_ITEM_SUCCESS: Final = "picking_up_item_success"
+TASK_STATUS_REMOTE_PICKUP_INITIALIZING: Final = "remote_pickup_initializing"
+TASK_STATUS_REMOTE_PICKUP_IDENTIFING: Final = "remote_pickup_identifing"
+TASK_STATUS_MANUAL_REMOTE_PICKUP: Final = "manual_remote_pickup"
+TASK_STATUS_AUTOMATIC_REMOTE_PICKUP: Final = "automatic_remote_pickup"
+TASK_STATUS_REMOTE_PICKUP_IN_PROGRESS: Final = "remote_pickup_in_progress"
+TASK_STATUS_REMOTE_PICKUP_PAUSED: Final = "remote_pickup_paused"
+TASK_STATUS_PLACING_ITEM: Final = "placing_item"
+TASK_STATUS_PLACING_ITEM_PAUSED: Final = "placing_item_paused"
 
 STATUS_CLEANING: Final = "cleaning"
 STATUS_FOLLOW_WALL: Final = "follow_wall_cleaning"
@@ -190,6 +219,10 @@ STATUS_SUMMON_CLEAN: Final = "summon_clean"
 STATUS_SHORTCUT: Final = "shortcut"
 STATUS_PERSON_FOLLOW: Final = "person_follow"
 STATUS_WATER_CHECK: Final = "water_check"
+STATUS_PET_GUARDING: Final = "pet_guarding"
+STATUS_AUTO_ARRANGEMENT: Final = "auto_arrangement"
+STATUS_SMART_ARRANGEMENT: Final = "smart_arrangement"
+STATUS_ZONED_ARRANGEMENT: Final = "zoned_arrangement"
 
 RELOCATION_STATUS_LOCATED: Final = "located"
 RELOCATION_STATUS_LOCATING: Final = "locating"
@@ -254,7 +287,7 @@ VOICE_ASSISTANT_LANGUAGE_CHINESE: Final = "chinese"
 WATER_TANK_INSTALLED: Final = "installed"
 WATER_TANK_NOT_INSTALLED: Final = "not_installed"
 WATER_TANK_MOP_INSTALLED: Final = "mop_installed"
-WATER_TANK_MOP_IN_STATION: Final = "mop_in_station"
+WATER_TANK_IN_STATION: Final = "in_station"
 
 CARPET_SENSITIVITY_LOW: Final = "low"
 CARPET_SENSITIVITY_MEDIUM: Final = "medium"
@@ -334,7 +367,6 @@ DRAINAGE_STATUS_DRAINING_SUCCESS: Final = "draining_successful"
 DRAINAGE_STATUS_DRAINING_FAILED: Final = "draining_failed"
 
 LOW_WATER_WARNING_NO_WARNING: Final = "no_warning"
-LOW_WATER_WARNING_NO_WATER_LEFT_DISMISS: Final = "no_water_left_dismiss"
 LOW_WATER_WARNING_NO_WATER_LEFT: Final = "no_water_left"
 LOW_WATER_WARNING_NO_WATER_LEFT_AFTER_CLEAN: Final = "no_water_left_after_clean"
 LOW_WATER_WARNING_NO_WATER_FOR_CLEAN: Final = "no_water_for_clean"
@@ -371,7 +403,14 @@ TASK_TYPE_CHANGING_MOP: Final = "changing_mop"
 TASK_TYPE_CHANGING_MOP_PAUSED: Final = "changing_mop_paused"
 TASK_TYPE_FLOOR_MAINTAINING: Final = "floor_maintaining"
 TASK_TYPE_FLOOR_MAINTAINING_PAUSED: Final = "floor_maintaining_paused"
-TASK_TYPE_WOOD_FLOOR_MAINTAINING: Final = "wood_floor_maintaining"
+TASK_TYPE_ARRANGING_ITEMS: Final = "arranging_items"
+TASK_TYPE_ARRANGING_ITEMS_PAUSED: Final = "arranging_items_paused"
+TASK_TYPE_INTENSIVE_HAIR_CLEANING: Final = "intensive_hair_cleaning"
+TASK_TYPE_ACCESSORY_HANDLING: Final = "accessory_handling"
+TASK_TYPE_INCREASED_DRUM_SPEED_CLEANING: Final = "increased_drum_speed_cleaning"
+TASK_TYPE_PRESSURIZED_CLEANING: Final = "pressurized_cleaning"
+TASK_TYPE_STEAM_CLEANING: Final = "steam_cleaning"
+TASK_TYPE_STEAM_CLEANING_PAUSED: Final = "steam_cleaning_paused"
 
 CLEAN_WATER_TANK_STATUS_INSTALLED: Final = "installed"
 CLEAN_WATER_TANK_STATUS_NOT_INSTALLED: Final = "not_installed"
@@ -512,12 +551,17 @@ ERROR_MOP_NOT_INSTALLED: Final = "mop_not_installed"
 ERROR_FLUFFING_ROLLER_ERROR: Final = "fluffing_roller_error"
 ERROR_BLOCKED_BY_OBSTACLE: Final = "blocked_by_obstacle"
 ERROR_RETURN_TO_CHARGE_FAILED: Final = "return_to_charge_failed"
+ERROR_ROBOTIC_ARM_STOPPED: Final = "robotic_arm_stopped"
+ERROR_DRAINAGE_OUTLET_FILTER: Final = "drainage_outlet_filter"
+ERROR_MAIN_WHEELS_ERROR: Final = "main_wheels_error"
 
 ATTR_VALUE: Final = "value"
 ATTR_CHARGING: Final = "charging"
 ATTR_DOCKED: Final = "docked"
 ATTR_LOCATED: Final = "located"
 ATTR_STARTED: Final = "started"
+ATTR_FAULTS: Final = "faults"
+ATTR_HAS_ERROR: Final = "has_error"
 ATTR_PAUSED: Final = "paused"
 ATTR_RUNNING: Final = "running"
 ATTR_RETURNING_PAUSED: Final = "returning_paused"
@@ -525,6 +569,8 @@ ATTR_RETURNING: Final = "returning"
 ATTR_MAPPING: Final = "mapping"
 ATTR_MAPPING_AVAILABLE: Final = "mapping_available"
 ATTR_WASHING_AVAILABLE: Final = "washing_available"
+ATTR_RETURNING_TO_WASH: Final = "returning_to_wash"
+ATTR_RETURNING_TO_WASH_PAUSED: Final = "returning_to_wash_paused"
 ATTR_DRYING_AVAILABLE: Final = "drying_available"
 ATTR_DUST_BAG_DRYING_AVAILABLE: Final = "dust_bag_drying_available"
 ATTR_DRAINING_AVAILABLE: Final = "draining_available"
@@ -532,6 +578,7 @@ ATTR_DRYING_LEFT: Final = "drying_left"
 ATTR_DUST_COLLECTION_AVAILABLE: Final = "dust_collection_available"
 ATTR_ROOMS: Final = "rooms"
 ATTR_MAPS: Final = "maps"
+ATTR_MAP_COUNT: Final = "map_count"
 ATTR_CURRENT_SEGMENT: Final = "current_segment"
 ATTR_SELECTED_MAP: Final = "selected_map"
 ATTR_SELECTED_MAP_ID: Final = "selected_map_id"
@@ -559,11 +606,13 @@ ATTR_MOP_PAD_HUMIDITY: Final = "mop_pad_humidity"
 ATTR_SELF_CLEAN_AREA: Final = "self_clean_area"
 ATTR_SELF_CLEAN_AREA_MIN: Final = "self_clean_area_min"
 ATTR_SELF_CLEAN_AREA_MAX: Final = "self_clean_area_max"
+ATTR_SELF_CLEAN_AREA_DEFAULT: Final = "self_clean_area_default"
 ATTR_PREVIOUS_SELF_CLEAN_AREA: Final = "previous_self_clean_area"
 ATTR_SELF_CLEAN_TIME: Final = "self_clean_time"
 ATTR_PREVIOUS_SELF_CLEAN_TIME: Final = "previous_self_clean_time"
 ATTR_SELF_CLEAN_TIME_MIN: Final = "self_clean_time_min"
 ATTR_SELF_CLEAN_TIME_MAX: Final = "self_clean_time_max"
+ATTR_SELF_CLEAN_TIME_DEFAULT: Final = "self_clean_time_default"
 ATTR_MOP_CLEAN_FREQUENCY: Final = "mop_clean_frequency"
 ATTR_MOP_PAD: Final = "mop_pad"
 ATTR_BATTERY: Final = "battery"
@@ -614,6 +663,7 @@ ATTR_MAP_ID: Final = "map_id"
 ATTR_SAVED_MAP_ID: Final = "saved_map_id"
 ATTR_COLOR_SCHEME: Final = "color_scheme"
 ATTR_CAPABILITIES: Final = "capabilities"
+ATTR_LAST_UPDATED_TIME: Final = "last_updated_time"
 
 MAP_PARAMETER_NAME: Final = "name"
 MAP_PARAMETER_VALUE: Final = "value"
@@ -673,370 +723,8 @@ MAP_DATA_JSON_PARAMETER_WALL: Final = "wall"
 MAP_DATA_JSON_PARAMETER_SEGMENT: Final = "segment"
 
 DEVICE_INFO: Final = (
-    "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"
+    "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"
 )
-
-PROPERTY_TO_NAME: Final = {
-    DreameVacuumProperty.STATE.name: ["state", "State"],
-    DreameVacuumProperty.ERROR.name: ["error", "Error"],
-    DreameVacuumProperty.BATTERY_LEVEL.name: ["battery_level", "Battery Level"],
-    DreameVacuumProperty.CHARGING_STATUS.name: ["charging_status", "Charging Status"],
-    DreameVacuumProperty.OFF_PEAK_CHARGING.name: [
-        "off_peak_charging",
-        "Off-Peak Charging",
-    ],
-    DreameVacuumProperty.STATUS.name: ["status", "Status"],
-    DreameVacuumProperty.CLEANING_TIME.name: ["cleaning_time", "Cleaning Time"],
-    DreameVacuumProperty.CLEANED_AREA.name: ["cleaned_area", "Cleaned Area"],
-    DreameVacuumProperty.SUCTION_LEVEL.name: ["suction_level", "Suction Level"],
-    DreameVacuumProperty.WATER_VOLUME.name: ["water_volume", "Water Volume"],
-    DreameVacuumProperty.WATER_TANK.name: ["water_tank", "Water Tank"],
-    DreameVacuumProperty.TASK_STATUS.name: ["task_status", "Task Status"],
-    DreameVacuumProperty.RESUME_CLEANING.name: ["resume_cleaning", "Resume Cleaning"],
-    DreameVacuumProperty.CARPET_BOOST.name: ["carpet_boost", "Carpet Boost"],
-    DreameVacuumProperty.REMOTE_CONTROL.name: ["remote_control", "Remote Control"],
-    DreameVacuumProperty.MOP_CLEANING_REMAINDER.name: [
-        "mop_cleaning_remainder",
-        "Mop Cleaning Remainder",
-    ],
-    DreameVacuumProperty.CLEANING_PAUSED.name: ["cleaning_paused", "Cleaning Paused"],
-    DreameVacuumProperty.FAULTS.name: ["faults", "Faults"],
-    DreameVacuumProperty.RELOCATION_STATUS.name: [
-        "relocation_status",
-        "Relocation Status",
-    ],
-    DreameVacuumProperty.OBSTACLE_AVOIDANCE.name: [
-        "obstacle_avoidance",
-        "Obstacle Avoidance",
-    ],
-    DreameVacuumProperty.AI_DETECTION.name: [
-        "ai_obstacle_detection",
-        "AI Obstacle Detection",
-    ],
-    DreameVacuumProperty.CLEANING_MODE.name: ["cleaning_mode", "Cleaning Mode"],
-    DreameVacuumProperty.SELF_WASH_BASE_STATUS.name: [
-        "self_wash_base_status",
-        "Self-Wash Base Status",
-    ],
-    DreameVacuumProperty.CUSTOMIZED_CLEANING.name: [
-        "customized_cleaning",
-        "Customized Cleaning",
-    ],
-    DreameVacuumProperty.CHILD_LOCK.name: ["child_lock", "Child Lock"],
-    DreameVacuumProperty.CARPET_SENSITIVITY.name: [
-        "carpet_sensitivity",
-        "Carpet Sensitivity",
-    ],
-    DreameVacuumProperty.TIGHT_MOPPING.name: ["tight_mopping", "Tight Mopping"],
-    DreameVacuumProperty.CLEANING_CANCEL.name: ["cleaning_cancel", "Cleaning Cancel"],
-    DreameVacuumProperty.CARPET_RECOGNITION.name: [
-        "carpet_recognition",
-        "Carpet Recognition",
-    ],
-    DreameVacuumProperty.SELF_CLEAN.name: ["self_clean", "Self-Clean"],
-    DreameVacuumProperty.WARN_STATUS.name: ["warn_status", "Warn Status"],
-    DreameVacuumProperty.CARPET_CLEANING.name: ["carpet_cleaning", "Carpet Cleaning"],
-    DreameVacuumProperty.AUTO_ADD_DETERGENT.name: [
-        "auto_add_detergent",
-        "Auto-Add Detergent",
-    ],
-    DreameVacuumProperty.DRYING_TIME.name: ["drying_time", "Drying Time"],
-    DreameVacuumProperty.MULTI_FLOOR_MAP.name: ["multi_floor_map", "Multi Floor Map"],
-    DreameVacuumProperty.MAP_LIST.name: ["map_list", "Map List"],
-    DreameVacuumProperty.RECOVERY_MAP_LIST.name: [
-        "recovery_map_list",
-        "Recovery Map List",
-    ],
-    DreameVacuumProperty.MAP_RECOVERY.name: ["map_recovery", "Map Recovery"],
-    DreameVacuumProperty.MAP_RECOVERY_STATUS.name: [
-        "map_recovery_status",
-        "Map Recovery Status",
-    ],
-    DreameVacuumProperty.VOLUME.name: ["volume", "Volume"],
-    DreameVacuumProperty.VOICE_ASSISTANT.name: ["voice_assistant", "Voice Assistant"],
-    DreameVacuumProperty.SCHEDULE.name: ["schedule", "Schedule"],
-    DreameVacuumProperty.AUTO_DUST_COLLECTING.name: [
-        "auto_dust_collecting",
-        "Auto Dust Collecting",
-    ],
-    DreameVacuumProperty.AUTO_EMPTY_FREQUENCY.name: [
-        "auto_empty_frequency",
-        "Auto Empty Frequency",
-    ],
-    DreameVacuumProperty.MAP_SAVING.name: [
-        "map_saving",
-        "Map Saving",
-    ],
-    DreameVacuumProperty.DUST_COLLECTION.name: ["dust_collection", "Dust Collection"],
-    DreameVacuumProperty.AUTO_EMPTY_STATUS.name: [
-        "auto_empty_status",
-        "Auto Empty Status",
-    ],
-    DreameVacuumProperty.SERIAL_NUMBER.name: ["serial_number", "Serial Number"],
-    DreameVacuumProperty.VOICE_PACKET_ID.name: ["voice_packet_id", "Voice Packet Id"],
-    DreameVacuumProperty.TIMEZONE.name: ["timezone", "Timezone"],
-    DreameVacuumProperty.MAIN_BRUSH_TIME_LEFT.name: [
-        "main_brush_time_left",
-        "Main Brush  Time Left",
-    ],
-    DreameVacuumProperty.MAIN_BRUSH_LEFT.name: ["main_brush_left", "Main Brush Left"],
-    DreameVacuumProperty.SIDE_BRUSH_TIME_LEFT.name: [
-        "side_brush_time_left",
-        "Side Brush Time Left",
-    ],
-    DreameVacuumProperty.SIDE_BRUSH_LEFT.name: ["side_brush_left", "Side Brush Left"],
-    DreameVacuumProperty.FILTER_LEFT.name: ["filter_left", "Filter Left"],
-    DreameVacuumProperty.FILTER_TIME_LEFT.name: [
-        "filter_time_left",
-        "Filter Time Left",
-    ],
-    DreameVacuumProperty.FIRST_CLEANING_DATE.name: [
-        "first_cleaning_date",
-        "First Cleaning Date",
-    ],
-    DreameVacuumProperty.TOTAL_CLEANING_TIME.name: [
-        "total_cleaning_time",
-        "Total Cleaning Time",
-    ],
-    DreameVacuumProperty.CLEANING_COUNT.name: ["cleaning_count", "Cleaning Count"],
-    DreameVacuumProperty.TOTAL_CLEANED_AREA.name: [
-        "total_cleaned_area",
-        "Total Cleaned Area",
-    ],
-    DreameVacuumProperty.TOTAL_RUNTIME.name: [
-        "total_runtime",
-        "Total Runtime",
-    ],
-    DreameVacuumProperty.TOTAL_CRUISE_TIME.name: [
-        "total_cruise_time",
-        "Total Cruise Time",
-    ],
-    DreameVacuumProperty.SENSOR_DIRTY_LEFT.name: [
-        "sensor_dirty_left",
-        "Sensor Dirty Left",
-    ],
-    DreameVacuumProperty.SENSOR_DIRTY_TIME_LEFT.name: [
-        "sensor_dirty_time_left",
-        "Sensor Dirty Time Left",
-    ],
-    DreameVacuumProperty.TANK_FILTER_LEFT.name: [
-        "tank_filter_left",
-        "Tank Filter Left",
-    ],
-    DreameVacuumProperty.TANK_FILTER_TIME_LEFT.name: [
-        "tank_filter_time_left",
-        "Tank Filter Time Left",
-    ],
-    DreameVacuumProperty.MOP_PAD_LEFT.name: ["mop_pad_left", "Mop Pad Left"],
-    DreameVacuumProperty.MOP_PAD_TIME_LEFT.name: [
-        "mop_pad_time_left",
-        "Mop Pad Time Left",
-    ],
-    DreameVacuumProperty.SILVER_ION_LEFT.name: ["silver_ion_left", "Silver-ion Left"],
-    DreameVacuumProperty.SILVER_ION_TIME_LEFT.name: [
-        "silver_ion_time_left",
-        "Silver-ion Time Left",
-    ],
-    DreameVacuumProperty.DETERGENT_LEFT.name: ["detergent_left", "Detergent Left"],
-    DreameVacuumProperty.DETERGENT_TIME_LEFT.name: [
-        "detergent_time_left",
-        "Detergent Time Left",
-    ],
-    DreameVacuumProperty.SQUEEGEE_LEFT.name: ["squeegee_left", "Squeegee Left"],
-    DreameVacuumProperty.SQUEEGEE_TIME_LEFT.name: [
-        "squeegee_time_left",
-        "Squeegee Time Left",
-    ],
-    DreameVacuumProperty.ONBOARD_DIRTY_WATER_TANK_LEFT.name: [
-        "onboard_dirty_water_tank_left",
-        "Onboard Dirty Water Tank Left",
-    ],
-    DreameVacuumProperty.ONBOARD_DIRTY_WATER_TANK_TIME_LEFT.name: [
-        "onboard_dirty_water_tank_time_left",
-        "Onboard Dirty Water Tank Time Left",
-    ],
-    DreameVacuumProperty.DIRTY_WATER_CHANNEL_DIRTY_LEFT.name: [
-        "DIRTY_WATER_CHANNEL_DIRTY_left",
-        "Dirty Water Channel Left",
-    ],
-    DreameVacuumProperty.DIRTY_WATER_CHANNEL_DIRTY_TIME_LEFT.name: [
-        "DIRTY_WATER_CHANNEL_DIRTY_time_left",
-        "Dirty Water Channel Time Left",
-    ],
-    DreameVacuumProperty.DEODORIZER_LEFT.name: [
-        "deodorizer_left",
-        "Deodorizer Left",
-    ],
-    DreameVacuumProperty.DEODORIZER_TIME_LEFT.name: [
-        "deodorizer_time_left",
-        "Deodorizer Time Left",
-    ],
-    DreameVacuumProperty.WHEEL_DIRTY_LEFT.name: [
-        "wheel_dirty_left",
-        "Wheel Dirty Left",
-    ],
-    DreameVacuumProperty.WHEEL_DIRTY_TIME_LEFT.name: [
-        "wheel_dirty_time_left",
-        "Wheel Dirty Time Left",
-    ],
-    DreameVacuumProperty.SCALE_INHIBITOR_LEFT.name: [
-        "scale_inhibitor_left",
-        "Scale Inhibitor Left",
-    ],
-    DreameVacuumProperty.SCALE_INHIBITOR_TIME_LEFT.name: [
-        "scale_inhibitor_time_left",
-        "Scale Inhibitor Time Left",
-    ],
-    DreameVacuumProperty.CLEANGENIUS_MODE.name: [
-        "cleangenius_mode",
-        "CleanGenius Mode",
-    ],
-    DreameVacuumProperty.DND_DISABLE_RESUME_CLEANING.name: [
-        "dnd_disable_resume_cleaning",
-        "DnD Disable Resume Cleaning",
-    ],
-    DreameVacuumProperty.DND_DISABLE_AUTO_EMPTY.name: [
-        "dnd_disable_auto_empty",
-        "DnD Disable Auto Empty",
-    ],
-    DreameVacuumProperty.DND_REDUCE_VOLUME.name: [
-        "dnd_reduce_volume",
-        "DnD Reduce Volume",
-    ],
-    DreameVacuumAIProperty.AI_FURNITURE_DETECTION.name: [
-        "ai_furniture_detection",
-        "AI Furniture Detection",
-    ],
-    DreameVacuumAIProperty.AI_OBSTACLE_DETECTION.name: [
-        "ai_obstacle_detection",
-        "AI Obstacle Detection",
-    ],
-    DreameVacuumAIProperty.AI_OBSTACLE_PICTURE.name: [
-        "ai_obstacle_picture",
-        "AI Obstacle Picture",
-    ],
-    DreameVacuumAIProperty.AI_FLUID_DETECTION.name: [
-        "ai_fluid_detection",
-        "AI Fluid Detection",
-    ],
-    DreameVacuumAIProperty.AI_PET_DETECTION.name: [
-        "ai_pet_detection",
-        "AI Pet Detection",
-    ],
-    DreameVacuumAIProperty.AI_OBSTACLE_IMAGE_UPLOAD.name: [
-        "ai_obstacle_image_upload",
-        "AI Obstacle Image Upload",
-    ],
-    DreameVacuumAIProperty.AI_IMAGE.name: ["ai_image", "AI Image"],
-    DreameVacuumAIProperty.AI_PET_AVOIDANCE.name: [
-        "ai_pet_avoidance",
-        "AI Pet Avoidance",
-    ],
-    DreameVacuumAIProperty.FUZZY_OBSTACLE_DETECTION.name: [
-        "fuzzy_obstacle_detection",
-        "Fuzzy Obstacle Detection",
-    ],
-    DreameVacuumAIProperty.PET_PICTURE.name: ["pet_picture", "Pet Picture"],
-    DreameVacuumAIProperty.PET_FOCUSED_DETECTION.name: [
-        "pet_focused_detection",
-        "Pet Focused Detection",
-    ],
-    DreameVacuumAIProperty.LARGE_PARTICLES_BOOST.name: [
-        "large_particles_boost",
-        "Large Particles Boost",
-    ],
-    DreameVacuumStrAIProperty.AI_HUMAN_DETECTION.name: [
-        "ai_human_detection",
-        "AI Human Detection",
-    ],
-    DreameVacuumAutoSwitchProperty.COLLISION_AVOIDANCE.name: [
-        "collision_avoidance",
-        "Collision Avoidance",
-    ],
-    DreameVacuumAutoSwitchProperty.FILL_LIGHT.name: ["fill_light", "Fill Light"],
-    DreameVacuumAutoSwitchProperty.AUTO_DRYING.name: ["auto_drying", "Auto Drying"],
-    DreameVacuumAutoSwitchProperty.STAIN_AVOIDANCE.name: [
-        "stain_avoidance",
-        "Stain Avoidance",
-    ],
-    DreameVacuumAutoSwitchProperty.MOPPING_TYPE.name: ["mopping_type", "Mopping Type"],
-    DreameVacuumAutoSwitchProperty.CLEANGENIUS.name: [
-        "cleangenius",
-        "CleanGenius",
-    ],
-    DreameVacuumAutoSwitchProperty.WIDER_CORNER_COVERAGE.name: [
-        "wider_corner_coverage",
-        "Wider Corner Coverage",
-    ],
-    DreameVacuumAutoSwitchProperty.FLOOR_DIRECTION_CLEANING.name: [
-        "floor_direction_cleaning",
-        "Floor Direction Cleaning",
-    ],
-    DreameVacuumAutoSwitchProperty.PET_FOCUSED_CLEANING.name: [
-        "pet_focused_cleaning",
-        "Pet Focused Cleaning",
-    ],
-    DreameVacuumAutoSwitchProperty.AUTO_RECLEANING.name: [
-        "auto_recleaning",
-        "Auto Re-Cleaning",
-    ],
-    DreameVacuumAutoSwitchProperty.AUTO_REWASHING.name: [
-        "auto_rewashing",
-        "Auto Re-Washing",
-    ],
-    DreameVacuumAutoSwitchProperty.MOP_PAD_SWING.name: [
-        "mop_pad_swing",
-        "Mop Pad Swing",
-    ],
-    DreameVacuumAutoSwitchProperty.MOP_EXTEND.name: [
-        "mop_extend",
-        "Mop Extend",
-    ],
-    DreameVacuumAutoSwitchProperty.MOP_EXTEND_FREQUENCY.name: [
-        "mop_extend_frequency",
-        "Mop Extend Frequency",
-    ],
-    DreameVacuumAutoSwitchProperty.HUMAN_FOLLOW.name: ["human_follow", "Human Follow"],
-    DreameVacuumAutoSwitchProperty.MAX_SUCTION_POWER.name: [
-        "max_suction_power",
-        "Max Suction Power",
-    ],
-    DreameVacuumAutoSwitchProperty.SMART_DRYING.name: ["smart_drying", "Smart Drying"],
-    DreameVacuumAutoSwitchProperty.DRAINAGE_CONFIRM_RESULT.name: [
-        "drainage_confirm_result",
-        "Drainage Confirm Result",
-    ],
-    DreameVacuumAutoSwitchProperty.DRAINAGE_TEST_RESULT.name: [
-        "drainage_test_result",
-        "Drainage Test Result",
-    ],
-    DreameVacuumAutoSwitchProperty.HOT_WASHING.name: ["hot_washing", "Hot Washing"],
-    DreameVacuumAutoSwitchProperty.UV_STERILIZATION.name: [
-        "uv_sterilization",
-        "UV Sterilization",
-    ],
-}
-
-ACTION_TO_NAME: Final = {
-    DreameVacuumAction.START: ["start", "Start"],
-    DreameVacuumAction.PAUSE: ["pause", "Pause"],
-    DreameVacuumAction.CHARGE: ["charge", "Charge"],
-    DreameVacuumAction.START_CUSTOM: ["start_custom", "Start Custom"],
-    DreameVacuumAction.STOP: ["stop", "Stop"],
-    DreameVacuumAction.CLEAR_WARNING: ["clear_warning", "Clear Warning"],
-    DreameVacuumAction.REQUEST_MAP: ["request_map", "Request Map"],
-    DreameVacuumAction.UPDATE_MAP_DATA: ["update_map_data", "Update Map Data"],
-    DreameVacuumAction.LOCATE: ["locate", "Locate"],
-    DreameVacuumAction.TEST_SOUND: ["test_sound", "Test Sound"],
-    DreameVacuumAction.RESET_MAIN_BRUSH: ["reset_main_brush", "Reset Main Brush"],
-    DreameVacuumAction.RESET_SIDE_BRUSH: ["reset_side_brush", "Reset Side Brush"],
-    DreameVacuumAction.RESET_FILTER: ["reset_filter", "Reset Filter"],
-    DreameVacuumAction.RESET_SENSOR: ["reset_sensor", "Reset Sensor"],
-    DreameVacuumAction.START_AUTO_EMPTY: ["start_auto_empty", "Start Auto Empty"],
-    DreameVacuumAction.RESET_MOP_PAD: ["reset_mop_pad", "Reset Mop Pad"],
-    DreameVacuumAction.RESET_SILVER_ION: ["reset_silver_ion", "Reset Silver-ion"],
-    DreameVacuumAction.RESET_DETERGENT: ["reset_detergent", "Reset Detergent"],
-}
 
 STATE_CODE_TO_STATE: Final = {
     DreameVacuumState.UNKNOWN: STATE_UNKNOWN,
@@ -1091,6 +779,24 @@ STATE_CODE_TO_STATE: Final = {
     DreameVacuumState.CHANGING_MOP_PAUSED: STATE_CHANGING_MOP_PAUSED,
     DreameVacuumState.FLOOR_MAINTAINING: STATE_FLOOR_MAINTAINING,
     DreameVacuumState.FLOOR_MAINTAINING_PAUSED: STATE_FLOOR_MAINTAINING_PAUSED,
+    DreameVacuumState.REMOTE_PICKUP: STATE_REMOTE_PICKUP,
+    DreameVacuumState.ARRANGING_ITEMS: STATE_ARRANGING_ITEMS,
+    DreameVacuumState.PET_GUARDING: STATE_PET_GUARDING,
+    DreameVacuumState.PET_GUARDING_PAUSED: STATE_PET_GUARDING_PAUSED,
+    DreameVacuumState.INSTALLING_MOP: STATE_INSTALLING_MOP,
+    DreameVacuumState.UNINSTALLING_MOP: STATE_UNINSTALLING_MOP,
+    DreameVacuumState.INTELLIGENT_RECHARGING: STATE_INTELLIGENT_RECHARGING,
+    DreameVacuumState.ASSISTED_CLEANING: STATE_ASSISTED_CLEANING,
+    DreameVacuumState.ENTERING_DOCK: STATE_ENTERING_DOCK,
+    DreameVacuumState.LEAVING_DOCK: STATE_LEAVING_DOCK,
+    DreameVacuumState.NAVIGATING_TO_CLIMBER: STATE_NAVIGATING_TO_CLIMBER,
+    DreameVacuumState.DOCKING_TO_CLIMBER: STATE_DOCKING_TO_CLIMBER,
+    DreameVacuumState.CLIMBER_DOCKED: STATE_CLIMBER_DOCKED,
+    DreameVacuumState.CLIMBER_NAVIGATING: STATE_CLIMBER_NAVIGATING,
+    DreameVacuumState.CLIMBING_STAIRS: STATE_CLIMBING_STAIRS,
+    DreameVacuumState.CLIMBING_STAIRS_COMPLETED: STATE_CLIMBING_STAIRS_COMPLETED,
+    DreameVacuumState.CLIMBER_AT_DOCK: STATE_CLIMBER_AT_DOCK,
+    DreameVacuumState.CLIMBER_LEAVING_DOCK: STATE_CLIMBER_LEAVING_DOCK,
 }
 
 # Dreame Vacuum suction level names
@@ -1128,7 +834,7 @@ WATER_TANK_CODE_TO_NAME: Final = {
     DreameVacuumWaterTank.INSTALLED: WATER_TANK_INSTALLED,
     DreameVacuumWaterTank.NOT_INSTALLED: WATER_TANK_NOT_INSTALLED,
     DreameVacuumWaterTank.MOP_INSTALLED: WATER_TANK_MOP_INSTALLED,
-    DreameVacuumWaterTank.MOP_IN_STATION: WATER_TANK_MOP_IN_STATION,
+    DreameVacuumWaterTank.IN_STATION: WATER_TANK_IN_STATION,
 }
 
 CARPET_SENSITIVITY_CODE_TO_NAME: Final = {
@@ -1199,6 +905,17 @@ TASK_STATUS_CODE_TO_NAME: Final = {
     DreameVacuumTaskStatus.AUTO_CLEANING_WASHING_PAUSED: TASK_STATUS_AUTO_CLEANING_WASHING_PAUSED,
     DreameVacuumTaskStatus.AREA_CLEANING_WASHING_PAUSED: TASK_STATUS_AREA_CLEANING_WASHING_PAUSED,
     DreameVacuumTaskStatus.CUSTOM_CLEANING_WASHING_PAUSED: TASK_STATUS_CUSTOM_CLEANING_WASHING_PAUSED,
+    DreameVacuumTaskStatus.PICKING_UP_ITEM: TASK_STATUS_PICKING_UP_ITEM,
+    DreameVacuumTaskStatus.PICKING_UP_ITEM_PAUSED: TASK_STATUS_PICKING_UP_ITEM_PAUSED,
+    DreameVacuumTaskStatus.PICKING_UP_ITEM_SUCCESS: TASK_STATUS_PICKING_UP_ITEM_SUCCESS,
+    DreameVacuumTaskStatus.REMOTE_PICKUP_INITIALIZING: TASK_STATUS_REMOTE_PICKUP_INITIALIZING,
+    DreameVacuumTaskStatus.REMOTE_PICKUP_IDENTIFING: TASK_STATUS_REMOTE_PICKUP_IDENTIFING,
+    DreameVacuumTaskStatus.MANUAL_REMOTE_PICKUP: TASK_STATUS_MANUAL_REMOTE_PICKUP,
+    DreameVacuumTaskStatus.AUTOMATIC_REMOTE_PICKUP: TASK_STATUS_AUTOMATIC_REMOTE_PICKUP,
+    DreameVacuumTaskStatus.REMOTE_PICKUP_IN_PROGRESS: TASK_STATUS_REMOTE_PICKUP_IN_PROGRESS,
+    DreameVacuumTaskStatus.REMOTE_PICKUP_PAUSED: TASK_STATUS_REMOTE_PICKUP_PAUSED,
+    DreameVacuumTaskStatus.PLACING_ITEM: TASK_STATUS_PLACING_ITEM,
+    DreameVacuumTaskStatus.PLACING_ITEM_PAUSED: TASK_STATUS_PLACING_ITEM_PAUSED,
 }
 
 STATUS_CODE_TO_NAME: Final = {
@@ -1207,7 +924,7 @@ STATUS_CODE_TO_NAME: Final = {
     DreameVacuumStatus.PAUSED: STATE_PAUSED,
     DreameVacuumStatus.CLEANING: STATUS_CLEANING,
     DreameVacuumStatus.BACK_HOME: STATE_RETURNING,
-    DreameVacuumStatus.PART_CLEANING: STATUS_SPOT_CLEANING,
+    DreameVacuumStatus.PARTIAL_CLEANING: STATUS_SPOT_CLEANING,
     DreameVacuumStatus.FOLLOW_WALL: STATUS_FOLLOW_WALL,
     DreameVacuumStatus.CHARGING: STATUS_CHARGING,
     DreameVacuumStatus.OTA: STATUS_OTA,
@@ -1231,6 +948,10 @@ STATUS_CODE_TO_NAME: Final = {
     DreameVacuumStatus.SHORTCUT: STATUS_SHORTCUT,
     DreameVacuumStatus.PERSON_FOLLOW: STATUS_PERSON_FOLLOW,
     DreameVacuumStatus.WATER_CHECK: STATUS_WATER_CHECK,
+    DreameVacuumStatus.PET_GUARDING: STATUS_PET_GUARDING,
+    DreameVacuumStatus.AUTO_ARRANGEMENT: STATUS_AUTO_ARRANGEMENT,
+    DreameVacuumStatus.SMART_ARRANGEMENT: STATUS_SMART_ARRANGEMENT,
+    DreameVacuumStatus.ZONED_ARRANGEMENT: STATUS_ZONED_ARRANGEMENT,
 }
 
 RELOCATION_STATUS_CODE_TO_NAME: Final = {
@@ -1345,6 +1066,7 @@ ERROR_CODE_TO_ERROR_NAME: Final = {
     DreameVacuumErrorCode.ROBOT_STUCK_ON_SLIPPERY_SURFACE: ERROR_ROBOT_STUCK_ON_SLIPPERY_SURFACE,
     DreameVacuumErrorCode.ROBOT_STUCK_ON_CARPET: ERROR_ROBOT_STUCK_ON_CARPET,
     DreameVacuumErrorCode.BIN_FULL: ERROR_BIN_FULL,
+    DreameVacuumErrorCode.BIN_FULL_2: ERROR_BIN_FULL,
     DreameVacuumErrorCode.BIN_OPEN: ERROR_BIN_OPEN,
     DreameVacuumErrorCode.BIN_OPEN_2: ERROR_BIN_OPEN,
     DreameVacuumErrorCode.WATER_TANK: ERROR_WATER_TANK,
@@ -1385,6 +1107,14 @@ ERROR_CODE_TO_ERROR_NAME: Final = {
     DreameVacuumErrorCode.MOP_COVER_ERROR_2: ERROR_MOP_COVER_ERROR,
     DreameVacuumErrorCode.BLOCKED_BY_OBSTACLE: ERROR_BLOCKED_BY_OBSTACLE,
     DreameVacuumErrorCode.RETURN_TO_CHARGE_FAILED: ERROR_RETURN_TO_CHARGE_FAILED,
+    DreameVacuumErrorCode.ROBOTIC_ARM_STOPPED: ERROR_ROBOTIC_ARM_STOPPED,
+    DreameVacuumErrorCode.LDS_ERROR_2: ERROR_LDS_ERROR,
+    DreameVacuumErrorCode.MOP_COVER_ERROR_3: ERROR_MOP_COVER_ERROR,
+    DreameVacuumErrorCode.ROLLER_MOP_ERROR_3: ERROR_ROLLER_MOP_ERROR,
+    DreameVacuumErrorCode.DRAINAGE_OUTLET_FILTER: ERROR_DRAINAGE_OUTLET_FILTER,
+    DreameVacuumErrorCode.MAIN_WHEELS_ERROR: ERROR_MAIN_WHEELS_ERROR,
+    DreameVacuumErrorCode.INTERNAL_ERROR_3: ERROR_INTERNAL_ERROR,
+    DreameVacuumErrorCode.INTERNAL_ERROR_4: ERROR_INTERNAL_ERROR,
 }
 
 DUST_COLLECTION_TO_NAME: Final = {
@@ -1589,7 +1319,7 @@ DRAINAGE_STATUS_TO_NAME: Final = {
 LOW_WATER_WARNING_TO_NAME: Final = {
     DreameVacuumLowWaterWarning.UNKNOWN: STATE_UNKNOWN,
     DreameVacuumLowWaterWarning.NO_WARNING: LOW_WATER_WARNING_NO_WARNING,
-    DreameVacuumLowWaterWarning.NO_WATER_LEFT_DISMISS: LOW_WATER_WARNING_NO_WATER_LEFT_DISMISS,
+    DreameVacuumLowWaterWarning.NO_WATER_LEFT_DISMISS: LOW_WATER_WARNING_NO_WARNING,
     DreameVacuumLowWaterWarning.NO_WATER_LEFT: LOW_WATER_WARNING_NO_WATER_LEFT,
     DreameVacuumLowWaterWarning.NO_WATER_LEFT_AFTER_CLEAN: LOW_WATER_WARNING_NO_WATER_LEFT_AFTER_CLEAN,
     DreameVacuumLowWaterWarning.NO_WATER_FOR_CLEAN: LOW_WATER_WARNING_NO_WATER_FOR_CLEAN,
@@ -1630,7 +1360,14 @@ TASK_TYPE_TO_NAME: Final = {
     DreameVacuumTaskType.CHANGING_MOP_PAUSED: TASK_TYPE_CHANGING_MOP_PAUSED,
     DreameVacuumTaskType.FLOOR_MAINTAINING: TASK_TYPE_FLOOR_MAINTAINING,
     DreameVacuumTaskType.FLOOR_MAINTAINING_PAUSED: TASK_TYPE_FLOOR_MAINTAINING_PAUSED,
-    DreameVacuumTaskType.WOOD_FLOOR_MAINTAINING: TASK_TYPE_WOOD_FLOOR_MAINTAINING,
+    DreameVacuumTaskType.ARRANGING_ITEMS: TASK_TYPE_ARRANGING_ITEMS,
+    DreameVacuumTaskType.ARRANGING_ITEMS_PAUSED: TASK_TYPE_ARRANGING_ITEMS_PAUSED,
+    DreameVacuumTaskType.INTENSIVE_HAIR_CLEANING: TASK_TYPE_INTENSIVE_HAIR_CLEANING,
+    DreameVacuumTaskType.ACCESSORY_HANDLING: TASK_TYPE_ACCESSORY_HANDLING,
+    DreameVacuumTaskType.INCREASED_DRUM_SPEED_CLEANING: TASK_TYPE_INCREASED_DRUM_SPEED_CLEANING,
+    DreameVacuumTaskType.PRESSURIZED_CLEANING: TASK_TYPE_PRESSURIZED_CLEANING,
+    DreameVacuumTaskType.STEAM_CLEANING: TASK_TYPE_STEAM_CLEANING,
+    DreameVacuumTaskType.STEAM_CLEANING_PAUSED: TASK_TYPE_STEAM_CLEANING_PAUSED,
 }
 
 CLEAN_WATER_TANK_STATUS_TO_NAME: Final = {
@@ -1853,669 +1590,11 @@ ERROR_CODE_GEN5_TO_IMAGE_INDEX: Final = {
     DreameVacuumErrorCode.SELF_TEST_FAILED: 999,
     DreameVacuumErrorCode.DRAINAGE_FAILED: 999,
     DreameVacuumErrorCode.RETURN_TO_CHARGE_FAILED: 1000,
-}
-
-
-# Dreame Vacuum error descriptions
-ERROR_CODE_TO_ERROR_DESCRIPTION: Final = {
-    DreameVacuumErrorCode.NO_ERROR: ["No error", ""],
-    DreameVacuumErrorCode.DROP: [
-        "Wheels are suspended",
-        "Please reposition the robot and restart.",
-    ],
-    DreameVacuumErrorCode.CLIFF: [
-        "Cliff sensor error",
-        "Please wipe the cliff sensor and start the cleanup away from the stairs.",
-    ],
-    DreameVacuumErrorCode.BUMPER: [
-        "Collision sensor is stuck",
-        "Please clean and gently tap the collision sensor.",
-    ],
-    DreameVacuumErrorCode.GESTURE: [
-        "Robot is tilted",
-        "Please move the robot to a level surface and start again.",
-    ],
-    DreameVacuumErrorCode.BUMPER_REPEAT: [
-        "Collision sensor is stuck",
-        "Please clean and gently tap the collision sensor.",
-    ],
-    DreameVacuumErrorCode.DROP_REPEAT: [
-        "Wheels are suspended",
-        "Please reposition the robot and restart.",
-    ],
-    DreameVacuumErrorCode.OPTICAL_FLOW: [
-        "Optical flow sensor error",
-        "Please try to restart the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.BOX: [
-        "Dust bin not installed",
-        "Please install the dust bin and filter.",
-    ],
-    DreameVacuumErrorCode.TANKBOX: [
-        "Water tank not installed",
-        "Please install the water tank.",
-    ],
-    DreameVacuumErrorCode.WATERBOX_EMPTY: [
-        "Water tank is empty",
-        "Please will up the water tank",
-    ],
-    DreameVacuumErrorCode.BOX_FULL: [
-        "The filter not dry or blocked",
-        "Please check whether the filter has dried or needs to be cleaned.",
-    ],
-    DreameVacuumErrorCode.BRUSH: [
-        "The main brush wrapped",
-        "Please remove the main brush and clean its bristles and bearings.",
-    ],
-    DreameVacuumErrorCode.SIDE_BRUSH: [
-        "The side brush wrapped",
-        "Please remove and clean the side brush.",
-    ],
-    DreameVacuumErrorCode.FAN: [
-        "The filter not dry or blocked",
-        "Please check whether the filter has dried or needs to be cleaned.",
-    ],
-    DreameVacuumErrorCode.LEFT_WHEEL_MOTOR: [
-        "The robot is stuck, or its left wheel may be blocked by foreign objects",
-        "Check whether there is any object stuck in the main wheels and start the robot in a new position.",
-    ],
-    DreameVacuumErrorCode.RIGHT_WHEEL_MOTOR: [
-        "The robot is stuck, or its right wheel may be blocked by foreign objects",
-        "Check whether there is any object stuck in the main wheels and start the robot in a new position.",
-    ],
-    DreameVacuumErrorCode.TURN_SUFFOCATE: [
-        "The robot is stuck, or cannot turn",
-        "The robot may be blocked or stuck.",
-    ],
-    DreameVacuumErrorCode.FORWARD_SUFFOCATE: [
-        "The robot is stuck, or cannot go forward",
-        "The robot may be blocked or stuck.",
-    ],
-    DreameVacuumErrorCode.CHARGER_GET: [
-        "Cannot find base",
-        "Please check whether the power cord is plugged in correctly.",
-    ],
-    DreameVacuumErrorCode.BATTERY_LOW: [
-        "Low battery",
-        "Battery level is too low. Please charge.",
-    ],
-    DreameVacuumErrorCode.CHARGE_FAULT: [
-        "Charging error",
-        "Please use a dry cloth to wipe charging contacts of the robot and auto-empty base.",
-    ],
-    DreameVacuumErrorCode.BATTERY_PERCENTAGE: ["Battery level error", ""],
-    DreameVacuumErrorCode.HEART: [
-        "Internal error",
-        "Please try to restart the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.CAMERA_OCCLUSION: [
-        "Visual positioning sensor error",
-        "Please clean the visual positioning sensor.",
-    ],
-    DreameVacuumErrorCode.MOVE: [
-        "Move sensor error",
-        "Please try to restart the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.FLOW_SHIELDING: [
-        "Optical sensor error",
-        "Please wipe the optical sensor clean and restart.",
-    ],
-    DreameVacuumErrorCode.INFRARED_SHIELDING: [
-        "Infrared shielding error",
-        "Please try to restart the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.CHARGE_NO_ELECTRIC: [
-        "The charging dock is not powered on",
-        "The charging dock is not powered on. Please check whether the power cord is plugged in correctly.",
-    ],
-    DreameVacuumErrorCode.BATTERY_FAULT: [
-        "Battery temperature error",
-        "Please wait until the battery temperature returns to normal.",
-    ],
-    DreameVacuumErrorCode.FAN_SPEED_ERROR: [
-        "Fan speed sensor error",
-        "Please try to restart the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.LEFTWHELL_SPEED: [
-        "Left wheel may be blocked by foreign objects",
-        "Check whether there is any object stuck in the main wheels and start the robot in a new position.",
-    ],
-    DreameVacuumErrorCode.RIGHTWHELL_SPEED: [
-        "Right wheel may be blocked by foreign objects",
-        "Check whether there is any object stuck in the main wheels and start the robot in a new position.",
-    ],
-    DreameVacuumErrorCode.BMI055_ACCE: [
-        "Accelerometer error",
-        "Please try to restart the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.BMI055_GYRO: [
-        "Gyro error",
-        "Please try to restart the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.XV7001: [
-        "Gyro error",
-        "Please try to restart the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.LEFT_MAGNET: [
-        "Left magnet sensor error",
-        "Please try to restart the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.RIGHT_MAGNET: [
-        "Right magnet sensor error",
-        "Please try to restart the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.FLOW_ERROR: [
-        "Flow sensor error",
-        "Please try to restart the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.INFRARED_FAULT: [
-        "Infrared error",
-        "Please try to restart the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.CAMERA_FAULT: [
-        "Camera error",
-        "Please try to restart the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.STRONG_MAGNET: [
-        "Strong magnetic field detected",
-        "Strong magnetic field detected. Please start away from the virtual wall.",
-    ],
-    DreameVacuumErrorCode.WATER_PUMP: [
-        "Water pump error",
-        "Please try to restart the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.RTC: ["RTC error", "Please try to restart the vacuum-mop."],
-    DreameVacuumErrorCode.AUTO_KEY_TRIG: [
-        "Internal error",
-        "Please try to restart the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.P3V3: [
-        "Internal error",
-        "Please try to restart the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.CAMERA_IDLE: [
-        "Internal error",
-        "Please try to restart the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.BLOCKED: [
-        "The robot may be blocked or stuck.",
-        "Cleanup route is blocked, returning to the dock.",
-    ],
-    DreameVacuumErrorCode.LDS_ERROR: [
-        "Laser distance sensor error",
-        "Please check whether the laser distance sensor has any jammed items",
-    ],
-    DreameVacuumErrorCode.LDS_BUMPER: [
-        "Laser distance sensor bumper error",
-        "Please check whether the laser distance sensor bumper is jammed",
-    ],
-    DreameVacuumErrorCode.WATER_PUMP_2: [
-        "Water pump error",
-        "Please try to restart the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.FILTER_BLOCKED: [
-        "The filter not dry or blocked",
-        "Please check whether the filter has dried or needs to be cleaned",
-    ],
-    DreameVacuumErrorCode.EDGE: [
-        "Edge sensor error",
-        "Edge sensor error. Please check and clean it.",
-    ],
-    DreameVacuumErrorCode.CARPET: [
-        "Please start the robot in non-carpet area.",
-        "A carpet is detected under the robot when it is mopping. Please move the robot to another place and restart it.",
-    ],
-    DreameVacuumErrorCode.LASER: [
-        "The 3D obstacle avoidance sensor is malfunctioning.",
-        "Please try to clean the 3D obstacle avoidance sensor.",
-    ],
-    DreameVacuumErrorCode.EDGE_2: [
-        "Edge sensor error",
-        "Edge sensor error. Please check and clean it.",
-    ],
-    DreameVacuumErrorCode.ULTRASONIC: [
-        "The ultrasonic sensor is malfunctioning.",
-        "Please restart the robot and try it again.",
-    ],
-    DreameVacuumErrorCode.NO_GO_ZONE: [
-        "No-Go zone or virtual wall detected.",
-        "Please move the robot away from the area and restart.",
-    ],
-    DreameVacuumErrorCode.ROUTE: [
-        "Unable to reach the specified area.",
-        "Please ensure that all doors in the home are open and clear any obstacles along the path.",
-    ],
-    DreameVacuumErrorCode.ROUTE_2: [
-        "Unable to reach the specified area.",
-        "Please try to delete the restricted area in the path.",
-    ],
-    DreameVacuumErrorCode.BLOCKED_2: [
-        "Cleanup route is blocked.",
-        "Please ensure that all doors in the home are open and clear any obstacles around the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.BLOCKED_3: [
-        "Cleanup route is blocked.",
-        "Please try to delete the restricted area or move the vacuum-mop out of this area.",
-    ],
-    DreameVacuumErrorCode.RESTRICTED: [
-        "Detected that the vacuum-mop is in a restricted area.",
-        "Please move the vacuum-mop out of this area.",
-    ],
-    DreameVacuumErrorCode.RESTRICTED_2: [
-        "Detected that the vacuum-mop is in a restricted area.",
-        "Please move the vacuum-mop out of this area.",
-    ],
-    DreameVacuumErrorCode.RESTRICTED_3: [
-        "Detected that the vacuum-mop is in a restricted area.",
-        "Please move the vacuum-mop out of this area.",
-    ],
-    DreameVacuumErrorCode.REMOVE_MOP: [
-        "Mopping completed. Please remove and clean the mop in time.",
-        "",
-    ],
-    DreameVacuumErrorCode.MOP_REMOVED: [
-        "The mop pad comes off during the cleaning task.",
-        "The mop pads come off, install them before resuming working.",
-    ],
-    DreameVacuumErrorCode.MOP_REMOVED_2: [
-        "The mop pad comes off during the cleaning task.",
-        "The mop pads come off, install them before resuming working.",
-    ],
-    DreameVacuumErrorCode.MOP_PAD_STOP_ROTATE: [
-        "Mop Pad Stops Rotating.",
-        "The mop pad has stopped rotating, please check.",
-    ],
-    DreameVacuumErrorCode.MOP_PAD_STOP_ROTATE_2: [
-        "Mop Pad Stops Rotating.",
-        "The mop pad has stopped rotating, please check.",
-    ],
-    DreameVacuumErrorCode.MOP_INSTALL_FAILED: [
-        "Mop pad installation failed.",
-        "Failed to install mop pads. Please install manually.",
-    ],
-    DreameVacuumErrorCode.LOW_BATTERY_TURN_OFF: [
-        "Low battery. Robot will shut down soon.",
-        "",
-    ],
-    DreameVacuumErrorCode.DIRTY_TANK_NOT_INSTALLED: [
-        "The used water tank of robot is not installed.",
-        "Please make sure that the used water tank of robot is installed properly, and then start the task.",
-    ],
-    DreameVacuumErrorCode.ROBOT_IN_HIDDEN_ROOM: [
-        "Hidden area. Please move the robot to the appropriate area and retry.",
-        "The area has been hidden. To reuse it, please go to the specific map and click the gray area to manually recover the hidden area.",
-    ],
-    DreameVacuumErrorCode.LDS_FAILED_TO_LIFT: [
-        "Failed to lift LDS module.",
-        "Please clear any debris around the LDS and move robot to an open area to resume the task.",
-    ],
-    DreameVacuumErrorCode.ROBOT_STUCK: [
-        "Move robot to an open area and resume the task.",
-        "LDS cannot be raised here for positioning.",
-    ],
-    DreameVacuumErrorCode.ROBOT_STUCK_REPEAT: [
-        "Move robot to an open area and resume the task.",
-        "1. Robot failed to position because the area under the furniture is uneven or has changed.\n2. Start the task or control the LDS to rise in an open area",
-    ],
-    DreameVacuumErrorCode.SLIPPERY_FLOOR: [
-        "Slippery floor. Please try again later.",
-        "Slippery floor. Robot failed to get through obstacles. You can wait for robot to retry, or clear the water around it and resume the task.",
-    ],
-    DreameVacuumErrorCode.CHECK_MOP_INSTALL: [
-        "Check mop Installation Instructions",
-        "Please check if the mop is installed properly.",
-    ],
-    DreameVacuumErrorCode.DIRTY_WATER_TANK_FULL: [
-        "Abnormal water level in the robot's used water tank",
-        "The robot's used water tank is too dirty. Please remove and clean it in time.",
-    ],
-    DreameVacuumErrorCode.RETRACTABLE_LEG_STUCK: [
-        "Retractable legs may be tangled.",
-        "Please check if the retractable legs are tangled.",
-    ],
-    DreameVacuumErrorCode.INTERNAL_ERROR: [
-        "Internal Error",
-        "Malfunction due to an internal error. Try to restart the robot.",
-    ],
-    DreameVacuumErrorCode.ROBOT_STUCK_2: [
-        "The robot is stuck",
-        "The robot may be blocked or stuck. Please clear surrounding.",
-    ],
-    DreameVacuumErrorCode.ROBOT_STUCK_ON_TABLES: [
-        "The robot is stuck",
-        "Robot stuck among the tables and chairs\n1. Please move robot to an open area and restart the task.\n2. It is recommended to arrange the tables and chairs neatly to prevent robot from getting stuck.",
-    ],
-    DreameVacuumErrorCode.ROBOT_STUCK_ON_PASSAGE: [
-        "The robot is stuck",
-        "Robot stuck in the narrow passage\n1. Please move robot to an open area and restart the task.\n2. It is recommended to set the narrow passage as a no-go zone to prevent the robot from getting stuck.",
-    ],
-    DreameVacuumErrorCode.ROBOT_STUCK_ON_THRESHOLD: [
-        "The robot is stuck",
-        "Robot stuck at the step/threshold\n1. Please move robot to an open area and restart the task.\n2. It is recommended to set the step/threshold as an impassable threshold to prevent robot from getting stuck.",
-    ],
-    DreameVacuumErrorCode.ROBOT_STUCK_ON_LOW_LYING_AREA: [
-        "The robot is stuck",
-        "Robot stuck in a low-clearance area\n1. Please move robot to an open area and restart the task.\n2. It is recommended to set the low area as a no-go zone to prevent robot from getting stuck.",
-    ],
-    DreameVacuumErrorCode.ROBOT_STUCK_ON_RAMP: [
-        "Robot has detected Easy-to-Fall ramps on the path",
-        "It is recommended to set passable thresholds if there are no Easy-to-Fall ramps on the path.",
-    ],
-    DreameVacuumErrorCode.ROBOT_STUCK_ON_OBSTACLE: [
-        "Robot has detected obstacles on the path",
-        "Please remove obstacles from the path and restart the task.",
-    ],
-    DreameVacuumErrorCode.ROBOT_STUCK_ON_PET: [
-        "Robot has detected people or pets on the path",
-        "Please ensure that no people or pets are on the path when restarting the task.",
-    ],
-    DreameVacuumErrorCode.ROBOT_STUCK_ON_SLIPPERY_SURFACE: [
-        "Robot is stuck due to slipping",
-        "Robot is stuck due to slipping. Please clean the main wheels.",
-    ],
-    DreameVacuumErrorCode.ROBOT_STUCK_ON_CARPET: [
-        "The robot is stuck",
-        "Robot slips on the carpet\n1. Please move robot away from the carpet and restart the task\n2. It is recommended to set the carpet as a no-go zone to prevent robot from getting stuck.",
-    ],
-    DreameVacuumErrorCode.BIN_FULL: [
-        "The dust collection bag is full, or the air duct is blocked.",
-        "The system detects that the dust collection bag is full, or the air duct is blocked.",
-    ],
-    DreameVacuumErrorCode.BIN_OPEN: [
-        "The upper cover of auto-empty base is not closed, or the dust collection bag is not installed.",
-        "The system detects that the upper cover of auto-empty base is not closed, or the dust collection bag is not installed.",
-    ],
-    DreameVacuumErrorCode.BIN_OPEN_2: [
-        "The upper cover of auto-empty base is not closed, or the dust collection bag is not installed.",
-        "The system detects that the upper cover of auto-empty base is not closed, or the dust collection bag is not installed.",
-    ],
-    DreameVacuumErrorCode.BIN_FULL_2: [
-        "The dust collection bag is full, or the air duct is blocked.",
-        "The system detects that the dust collection bag is full, or the air duct is blocked.",
-    ],
-    DreameVacuumErrorCode.WATER_TANK: [
-        "The clean water tank is not installed.",
-        "The clean water tank is not installed, please install it.",
-    ],
-    DreameVacuumErrorCode.DIRTY_WATER_TANK: [
-        "The dirty water tank is full or not installed.",
-        "Check whether the dirty water tank is full and the dirty water tank is installed.",
-    ],
-    DreameVacuumErrorCode.WATER_TANK_DRY: [
-        "Low water level in the clean water tank.",
-        "Insufficient water in the fresh tank, please add water. Otherwise, the robot will not return to the base to have the mop pad cleaned during the cleaning task.",
-    ],
-    DreameVacuumErrorCode.DIRTY_WATER_TANK_BLOCKED: [
-        "Dirty water tank blocked.",
-        "Please try to restart the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.DIRTY_WATER_TANK_PUMP: [
-        "Dirty water tank pump error.",
-        "Please try to restart the vacuum-mop.",
-    ],
-    DreameVacuumErrorCode.MOP_PAD: [
-        "The washboard is not installed properly.",
-        "The washboard is not installed and the robot cannot return to the self-wash base. Please ensure that the washboard is installed and the clasps on both sides are tightly fastened.",
-    ],
-    DreameVacuumErrorCode.WET_MOP_PAD: [
-        "The water level of the washboard is abnormal, please clean the washboard timely.",
-        "The water level of the washboard is abnormal. Please clean it timely to avoid blockage. If the problem still cannot be solved, please contact customer service.",
-    ],
-    DreameVacuumErrorCode.CLEAN_MOP_PAD: [
-        "The cleaning task is complete, please clean the mop pad washboard.",
-        "Please clean the mop pad washboard in time to avoid stains or odor.",
-    ],
-    DreameVacuumErrorCode.CLEAN_TANK_LEVEL: [
-        "Please fill the clean water tank.",
-        "The water in the clean water tank is about to be used up. Check and fill the clean water tank promptly.",
-    ],
-    DreameVacuumErrorCode.STATION_DISCONNECTED: [
-        "Base station not powered on.",
-        "Please check whether the power is off or the power switch is on in your home, and re-plug both ends of the base station power supply.",
-    ],
-    DreameVacuumErrorCode.DIRTY_TANK_LEVEL: [
-        "The water level in the used water tank is too high.",
-        "Please check if the used water tank is full.",
-    ],
-    DreameVacuumErrorCode.WASHBOARD_LEVEL: [
-        "Water level in the washboard is too high.",
-        "Please clean the used water tank and washboard in time.",
-    ],
-    DreameVacuumErrorCode.NO_MOP_IN_STATION: [
-        "Check if the mop pad is in the base station, or install the mop pad onto the robot manually.",
-        "The mop pad is out of place. Retry after putting it into the base station or install it onto the robot manually.",
-    ],
-    DreameVacuumErrorCode.DUST_BAG_FULL: [
-        "Check whether the dust collection bag is full.",
-        "If so, replace the bag. Please clean the auto-empty vents of the dust bin and the base station regularly.",
-    ],
-    DreameVacuumErrorCode.SELF_TEST_FAILED: [
-        "Self test failed.",
-        "There is no water in the clean water tank of the upper and lower water modules.",
-    ],
-    DreameVacuumErrorCode.WASHBOARD_NOT_WORKING: [
-        "Washboard stops working. Please check.",
-        "Washboard stops working. Please follow troubleshooting steps as below:\n1. Check if the washboard is tangled. Clean up before use\n2. Check if the washboard is installed properly\n3.如仍未解决请联系客服",
-    ],
-    DreameVacuumErrorCode.DRAINAGE_FAILED: [
-        "Abnormal water drainage from used water tank",
-        "Sewage pump error. Please contact customer service.",
-    ],
-    DreameVacuumErrorCode.MOP_NOT_DETECTED: [
-        "Mop not detected.",
-        "Mop not detected. Please install and continue the task.",
-    ],
-    DreameVacuumErrorCode.MOP_HOLDER_ERROR: [
-        "Mop holder error in the dock.",
-        "Mop holder quantity/placement error in the dock. Please install the mop holder or adjust its placement to ensure proper cleaning.",
-    ],
-    DreameVacuumErrorCode.DOCK_ERROR: [
-        "Dock Error",
-        "Please check the dock and try the following steps:\n1. Make sure the hatch is fully closed.\n2. Make sure the three groups of mops are placed on the hatch in red-yellow-blue order. If the mops are currently on the transport carrier or washboard, put them back on the hatch in this order and try again.\n3. Check for any debris inside the dock. Do not place your hand, robot, or other items in the washboard when switching mops.",
-    ],
-    DreameVacuumErrorCode.WASH_FAILED: [
-        "Failed to wash dirty mop.",
-        "Please check the dock and try the following steps:\n1. Please manually attach the mop that needs washing to robot.\n2. Please install other dirty mops onto the hatch.\n3. Go to the app → Dock Functions → Wash to restart the mop-washing task.",
-    ],
-    DreameVacuumErrorCode.ROBOT_STUCK_ON_CURTAIN: [
-        "The robot is stuck",
-        "Robot slips in the curtain area\n1. Please move robot away from the curtain area and restart the task.\n2. Robot cannot clean this curtain area. It is recommended to remove it.",
-    ],
-    DreameVacuumErrorCode.EDGE_MOP_STOP_ROTATE: [
-        "Edge mop stopped rotating.",
-        "Edge mop stopped rotating. Please follow these steps:\n1. Check if robot is on a carpet. Friction between the edge mop and carpet may stop it from rotating. Move robot to a non-carpet area and resume cleaning.\n2. Check if the edge mop is tangled. If so, remove them and resume cleaning.",
-    ],
-    DreameVacuumErrorCode.EDGE_MOP_DETACHED: [
-        "Edge mop detached.",
-        "Edge mop not detected. Please install it before resuming cleaning.",
-    ],
-    DreameVacuumErrorCode.CHASSIS_LIFT_MALFUNCTION: [
-        "Chassis lift malfunction.",
-        "Chassis lift malfunction. Please restart the task. If the issue persists, contact customer service.",
-    ],
-    DreameVacuumErrorCode.INTERNAL_ERROR_2: [
-        "Internal Error",
-        "Malfunction due to an internal error. Try to restart the robot.",
-    ],
-    DreameVacuumErrorCode.MOP_COVER_ERROR: [
-        "Mop cover error.",
-        "Check for any debris near the roller mop and mop cover. Clean the roller mop to prevent the cover from getting stuck. After that, place the robot flat and resume the task. If the issue persists, please contact customer service.",
-    ],
-    DreameVacuumErrorCode.ROLLER_MOP_ERROR: [
-        "Roller mop error.",
-        "Check for any debris near the roller mop and mop cover. Clean the roller mop to prevent it from getting stuck. After that, place the robot flat and resume the task. If the issue persists, please contact customer service.",
-    ],
-    DreameVacuumErrorCode.ONBOARD_WATER_TANK_EMPTY: [
-        "Low water level in robot’s clean water box.",
-        "Low water level in robot’s clean water box. Please refill promptly.",
-    ],
-    DreameVacuumErrorCode.ONBOARD_DIRTY_WATER_TANK_FULL: [
-        "Robot's used water box is full. Please empty it promptly.",
-        "Please take out the box and empty it. Alternatively, you can move robot to the dock for mop-washing (this will also drain the used water).",
-    ],
-    DreameVacuumErrorCode.MOP_NOT_INSTALLED: [
-        "Mop Not Installed",
-        "Please confirm the roller mop is properly installed before starting or resuming the task.",
-    ],
-    DreameVacuumErrorCode.ROLLER_MOP_ERROR_2: [
-        "Roller mop error.",
-        "Check for any debris near the roller mop and mop cover. Clean the roller mop to prevent it from getting stuck. After that, place the robot flat and resume the task. If the issue persists, please contact customer service.",
-    ],
-    DreameVacuumErrorCode.FLUFFING_ROLLER_ERROR: [
-        "Fluffing Roller Error.",
-        "1. Turn robot over with the bottom facing up. Press the release button on one side of the roller mop to take it out, then clean any debris around it.\n2. Press the orange clip and take out the fluffing roller. Clean any hair or debris on it.\n3. After cleaning, install the fluffing roller and press the clip firmly. Then install the roller mop, place the robot flat, and resume the task.\nIf the issue persists, please check more details or contact customer service.",
-    ],
-    DreameVacuumErrorCode.MOP_COVER_ERROR_2: [
-        "Mop cover error.",
-        "Check for any debris near the roller mop and mop cover. Clean the roller mop to prevent the cover from getting stuck. After that, place the robot flat and resume the task. If the issue persists, please contact customer service.",
-    ],
-    DreameVacuumErrorCode.BLOCKED_BY_OBSTACLE: [
-        "Robot blocked by obstacle",
-        "Please check for any obstacles in front of the robot and remove them.",
-    ],
-    DreameVacuumErrorCode.RETURN_TO_CHARGE_FAILED: [
-        "Failed to return to charge.",
-        "Please check the base station.\n1. Check if the ramp extension plate is installed down to the base station;\n2. Check if the base station is powered on;\n3. Make sure there is no obstacle in front of the base station.",
-    ],
-}
-
-# Dreame Vacuum low water warning descriptions
-LOW_WATER_WARNING_CODE_TO_DESCRIPTION: Final = {
-    DreameVacuumLowWaterWarning.NO_WARNING: ["No warning", ""],
-    DreameVacuumLowWaterWarning.NO_WATER_LEFT_DISMISS: [
-        "Please check the clean water tank.",
-        "",
-    ],
-    DreameVacuumLowWaterWarning.NO_WATER_LEFT: [
-        "Please fill the clean water tank.",
-        "The water in the clean water tank is about to be used up. Check and fill the clean water tank promptly.",
-    ],
-    DreameVacuumLowWaterWarning.NO_WATER_LEFT_AFTER_CLEAN: [
-        "Please fill the clean water tank.",
-        "Mop pad has been cleaned. Detected that the water in the clean water tank is insufficient, please fill the clean water tank and empty the used water tank.",
-    ],
-    DreameVacuumLowWaterWarning.NO_WATER_FOR_CLEAN: [
-        "Low water level in the clean water tank.",
-        "Robot has switched to Vacuuming Mode.",
-    ],
-    DreameVacuumLowWaterWarning.LOW_WATER: [
-        "About to run out of water",
-        "Please fill the clean water tank.",
-    ],
-    DreameVacuumLowWaterWarning.TANK_NOT_INSTALLED: [
-        "The clean water tank is not installed.",
-        "Please check the clean water tank",
-    ],
-}
-
-CONSUMABLE_TO_LIFE_WARNING_DESCRIPTION: Final = {
-    DreameVacuumProperty.MAIN_BRUSH_LEFT: [
-        [
-            "Main brush must be replaced",
-            "The main brush is worn out. Please replace it in time and reset the counter.",
-        ],
-        [
-            "Main brush needs to be replaced soon",
-            "The main brush is nearly worn out. Please replace it in time.",
-        ],
-    ],
-    DreameVacuumProperty.SIDE_BRUSH_LEFT: [
-        [
-            "Side brush must be replaced",
-            "The side brush is worn out. Please replace it and reset the counter.",
-        ],
-        [
-            "Side brush needs to be replaced soon",
-            "The side brush is nearly worn out. Please replace it as soon as possible.",
-        ],
-    ],
-    DreameVacuumProperty.FILTER_LEFT: [
-        [
-            "Filter must be replaced",
-            "The filter is worn out. Please replace it in time and reset the counter.",
-        ],
-        [
-            "Filter needs to be replaced soon",
-            "The filter is nearly worn out. Please replace it in time.",
-        ],
-    ],
-    DreameVacuumProperty.SENSOR_DIRTY_LEFT: [
-        ["Sensors must be cleaned", "Please clean the sensors and reset the counter"]
-    ],
-    DreameVacuumProperty.TANK_FILTER_LEFT: [
-        [
-            "Tank filter must be replaced",
-            "The tank filter is worn out. Please replace it in time and reset the counter.",
-        ],
-        [
-            "Tank filter needs to be replaced soon",
-            "The tank filter is nearly worn out. Please replace it in time.",
-        ],
-    ],
-    DreameVacuumProperty.MOP_PAD_LEFT: [
-        ["Mop Pad Worn Out", "Please replace the mop pad and reset the counter."],
-        ["Mop Pad Nearly Worn Out", "Please replace the mop pad timely."],
-    ],
-    DreameVacuumProperty.SILVER_ION_LEFT: [
-        [
-            "Silver Ion Sterilizer Deteriorated",
-            "Please replace the silver ion sterilizer and reset the counter.",
-        ],
-        [
-            "Silver Ion Sterilizer Near to Deterioration",
-            "Please replace the silver ion sterilizer timely.",
-        ],
-    ],
-    DreameVacuumProperty.DETERGENT_LEFT: [
-        [
-            "The detergent is used up",
-            "Please replace the detergent cartridge it and reset the counter.",
-        ],
-        [
-            "The detergent is about to be used up",
-            "The detergent is about to be used up, please replace it in time.",
-        ],
-    ],
-    DreameVacuumProperty.SQUEEGEE_LEFT: [
-        ["Squeegee Worn Out", "Please replace the squeegee and reset the counter."],
-        ["Squeegee Nearly Worn Out", "Please replace the squeegee timely."],
-    ],
-    DreameVacuumProperty.ONBOARD_DIRTY_WATER_TANK_LEFT: [
-        [
-            "Onboard dirty water tank needs to be cleaned",
-            "Please clean the onboard dirty water tank and reset the counter.",
-        ]
-    ],
-    DreameVacuumProperty.DIRTY_WATER_CHANNEL_DIRTY_LEFT: [
-        [
-            "Dirty water channel needs to be cleaned",
-            "Please clean the dirty water channel and reset the counter.",
-        ]
-    ],
-    DreameVacuumProperty.DEODORIZER_LEFT: [
-        [
-            "Used water tank deodorizer has been exhausted.",
-            "Used water tank deodorizer has been exhausted. Please replace it.",
-        ],
-        [
-            "Used water tank deodorizer is running out.",
-            "Used water tank deodorizer is running out. Please replace it.",
-        ],
-    ],
-    DreameVacuumProperty.WHEEL_DIRTY_LEFT: [
-        ["Omnidirectional wheel needs to be cleaned", "Please clean omnidirectional wheel and reset the counter."]
-    ],
-    DreameVacuumProperty.SCALE_INHIBITOR_LEFT: [
-        ["Scale inhibitor has been exhausted", "Please replace the scale inhibitor and reset the counter."],
-        ["Scale inhibitor is running out", "Please replace the scale inhibitor timely."],
-    ],
-    DreameVacuumProperty.FLUFFING_ROLLER_DIRTY_LEFT: [
-        ["Fluffing roller needs to be cleaned", "Please clean fluffing roller and reset the counter."]
-    ],
-    DreameVacuumProperty.ROLLER_MOP_FILTER_DIRTY_LEFT: [
-        ["Roller mop filter needs to be cleaned", "Please clean roller mop filter and reset the counter."]
-    ],
-    DreameVacuumProperty.WATER_OUTLET_FILTER_DIRTY_LEFT: [
-        ["Water outlet filter needs to be cleaned", "Please clean water outlet filter and reset the counter."]
-    ],
+    DreameVacuumErrorCode.LDS_ERROR_2: 48,
+    DreameVacuumErrorCode.MOP_COVER_ERROR_3: 209,
+    DreameVacuumErrorCode.ROLLER_MOP_ERROR_3: 210,
+    DreameVacuumErrorCode.INTERNAL_ERROR_3: 19,
+    DreameVacuumErrorCode.INTERNAL_ERROR_4: 19,
+    DreameVacuumErrorCode.ROBOTIC_ARM_STOPPED: 212,
+    DreameVacuumErrorCode.DRAINAGE_OUTLET_FILTER: 998,
 }

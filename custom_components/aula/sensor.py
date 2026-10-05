@@ -18,7 +18,6 @@ import homeassistant.helpers.config_validation as cv
 _LOGGER = logging.getLogger(__name__)
 
 from .const import (
-    CONF_SCHOOLSCHEDULE,
     CONF_UGEPLAN,
     CONF_MU_OPGAVER,
     CONF_MITID_USERNAME,
@@ -92,11 +91,6 @@ async def async_setup_entry(
                 entities.append(AulaSensor(hass, coordinator, child))
         else:
             entities.append(AulaSensor(hass, coordinator, child))
-    # We have data and can now set up the calendar platform:
-    if config[CONF_SCHOOLSCHEDULE]:
-        hass.async_create_task(
-            hass.config_entries.async_forward_entry_setups(config_entry, ["calendar"])
-        )
 
     global ugeplan
     global mu_opgaver
@@ -212,7 +206,7 @@ class AulaSensor(Entity):
             except:
                 attributes["mu_opgaver"] = "Min Uddannelse Opgaver not available"
             try:
-                attributes["mu_opgaver_next"] = self._client.mu_opgavernext_attr[
+                attributes["mu_opgaver_next"] = self._client.mu_opgaver_next_attr[
                     self._child["name"].split()[0]
                 ]
             except:

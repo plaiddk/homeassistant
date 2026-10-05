@@ -1,12 +1,29 @@
+- triggers:
+    - trigger: homeassistant
+      event: start
+    - trigger: event
+      event_type: event_template_reloaded
+    - trigger: time_pattern
+      minutes: /5
+  actions:
+    - action: rest_command.runplanner_routes
+      response_variable: resp
+      continue_on_error: true
+  sensor:
+    - name: RunPlanner Routes Count
+      unique_id: runplanner_routes_count
+      icon: mdi:run
+      state: >-
+        {{ resp.content | count if resp is defined and resp.status == 200 and resp.content is list else this.state }}
+      attributes:
+        data: >-
+          {{ resp.content if resp is defined and resp.status == 200 and resp.content is list else this.attributes.get('data', []) }}
+
 - sensor:
     - name: "RunPlanner Current Route ID"
       state: >-
-        {% set list = states('sensor.runplanner_routes_names') | replace("'", '"') %}
+        {% set raw = state_attr('sensor.runplanner_routes_count', 'data') %}
+        {% set routes = (raw | from_json if raw is string else raw) or [] %}
         {% set name = states('input_select.runplanner_route') %}
-        {% if list in ['unknown','unavailable','none',''] or name in ['unknown','unavailable','—','', none] %}
-          {{ '' }}
-        {% else %}
-          {% set arr = list | from_json %}
-          {% set match = arr | selectattr('name','equalto', name) | list %}
-          {{ match[0].id if match|length>0 else '' }}
-        {% endif %}
+        {% set match = routes | selectattr('name', 'eq', name) | list %}
+        {{ match[0].id if match | count > 0 else '' }}

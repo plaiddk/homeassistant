@@ -4,6 +4,11 @@ import datetime
 import pytz
 import asyncio
 import threading
+import datetime
+import base64
+import urllib.parse
+import html
+import uuid
 from bs4 import BeautifulSoup
 import json, re
 from .const import (
@@ -13,12 +18,96 @@ from .const import (
     MEEBOOK_API,
     SYSTEMATIC_API,
     EASYIQ_API,
+    EASYIQ_SKOLEPORTAL_API,
 )
 from homeassistant.exceptions import ConfigEntryNotReady, ConfigEntryAuthFailed
+from homeassistant.components.calendar import CalendarEvent
+from homeassistant.util import dt as dt_util
 from .aula_login_client.client import AulaLoginClient
 from .aula_login_client.exceptions import AulaAuthenticationError
 
 _LOGGER = logging.getLogger(__name__)
+
+# Widgets that can mint a token for the Min Uddannelse "opgaveliste" endpoint,
+# in order of preference. 0030 is the dedicated "MU Opgaver" widget; 0023
+# ("MinUddannelse - SSO") is accepted by the same endpoint and is available at
+# schools that do not expose 0030 to guardians.
+MU_OPGAVER_WIDGETS = ("0030", "0023")
+
+# Widgets that can mint a token for the EasyIQ Ugeplan endpoint,
+# in order of preference.
+EASYIQ_WIDGETS = ("0001", "0128", "00142", "0142")
+
+
+def decode_mu_deeplink(url):
+    """Return the MinUddannelse page URL embedded in an opgave "url" field.
+
+    Min Uddannelse returns a redirect wrapper whose last path segment is the
+    base64 of the (url-encoded) real page URL. That redirect only works inside
+    an authenticated browser session, so linking to the decoded URL directly
+    gives a link that works from a dashboard. Returns None if it cannot be
+    decoded.
+    """
+    if not url:
+        return None
+    try:
+        encoded = url.rsplit("/", 1)[-1]
+        encoded = encoded + "=" * (-len(encoded) % 4)
+        decoded = urllib.parse.unquote(base64.b64decode(encoded).decode("utf-8"))
+        return decoded or None
+    except Exception:
+        _LOGGER.debug("Could not decode Min Uddannelse deep link: " + str(url))
+        return None
+
+
+def format_mu_opgaver(opgaver, first_name):
+    """Render one child's opgaver as the HTML used for the sensor attribute."""
+    _ugep = ""
+    for opgave in opgaver:
+        if opgave["kuvertnavn"].split()[0] != first_name:
+            continue
+        title = opgave["title"]
+        link = decode_mu_deeplink(opgave.get("url") or "")
+        if link:
+            title = '<a href="' + link + '" target="_blank">' + title + "</a>"
+        _ugep = _ugep + "<h2>" + title + "</h2>"
+        _ugep = _ugep + "<h3>" + opgave["kuvertnavn"] + "</h3>"
+        _ugep = _ugep + "Ugedag: " + opgave["ugedag"] + "<br>"
+        _ugep = _ugep + "Type: " + opgave["opgaveType"] + "<br>"
+        for hold in opgave["hold"]:
+            _ugep = _ugep + "Hold: " + hold["navn"] + "<br>"
+        try:
+            _ugep = _ugep + "Forløb: " + opgave["forloeb"]["navn"]
+        except (KeyError, TypeError):
+            _LOGGER.debug("Did not find forloeb key: " + str(opgave))
+    return _ugep
+
+
+def extract_ugeplan_title(description):
+    if not description:
+        return ""
+    soup = BeautifulSoup(description, "html.parser")
+    for tag in soup.find_all(["h1", "h2", "h3"]):
+        title = tag.get_text(" ", strip=True)
+        if title:
+            return html.unescape(title).strip()
+    return ""
+
+
+def extract_ugeplan_notice_title(description):
+    title = extract_ugeplan_title(description)
+    if title:
+        return title
+    text = BeautifulSoup(description or "", "html.parser").get_text("\n")
+    return next((line.strip() for line in text.splitlines() if line.strip()), "")
+
+
+def is_ugeplan_all_day(value):
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in ("true", "1", "yes")
+    return value == 1
 
 
 class Client:
@@ -26,6 +115,7 @@ class Client:
     presence = {}
     ugep_attr = {}
     ugepnext_attr = {}
+    ugep_events = {}
     mu_opgaver_attr = {}
     mu_opgaver_next_attr = {}
     widgets = {}
@@ -51,6 +141,9 @@ class Client:
         self._mitid_password = mitid_password
         self._mitid_token = mitid_token
         self._mitid_identity = mitid_identity
+
+        self._birthday_cache = {}
+        self._birthday_cache_time = {}
 
         # Store Home Assistant references for token persistence
         self._hass = hass
@@ -96,6 +189,7 @@ class Client:
         # HTTP session
         self._session = None
         self.unread_messages = unread_messages
+        self.easyiq_login_ids = {}
 
     def _get_access_token_param(self):
         if self._tokens and "access_token" in self._tokens:
@@ -141,7 +235,7 @@ class Client:
             res = {"raw_response": response.text}
         return res
 
-    def login(self):
+    def login(self, force_refresh=False):
         """Authenticate with Aula using MitID OAuth 2.0 flow."""
         _LOGGER.info("Starting MitID authentication")
 
@@ -160,8 +254,8 @@ class Client:
                 else:
                     _LOGGER.info(f"Token status: {token_check.get('reason', 'unknown')}")
 
-                # If token looks valid, try to use it
-                if token_check.get("valid", False):
+                # If token looks valid and not forced to refresh, try to use it
+                if token_check.get("valid", False) and not force_refresh:
                     _LOGGER.info("Using valid stored tokens")
                     self._apply_token_to_session(self._tokens["access_token"])
                     try:
@@ -171,7 +265,7 @@ class Client:
                             f"Stored token rejected by API: {e}. Attempting refresh."
                         )
 
-                # If we are here, token is expired or rejected. Try refresh.
+                # If we are here, token is expired, rejected, or force_refresh requested.
                 _LOGGER.info("Attempting to refresh token")
                 if self._aula_client.renew_access_token():
                     # Update local tokens
@@ -308,6 +402,250 @@ class Client:
             + str(self._mu_opgaver)
         )
         return True
+
+    def get_child_class_groups(self):
+        """Return each child's main class group."""
+
+        if not self._ensure_valid_token():
+            _LOGGER.warning("Unable to retrieve Aula groups: token is not valid")
+            return {}
+
+        if not self._children:
+            return {}
+
+        params = [
+            ("method", "groups.getGroupsByContext"),
+        ]
+
+        # Aula expects the institution profile ID, which is child["id"]
+        for child in self._children:
+            params.append(
+                ("childInstitutionProfileIds[]", str(child["id"]))
+            )
+        if self._tokens and "access_token" in self._tokens:
+            params.append(
+                ("access_token", self._tokens["access_token"])
+            )
+
+        try:
+            response = self._session.get(
+                self.apiurl,
+                params=params,
+                verify=True,
+            )
+
+            response.raise_for_status()
+            result = response.json()
+
+            if result.get("status", {}).get("message") != "OK":
+                _LOGGER.warning(
+                    "groups.getGroupsByContext returned unexpected status: %s",
+                    result.get("status"),
+                )
+                return {}
+
+            contexts = result.get("data", [])
+
+            child_groups = {}
+
+            for child in self._children:
+                child_id = child["id"]
+                profile_id = child["profileId"]
+                child_name = child["name"]
+
+                institution_profile = child.get(
+                    "institutionProfile", {}
+                )
+
+                class_name = institution_profile.get("metadata")
+
+                if not class_name:
+                    _LOGGER.debug(
+                        "No class metadata found for %s",
+                        child_name,
+                    )
+                    continue
+
+                # Find this child's group context
+                context = next(
+                    (
+                        item
+                        for item in contexts
+                        if item.get("profileId") == profile_id
+                    ),
+                    None,
+                )
+
+                if not context:
+                    _LOGGER.warning(
+                        "No Aula group context found for %s",
+                        child_name,
+                    )
+                    continue
+
+                # Match the actual class group, e.g.
+                # metadata "2BA" -> group named "2BA"
+                class_group = next(
+                    (
+                        group
+                        for group in context.get("groups", [])
+                        if group.get("name") == class_name
+                    ),
+                    None,
+                )
+
+                if not class_group:
+                    _LOGGER.warning(
+                        "Could not find Aula group '%s' for %s",
+                        class_name,
+                        child_name,
+                    )
+                    continue
+
+                child_groups[child_id] = {
+                    "child_name": child_name,
+                    "class_name": class_name,
+                    "group_id": class_group["id"],
+                }
+
+                _LOGGER.debug(
+                    "Aula class group for %s: %s (%s)",
+                    child_name,
+                    class_name,
+                    class_group["id"],
+                )
+
+            return child_groups
+
+        except Exception as err:
+            _LOGGER.warning(
+                "Unable to retrieve Aula child groups: %s",
+                err,
+            )
+            return {}
+
+    def get_class_birthdays(self, group_id):
+        """Return classmates with birthdays for an Aula class group."""
+
+        if not group_id:
+            return []
+
+        now = datetime.datetime.now(datetime.timezone.utc)
+        cached = self._birthday_cache.get(group_id)
+        cached_at = self._birthday_cache_time.get(group_id)
+
+        if cached is not None and cached_at is not None:
+            if now - cached_at < datetime.timedelta(hours=24):
+                _LOGGER.debug(
+                    "Using cached birthday list for Aula group %s",
+                    group_id,
+            )
+            return cached
+
+        if not self._ensure_valid_token():
+            _LOGGER.warning(
+                "Unable to retrieve Aula birthdays: token is not valid"
+            )
+            return []
+
+        birthdays = []
+        seen_profiles = set()
+
+        page = 1
+
+        while page < 50:
+            try:
+                params = {
+                    "method": "profiles.getContactlist",
+                    "groupId": str(group_id),
+                    "filter": "child",
+                    "field": "name",
+                    "page": str(page),
+                    "order": "asc",
+                }
+                
+                if self._tokens and "access_token" in self._tokens:
+                    params["access_token"] = self._tokens["access_token"]
+
+                response = self._session.get(
+                    self.apiurl,
+                    params=params,
+                    verify=True,
+                )
+
+                response.raise_for_status()
+
+                if response.status_code != 200:
+                    _LOGGER.warning(
+                        "Aula contact list failed for group %s, page %s: "
+                        "HTTP %s - %s",
+                        group_id,
+                        page,
+                        response.status_code,
+                        response.text[:1000],
+                    )
+                    break
+
+                result = response.json()
+
+                if result.get("status", {}).get("message") != "OK":
+                    _LOGGER.warning(
+                        "profiles.getContactlist returned unexpected status "
+                        "for group %s: %s",
+                        group_id,
+                        result.get("status"),
+                    )
+                    break
+
+                contacts = result.get("data", [])
+
+                if not contacts:
+                    break
+
+                for contact in contacts:
+                    if contact.get("role") != "child":
+                        continue
+
+                    birthday = contact.get("birthday")
+                    full_name = contact.get("fullName")
+                    profile_id = contact.get("profileId")
+
+                    if not birthday or not full_name:
+                        continue
+
+                    if profile_id in seen_profiles:
+                        continue
+
+                    seen_profiles.add(profile_id)
+
+                    birthdays.append(
+                        {
+                            "profile_id": profile_id,
+                            "name": full_name,
+                            "birthday": birthday,
+                        }
+                    )
+
+                page += 1
+
+            except Exception as err:
+                _LOGGER.warning(
+                    "Unable to retrieve Aula contact list for group %s: %s",
+                    group_id,
+                    err,
+                )
+                break
+
+        _LOGGER.debug(
+            "Found %s classmates with birthdays in Aula group %s",
+            len(birthdays),
+            group_id,
+        )
+
+        self._birthday_cache[group_id] = birthdays
+        self._birthday_cache_time[group_id] = now
+
+        return birthdays
 
     def get_widgets(self):
         widgets_response = self._session.get(
@@ -653,15 +991,19 @@ class Client:
 
             if len(self.widgets) == 0:
                 self.get_widgets()
-            if "0030" not in self.widgets:
+            mu_widget = next(
+                (widget for widget in MU_OPGAVER_WIDGETS if widget in self.widgets),
+                None,
+            )
+            if mu_widget is None:
                 _LOGGER.error(
-                    "You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030) in Aula."
+                    "You have enabled Min Uddannelse Opgaver, but we cannot find any supported widgets (0030,0023) in Aula."
                 )
 
             def mu_opgaver(week, thisnext):
-                if "0030" in self.widgets:
-                    _LOGGER.debug("In the MU Opgaver flow")
-                    token = self.get_token("0030")
+                if mu_widget is not None:
+                    _LOGGER.debug("In the MU Opgaver flow, using widget " + mu_widget)
+                    token = self.get_token(mu_widget)
                     get_payload = (
                         "/opgaveliste?assuranceLevel=2&childFilter="
                         + childUserIds
@@ -685,23 +1027,7 @@ class Client:
                     for full_name in self._childnames.items():
                         name_parts = full_name[1].split()
                         first_name = name_parts[0]
-                        _ugep = ""
-                        for i in opgaver_list:
-                            _LOGGER.debug(
-                                "i kuvertnavn split " + str(i["kuvertnavn"].split()[0])
-                            )
-                            _LOGGER.debug("first_name " + first_name)
-                            if i["kuvertnavn"].split()[0] == first_name:
-                                _ugep = _ugep + "<h2>" + i["title"] + "</h2>"
-                                _ugep = _ugep + "<h3>" + i["kuvertnavn"] + "</h3>"
-                                _ugep = _ugep + "Ugedag: " + i["ugedag"] + "<br>"
-                                _ugep = _ugep + "Type: " + i["opgaveType"] + "<br>"
-                                for h in i["hold"]:
-                                    _ugep = _ugep + "Hold: " + h["navn"] + "<br>"
-                                try:
-                                    _ugep = _ugep + "Forløb: " + i["forloeb"]["navn"]
-                                except:
-                                    _LOGGER.debug("Did not find forloeb key: " + str(i))
+                        _ugep = format_mu_opgaver(opgaver_list, first_name)
                         if thisnext == "this":
                             self.mu_opgaver_attr[first_name] = _ugep
                         elif thisnext == "next":
@@ -736,10 +1062,10 @@ class Client:
                 "0029" not in self.widgets
                 and "0004" not in self.widgets
                 and "0062" not in self.widgets
-                and "0001" not in self.widgets
+                and not any(widget in self.widgets for widget in EASYIQ_WIDGETS)
             ):
                 _LOGGER.error(
-                    "You have enabled ugeplaner, but we cannot find any supported widgets (0029,0004,0001) in Aula."
+                    "You have enabled ugeplaner, but we cannot find any supported widgets (0029,0004,0062,EasyIQ) in Aula."
                 )
             if "0029" in self.widgets and "0004" in self.widgets:
                 _LOGGER.warning(
@@ -777,138 +1103,422 @@ class Client:
                     except:
                         _LOGGER.debug("Cannot fetch ugeplaner, so setting as empty")
                         _LOGGER.debug("ugeplaner response " + str(ugeplaner.text))
-                if "0001" in self.widgets:
+                easyiq_widget = next(
+                    (widget for widget in EASYIQ_WIDGETS if widget in self.widgets),
+                    None,
+                )
+                if easyiq_widget is not None:
                     import calendar
 
-                    _LOGGER.debug("In the EasyIQ flow")
-                    token = self.get_token("0001")
+                    _LOGGER.debug(f"In the EasyIQ flow using widget {easyiq_widget}")
+                    token = self.get_token(easyiq_widget)
                     csrf_token = self._get_csrf_token()
 
-                    easyiq_headers = {
-                        "x-aula-institutionfilter": str(self._institutionProfiles[0]),
-                        "x-aula-userprofile": "guardian",
-                        "Authorization": token,
-                        "accept": "application/json",
-                        "origin": "https://www.aula.dk",
-                        "referer": "https://www.aula.dk/",
-                        "authority": "api.easyiqcloud.dk",
-                    }
-                    if csrf_token:
-                        easyiq_headers["csrfp-token"] = csrf_token
+                    try:
+                        year, week_num = week.split("-W")
+                        target_date = datetime.date.fromisocalendar(int(year), int(week_num), 1).strftime("%Y-%m-%dT00:00:00")
+                    except Exception:
+                        target_date = datetime.datetime.now().strftime("%Y-%m-%dT00:00:00")
 
-                    for child in self._childrenFirstNamesAndUserIDs.items():
-                        userid = child[0]
-                        first_name = child[1]
-
-                        _LOGGER.debug("EasyIQ headers " + str(easyiq_headers))
-                        post_data = {
-                            "sessionId": guardian,
-                            "currentWeekNr": week,
-                            "userProfile": "guardian",
-                            "institutionFilter": self._institutionProfiles,
-                            "childFilter": [userid],
-                        }
-                        _LOGGER.debug("EasyIQ post data " + str(post_data))
-                        ugeplaner = requests.post(
-                            EASYIQ_API + "/weekplaninfo",
-                            json=post_data,
-                            headers=easyiq_headers,
-                            verify=True,
-                        )
-                        # _LOGGER.debug(
-                        #    "EasyIQ Opgaver status_code " + str(ugeplaner.status_code)
-                        # )
-                        _LOGGER.debug(
-                            "EasyIQ Opgaver response " + str(ugeplaner.json())
-                        )
-                        _ugep = (
-                            "<h2>"
-                            # + ugeplaner.json()["Weekplan"]["ActivityName"]
-                            + " Uge "
-                            + week.split("-W")[1]
-                            # + ugeplaner.json()["Weekplan"]["WeekNo"]
-                            + "</h2>"
-                        )
-                        # from datetime import datetime
-
-                        def findDay(date):
-                            day, month, year = (int(i) for i in date.split(" "))
-                            dayNumber = calendar.weekday(year, month, day)
-                            days = [
-                                "Mandag",
-                                "Tirsdag",
-                                "Onsdag",
-                                "Torsdag",
-                                "Fredag",
-                                "Lørdag",
-                                "Søndag",
-                            ]
-                            return days[dayNumber]
-
-                        def is_correct_format(date_string, format):
+                    def parse_dt(dt_str):
+                        if not dt_str or not isinstance(dt_str, str):
+                            return None
+                        clean_str = dt_str.split("+")[0].split("Z")[0].split(".")[0].replace("T", " ").strip()
+                        for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y/%m/%d %H:%M", "%Y-%m-%d", "%Y/%m/%d"):
                             try:
-                                datetime.datetime.strptime(date_string, format)
-                                return True
+                                return datetime.datetime.strptime(clean_str, fmt)
                             except ValueError:
-                                _LOGGER.debug(
-                                    "Could not parse timestamp: " + str(date_string)
-                                )
-                                return False
+                                pass
+                        return None
+
+                    days = ["Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag"]
+
+                    def extract_json_key(data, keys):
+                        """Recursively search a JSON dict/list for any key matching candidate list."""
+                        if isinstance(data, dict):
+                            for k, v in data.items():
+                                if k.lower() in [target.lower() for target in keys] and v is not None and str(v).strip() != "":
+                                    return v
+                                res = extract_json_key(v, keys)
+                                if res is not None:
+                                    return res
+                        elif isinstance(data, list):
+                            for item in data:
+                                res = extract_json_key(item, keys)
+                                if res is not None:
+                                    return res
+                        return None
+
+                    for child_userid, first_name in self._childrenFirstNamesAndUserIDs.items():
+                        easyiq_session = requests.Session()
+                        easyiq_headers = {
+                            "Authorization": token,
+                            "Referer": "https://skoleportal.easyiqcloud.dk/UgeplanWidget",
+                            "Origin": "https://skoleportal.easyiqcloud.dk",
+                            "X-UserProfile": "guardian",
+                            "X-Login": guardian,
+                            "X-InstitutionFilter": ",".join(self._institutionProfiles),
+                            "X-ChildFilter": ",".join(self._childuserids),
+                            "X-Child": str(child_userid),
+                            "X-WidgetInstanceId": str(uuid.uuid4()),
+                            "X-Requested-With": "XMLHttpRequest",
+                            "Content-Type": "application/json",
+                            "Accept": "application/json, text/plain, */*",
+                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+                        }
+                        if csrf_token:
+                            easyiq_headers["csrfp-token"] = csrf_token
+
+                        login_id = None
+                        activity_filter = None
+                        events_list = []
+                        skoleportal_success = False
+                        skoleportal_auth_response = False
 
                         try:
-                            for i in ugeplaner.json()["Events"]:
-                                if is_correct_format(i["start"], "%Y/%m/%d %H:%M"):
-                                    _LOGGER.debug("No Event")
-                                    start_datetime = datetime.datetime.strptime(
-                                        i["start"], "%Y/%m/%d %H:%M"
-                                    )
-                                    _LOGGER.debug(start_datetime)
-                                    end_datetime = datetime.datetime.strptime(
-                                        i["end"], "%Y/%m/%d %H:%M"
-                                    )
-                                    if start_datetime.date() == end_datetime.date():
-                                        formatted_day = findDay(
-                                            start_datetime.strftime("%d %m %Y")
-                                        )
-                                        formatted_start = start_datetime.strftime(
-                                            " %H:%M"
-                                        )
-                                        formatted_end = end_datetime.strftime("- %H:%M")
-                                        dresult = f"{formatted_day} {formatted_start} {formatted_end}"
-                                    else:
-                                        formatted_start = findDay(
-                                            start_datetime.strftime("%d %m %Y")
-                                        )
-                                        formatted_end = findDay(
-                                            end_datetime.strftime("%d %m %Y")
-                                        )
-                                        dresult = f"{formatted_start} {formatted_end}"
-                                    _ugep = _ugep + "<br><b>" + dresult + "</b><br>"
-                                    if i["itemType"] == "5":
-                                        _ugep = (
-                                            _ugep
-                                            + "<br><b>"
-                                            + str(i["title"])
-                                            + "</b><br>"
-                                        )
-                                    else:
-                                        _ugep = (
-                                            _ugep
-                                            + "<br><b>"
-                                            + str(i["ownername"])
-                                            + "</b><br>"
-                                        )
-                                    _ugep = _ugep + str(i["description"]) + "<br>"
-                                else:
-                                    _LOGGER.debug("None")
-                        except KeyError:
-                            _LOGGER.debug("None")
+                            # 1. Access UgeplanWidget page to initialize session
+                            easyiq_session.get(
+                                EASYIQ_SKOLEPORTAL_API + "/UgeplanWidget",
+                                headers=easyiq_headers,
+                                params={
+                                    "token": token.removeprefix("Bearer ").strip()
+                                },
+                                verify=True,
+                                timeout=10,
+                            )
 
-                        if thisnext == "this":
-                            self.ugep_attr[first_name] = _ugep
-                        elif thisnext == "next":
-                            self.ugepnext_attr[first_name] = _ugep
-                        _LOGGER.debug("EasyIQ result: " + str(_ugep))
+                            # 2. Authenticate user to get child loginId
+                            auth_resp = easyiq_session.post(
+                                EASYIQ_SKOLEPORTAL_API + "/Aula/AuthenticateAulaUser",
+                                headers={
+                                    **easyiq_headers,
+                                    "Content-Length": "0",
+                                },
+                                verify=True,
+                                timeout=10,
+                            )
+                            _LOGGER.debug("EasyIQ Skoleportal Auth status %s for %s: %r", auth_resp.status_code, first_name, auth_resp.text[:500])
+
+                            if auth_resp.status_code == 200:
+                                try:
+                                    auth_json = auth_resp.json()
+                                    if isinstance(auth_json, dict):
+                                        skoleportal_auth_response = True
+                                        auth_child = auth_json.get("child") or auth_json.get("Child")
+                                        candidate_login_id = auth_json.get("loginId") or auth_json.get("LoginId") or auth_json.get("id") or auth_json.get("Id")
+                                        if auth_child and str(auth_child) != str(child_userid):
+                                            _LOGGER.info(
+                                                "EasyIQ Ugeplan is unavailable for child %s; response belongs to child %s",
+                                                child_userid,
+                                                auth_child,
+                                            )
+                                        else:
+                                            login_id = candidate_login_id
+                                            if login_id:
+                                                self.easyiq_login_ids[str(child_userid)] = str(login_id)
+                                            activity_filter = auth_json.get("activityFilter") or auth_json.get("ActivityFilter")
+                                            _LOGGER.debug("Extracted EasyIQ loginId=%s for %s (child=%s)", login_id, first_name, child_userid)
+                                    else:
+                                        _LOGGER.debug("EasyIQ Auth response is not a dict for %s: %r", first_name, auth_resp.text[:200])
+                                except Exception as json_e:
+                                    _LOGGER.debug("Could not parse auth_json for %s: %s (text: %r)", first_name, json_e, auth_resp.text[:200])
+
+                            if login_id:
+                                params = {
+                                    "loginId": str(login_id),
+                                    "date": target_date,
+                                    "courseFilter": "-1",
+                                    "textFilter": "",
+                                    "ownWeekPlan": "false",
+                                }
+                                if activity_filter:
+                                    params["activityFilter"] = str(activity_filter)
+
+                                events_resp = easyiq_session.get(
+                                    EASYIQ_SKOLEPORTAL_API + "/Calendar/CalendarGetWeekplanEvents",
+                                    headers=easyiq_headers,
+                                    params=params,
+                                    verify=True,
+                                    timeout=10,
+                                )
+                                _LOGGER.debug("EasyIQ Skoleportal events status %s for %s (loginId=%s): %r", events_resp.status_code, first_name, login_id, events_resp.text[:500])
+
+                                if events_resp.status_code == 200:
+                                    try:
+                                        raw_events = events_resp.json()
+                                        skoleportal_success = True
+                                        if isinstance(raw_events, list):
+                                            events_list = raw_events
+                                        elif isinstance(raw_events, dict):
+                                            events_list = (
+                                                raw_events.get("Events")
+                                                or raw_events.get("events")
+                                                or raw_events.get("data")
+                                                or raw_events.get("items")
+                                                or raw_events.get("WeekPlan")
+                                                or []
+                                            )
+                                    except Exception as json_e:
+                                        _LOGGER.debug("Could not parse events JSON for %s: %s (text: %r)", first_name, json_e, events_resp.text[:200])
+                                else:
+                                    _LOGGER.debug("EasyIQ Skoleportal returned non-200 response for %s: %r", first_name, events_resp.text[:200])
+                        except Exception as err:
+                            _LOGGER.warning("EasyIQ Skoleportal API call failed for %s: %s", first_name, err)
+
+                        if skoleportal_success:
+                            week_num_str = week.split("-W")[-1] if "-W" in week else week
+                            _ugep = f"<h2>Uge {week_num_str}</h2>"
+
+                            events_by_day = {}
+                            important_notes = []
+
+                            for item in events_list:
+                                if not isinstance(item, dict):
+                                    continue
+                                course = (item.get("CoursesDisplay") or "").strip()
+                                raw_title = (item.get("Title") or item.get("title") or item.get("subject") or item.get("Subject") or item.get("name") or item.get("Name") or "").strip()
+                                desc = (item.get("Description") or item.get("description") or item.get("text") or item.get("Text") or item.get("content") or item.get("Content") or "").strip()
+                                description_title = extract_ugeplan_title(desc)
+                                is_notice = not course
+                                title = (
+                                    raw_title
+                                    or (extract_ugeplan_notice_title(desc) if is_notice else description_title)
+                                    or course
+                                    or "Ugeplan"
+                                )
+                                owner = (item.get("OwnerName") or item.get("ownername") or item.get("ownerName") or item.get("teacher") or item.get("Teacher") or "").strip()
+                                start_str = item.get("StartTime") or item.get("start") or item.get("Start") or item.get("startDate") or item.get("startDateTime")
+                                end_str = item.get("EndTime") or item.get("end") or item.get("End") or item.get("endDate") or item.get("endDateTime")
+
+                                start_dt = parse_dt(start_str)
+                                end_dt = parse_dt(end_str)
+
+                                if start_dt and not is_notice:
+                                    day_name = days[start_dt.weekday()]
+                                    day_date = start_dt.date()
+                                    time_str = start_dt.strftime("%H:%M")
+                                    if end_dt:
+                                        time_str += f"-{end_dt.strftime('%H:%M')}"
+                                    
+                                    day_key = (day_date, day_name)
+                                    if day_key not in events_by_day:
+                                        events_by_day[day_key] = []
+                                    events_by_day[day_key].append({
+                                        "time": time_str,
+                                        "title": title or owner,
+                                        "desc": desc,
+                                        "owner": owner if title else "",
+                                    })
+                                elif title or desc:
+                                    important_notes.append({"title": title, "desc": desc, "owner": owner})
+
+                            if important_notes:
+                                _ugep += "<h3>Vigtig information</h3>"
+                                for note in important_notes:
+                                    if note["title"]:
+                                        _ugep += f"<br><b>{note['title']}</b>"
+                                    if note["owner"]:
+                                        _ugep += f" (<i>{note['owner']}</i>)"
+                                    if note["title"] or note["owner"]:
+                                        _ugep += "<br>"
+                                    if note["desc"]:
+                                        _ugep += f"{note['desc']}<br>"
+
+                            if events_by_day:
+                                for (day_date, day_name), day_events in sorted(events_by_day.items(), key=lambda x: x[0][0]):
+                                    _ugep += f"<br><h3>{day_name} {day_date.strftime('%d/%m')}</h3>"
+                                    for ev in day_events:
+                                        _ugep += f"<b>{ev['time']} {ev['title']}</b><br>"
+                                        if ev["owner"]:
+                                            _ugep += f"<i>{ev['owner']}</i><br>"
+                                        if ev["desc"]:
+                                            _ugep += f"{ev['desc']}<br>"
+
+                            if thisnext == "this":
+                                self.ugep_attr[first_name] = _ugep
+                            elif thisnext == "next":
+                                self.ugepnext_attr[first_name] = _ugep
+
+                            if first_name not in self.ugep_events or thisnext == "this":
+                                self.ugep_events[first_name] = []
+
+                            for item in events_list:
+                                if not isinstance(item, dict):
+                                    continue
+                                course = (item.get("CoursesDisplay") or "").strip()
+                                raw_title = (item.get("Title") or item.get("title") or item.get("subject") or item.get("Subject") or item.get("name") or item.get("Name") or "").strip()
+                                raw_desc = (item.get("Description") or item.get("description") or item.get("text") or item.get("Text") or item.get("content") or item.get("Content") or "").strip()
+                                item_desc = html.unescape(BeautifulSoup(raw_desc, "html.parser").get_text(separator=" ")).strip() if raw_desc else ""
+                                description_title = extract_ugeplan_title(raw_desc)
+                                is_notice = not course
+                                item_title = (
+                                    raw_title
+                                    or (extract_ugeplan_notice_title(raw_desc) if is_notice else description_title)
+                                    or course
+                                    or "Ugeplan"
+                                )
+                                item_owner = (item.get("OwnerName") or item.get("ownername") or item.get("ownerName") or item.get("teacher") or item.get("Teacher") or "").strip()
+                                start_str = item.get("StartTime") or item.get("start") or item.get("Start") or item.get("startDate") or item.get("startDateTime")
+                                end_str = item.get("EndTime") or item.get("end") or item.get("End") or item.get("endDate") or item.get("endDateTime")
+
+                                start_dt = parse_dt(start_str)
+                                end_dt = parse_dt(end_str)
+                                is_all_day = is_ugeplan_all_day(item.get("IsAllDay")) or is_notice
+
+                                summary = item_title
+                                if item_owner and item_owner != item_title:
+                                    summary += f" ({item_owner})"
+                                if not summary:
+                                    summary = "Ugeplan"
+
+                                if start_dt:
+                                    has_time = not is_all_day and (start_dt.hour != 0 or start_dt.minute != 0 or (end_dt and (end_dt.hour != 0 or end_dt.minute != 0)))
+                                    if has_time:
+                                        ev_start = start_dt.replace(tzinfo=dt_util.DEFAULT_TIME_ZONE)
+                                        if end_dt:
+                                            ev_end = end_dt.replace(tzinfo=dt_util.DEFAULT_TIME_ZONE)
+                                        else:
+                                            ev_end = (start_dt + datetime.timedelta(hours=1)).replace(tzinfo=dt_util.DEFAULT_TIME_ZONE)
+                                    else:
+                                        ev_start = start_dt.date()
+                                        if end_dt and end_dt.date() > start_dt.date():
+                                            ev_end = end_dt.date() + datetime.timedelta(days=1)
+                                        else:
+                                            ev_end = start_dt.date() + datetime.timedelta(days=1)
+                                else:
+                                    try:
+                                        y, w = week.split("-W")
+                                        m_date = datetime.date.fromisocalendar(int(y), int(w), 1)
+                                    except Exception:
+                                        m_date = datetime.date.today()
+                                    ev_start = m_date
+                                    ev_end = m_date + datetime.timedelta(days=1)
+
+                                self.ugep_events[first_name].append(
+                                    CalendarEvent(
+                                        summary=summary,
+                                        start=ev_start,
+                                        end=ev_end,
+                                        description=item_desc or None,
+                                    )
+                                )
+                            _LOGGER.debug("EasyIQ Skoleportal result for %s: %s", first_name, _ugep)
+                        elif not skoleportal_auth_response:
+                            # 2. Fallback to legacy EasyIQ API
+                            easyiq_legacy_headers = {
+                                "x-aula-institutionfilter": str(self._institutionProfiles[0]),
+                                "x-aula-userprofile": "guardian",
+                                "Authorization": token,
+                                "accept": "application/json",
+                                "origin": "https://www.aula.dk",
+                                "referer": "https://www.aula.dk/",
+                                "authority": "api.easyiqcloud.dk",
+                            }
+                            if csrf_token:
+                                easyiq_legacy_headers["csrfp-token"] = csrf_token
+
+                            _LOGGER.debug("EasyIQ legacy headers " + str(easyiq_legacy_headers))
+                            post_data = {
+                                "sessionId": guardian,
+                                "currentWeekNr": week,
+                                "userProfile": "guardian",
+                                "institutionFilter": self._institutionProfiles,
+                                "childFilter": [child_userid],
+                            }
+                            _LOGGER.debug("EasyIQ legacy post data " + str(post_data))
+                            ugeplaner = requests.post(
+                                EASYIQ_API + "/weekplaninfo",
+                                json=post_data,
+                                headers=easyiq_legacy_headers,
+                                verify=True,
+                            )
+                            _LOGGER.debug(
+                                "EasyIQ legacy response " + str(ugeplaner.text)
+                            )
+                            _ugep = (
+                                "<h2>"
+                                + " Uge "
+                                + week.split("-W")[1]
+                                + "</h2>"
+                            )
+
+                            def findDay(date):
+                                day, month, year = (int(i) for i in date.split(" "))
+                                dayNumber = calendar.weekday(year, month, day)
+                                days = [
+                                    "Mandag",
+                                    "Tirsdag",
+                                    "Onsdag",
+                                    "Torsdag",
+                                    "Fredag",
+                                    "Lørdag",
+                                    "Søndag",
+                                ]
+                                return days[dayNumber]
+
+                            def is_correct_format(date_string, format):
+                                try:
+                                    datetime.datetime.strptime(date_string, format)
+                                    return True
+                                except ValueError:
+                                    _LOGGER.debug(
+                                        "Could not parse timestamp: " + str(date_string)
+                                    )
+                                    return False
+
+                            try:
+                                for i in ugeplaner.json()["Events"]:
+                                    if is_correct_format(i["start"], "%Y/%m/%d %H:%M"):
+                                        _LOGGER.debug("No Event")
+                                        start_datetime = datetime.datetime.strptime(
+                                            i["start"], "%Y/%m/%d %H:%M"
+                                        )
+                                        end_datetime = datetime.datetime.strptime(
+                                            i["end"], "%Y/%m/%d %H:%M"
+                                        )
+                                        if start_datetime.date() == end_datetime.date():
+                                            formatted_day = findDay(
+                                                start_datetime.strftime("%d %m %Y")
+                                            )
+                                            formatted_start = start_datetime.strftime(
+                                                " %H:%M"
+                                            )
+                                            formatted_end = end_datetime.strftime("- %H:%M")
+                                            dresult = f"{formatted_day} {formatted_start} {formatted_end}"
+                                        else:
+                                            formatted_start = findDay(
+                                                start_datetime.strftime("%d %m %Y")
+                                            )
+                                            formatted_end = findDay(
+                                                end_datetime.strftime("%d %m %Y")
+                                            )
+                                            dresult = f"{formatted_start} {formatted_end}"
+                                        _ugep = _ugep + "<br><b>" + dresult + "</b><br>"
+                                        if i["itemType"] == "5":
+                                            _ugep = (
+                                                _ugep
+                                                + "<br><b>"
+                                                + str(i["title"])
+                                                + "</b><br>"
+                                            )
+                                        else:
+                                            _ugep = (
+                                                _ugep
+                                                + "<br><b>"
+                                                + str(i["ownername"])
+                                                + "</b><br>"
+                                            )
+                                        _ugep = _ugep + str(i["description"]) + "<br>"
+                                    else:
+                                        _LOGGER.debug("None")
+                            except KeyError:
+                                _LOGGER.debug("None")
+
+                            if thisnext == "this":
+                                self.ugep_attr[first_name] = _ugep
+                            elif thisnext == "next":
+                                self.ugepnext_attr[first_name] = _ugep
+                            _LOGGER.debug("EasyIQ legacy result: " + str(_ugep))
 
                 if "0062" in self.widgets:
                     _LOGGER.debug("In the Huskelisten flow...")
@@ -962,49 +1572,54 @@ class Client:
                         )
                         try:
                             data = json.loads(response.text, strict=False)
-                        except:
+                        except (json.JSONDecodeError, ValueError):
                             _LOGGER.error(
                                 "Could not parse the response from Huskelisten as json."
                             )
+                            data = None
                         # _LOGGER.debug("Huskelisten raw response: "+str(response.text))
 
-                    for person in data:
-                        name = person["userName"].split()[0]
-                        _LOGGER.debug("Huskelisten for " + name)
-                        huskel = ""
-                        reminders = person["teamReminders"]
-                        if len(reminders) > 0:
-                            for reminder in reminders:
-                                local_timezone = (
-                                    datetime.datetime.now(datetime.timezone.utc)
-                                    .astimezone()
-                                    .tzinfo
-                                )
-                                due_date = datetime.datetime.strptime(
-                                    reminder["dueDate"], "%Y-%m-%dT%H:%M:%SZ"
-                                )
-                                local_due_date = (
-                                    due_date.replace(tzinfo=datetime.timezone.utc)
-                                    .astimezone(local_timezone)
-                                    .strftime("%A %d. %B")
-                                )
-                                huskel = huskel + "<h3>" + local_due_date + "</h3>"
-                                subjectName = (
-                                    reminder["subjectName"]
-                                    if "subjectName" in reminder
-                                    else ""
-                                )
-                                huskel = huskel + "<b>" + subjectName + "</b><br>"
-                                huskel = (
-                                    huskel + "af " + reminder["createdBy"] + "<br><br>"
-                                )
-                                content = re.sub(
-                                    r"([0-9]+)(\.)", r"\1\.", reminder["reminderText"]
-                                )
-                                huskel = huskel + content + "<br><br>"
-                        else:
-                            huskel = huskel + str(name) + " har ingen påmindelser."
-                        self.huskeliste[name] = huskel
+                    if not isinstance(data, list):
+                        if data is not None:
+                            _LOGGER.warning("Unexpected response type from Huskelisten: " + str(type(data)) + ". Response: " + str(data)[:200])
+                    else:
+                        for person in data:
+                            name = person["userName"].split()[0]
+                            _LOGGER.debug("Huskelisten for " + name)
+                            huskel = ""
+                            reminders = person["teamReminders"]
+                            if len(reminders) > 0:
+                                for reminder in reminders:
+                                    local_timezone = (
+                                        datetime.datetime.now(datetime.timezone.utc)
+                                        .astimezone()
+                                        .tzinfo
+                                    )
+                                    due_date = datetime.datetime.strptime(
+                                        reminder["dueDate"], "%Y-%m-%dT%H:%M:%SZ"
+                                    )
+                                    local_due_date = (
+                                        due_date.replace(tzinfo=datetime.timezone.utc)
+                                        .astimezone(local_timezone)
+                                        .strftime("%A %d. %B")
+                                    )
+                                    huskel = huskel + "<h3>" + local_due_date + "</h3>"
+                                    subjectName = (
+                                        reminder["subjectName"]
+                                        if "subjectName" in reminder
+                                        else ""
+                                    )
+                                    huskel = huskel + "<b>" + subjectName + "</b><br>"
+                                    huskel = (
+                                        huskel + "af " + reminder["createdBy"] + "<br><br>"
+                                    )
+                                    content = re.sub(
+                                        r"([0-9]+)(\.)", r"\1\.", reminder["reminderText"]
+                                    )
+                                    huskel = huskel + content + "<br><br>"
+                            else:
+                                huskel = huskel + str(name) + " har ingen påmindelser."
+                            self.huskeliste[name] = huskel
 
                 # End Huskelisten
                 if "0004" in self.widgets:
@@ -1045,14 +1660,41 @@ class Client:
                         response = requests.get(
                             MEEBOOK_API + get_payload, headers=headers, verify=True
                         )
-                        data = json.loads(response.text, strict=False)
+                        try:
+                            data = json.loads(response.text, strict=False)
+                        except (json.JSONDecodeError, ValueError):
+                            _LOGGER.warning("Could not parse the response from Meebook as json. Response: " + str(response.text[:200]))
+                            data = None
                         # _LOGGER.debug("Meebook ugeplan raw response from week "+week+": "+str(response.text))
 
-                    if "exceptionMessage" in data:
-                        _LOGGER.warning(
-                            "Ignoring error in fetching data from Meebook. Error exception message: "
-                            + data["exceptionMessage"]
-                        )
+                    if isinstance(data, dict) and "message" in data and "expired" in str(data["message"]).lower():
+                        _LOGGER.debug("Meebook token expired, resetting session and retrying...")
+                        self.tokens.pop("0004", None)
+                        self._session = None
+                        try:
+                            self.login(force_refresh=True)
+                        except Exception as login_err:
+                            _LOGGER.warning(f"Failed to refresh Aula session after Meebook token expiry: {login_err}")
+                        token = self.get_token("0004")
+                        if token:
+                            headers["authorization"] = token
+                            response = requests.get(
+                                MEEBOOK_API + get_payload, headers=headers, verify=True
+                            )
+                            try:
+                                data = json.loads(response.text, strict=False)
+                            except (json.JSONDecodeError, ValueError):
+                                _LOGGER.warning("Could not parse the response from Meebook as json after token refresh. Response: " + str(response.text[:200]))
+                                data = None
+
+                    if not isinstance(data, list):
+                        if isinstance(data, dict) and "exceptionMessage" in data:
+                            _LOGGER.warning(
+                                "Ignoring error in fetching data from Meebook. Error exception message: "
+                                + data["exceptionMessage"]
+                            )
+                        elif data is not None:
+                            _LOGGER.warning("Unexpected response type from Meebook: " + str(type(data)) + ". Response: " + str(data)[:200])
                     else:
                         for person in data:
                             _LOGGER.debug("Meebook ugeplan for " + person["name"])

@@ -6,7 +6,7 @@ from homeassistant.const import __version__ as HA_VERSION
 NAME = "EV Smart Charging"
 DOMAIN = "ev_smart_charging"
 DOMAIN_DATA = f"{DOMAIN}_data"
-VERSION = "v2.5.1"
+VERSION = "v2.6.0"
 ISSUE_URL = "https://github.com/jonasbkarlsson/ev_smart_charging/issues"
 
 # Icons
@@ -32,6 +32,7 @@ PLATFORM_ENTSOE = "entsoe"
 PLATFORM_TGE = "tge"
 PLATFORM_GESPOT = "ge_spot"
 PLATFORM_VW = "volkswagen_we_connect_id"
+PLATFORM_TESLA_FLEET = "tesla_fleet"
 PLATFORM_OCPP = "ocpp"
 PLATFORM_GENERIC = "generic"
 
@@ -78,6 +79,7 @@ CONF_MIN_SOC = "min_soc"
 CONF_SOLAR_CHARGING_CONFIGURED = "solar_charging_configured"
 CONF_GRID_USAGE_SENSOR = "grid_usage_sensor"
 CONF_GRID_VOLTAGE = "grid_voltage"
+CONF_CHARGING_STATE_ENTITY = "charging_state_entity"
 
 QUARTERS = [
     "None",

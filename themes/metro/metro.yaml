@@ -593,44 +593,26 @@ ________________________________________Common Base 3 (Do Not Use):
 
   card-mod-root-yaml: &card-mod-root |
     .: |
+      .toolbar > ha-tab-group {
+        pointer-events: none;
+        opacity: 0;
+      }
       /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
       @media (min-width: 768px) {
-      :not(.edit-mode) > #view {
-        padding-left: 100px !important;
-      }
-    }
-
-    /* Add bottom padding for mobile screens to prevent cards from overlapping with the navbar */
-    @media (max-width: 767px) {
-      :not(.edit-mode) > hui-view:after {
-        content: "";
-        display: block;
-        height: 80px;
-        width: 100%;
-        background-color: transparent; 
-      }
-    }
-      @supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {
-        app-header, app-toolbar {
-          background-color: "rgba(var(--rgb-primary-background-color),.33)"
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
+        :not(.edit-mode) > #view {
+          padding-left: 100px !important;
         }
       }
-      app-toolbar [main-title] {
-        font-size: var(--h5-font-size);
-        line-height: 1.1;
-        font-weight: var(--h5-font-weight);
-        text-transform: uppercase;
-        margin-left: 8px !important;
-      }
-    app-header$: |
-      :host::before {
-        box-shadow: inset 0px 4px 6px -4px rgb(0 0 0 / 10%) !important;
-      }
-    ha-app-layout$app-header$app-toolbar$ha-tabs$: |
-      .iron-selected paper-tab {
-      
+
+      /* Add bottom padding for mobile screens to prevent cards from overlapping with the navbar */
+      @media (max-width: 767px) {
+        :not(.edit-mode) > hui-view:after {
+          content: "";
+          display: block;
+          height: 80px;
+          width: 100%;
+          background-color: transparent; 
+        }
       }
 
   card-mod-sidebar: &card-mod-sidebar |
@@ -733,7 +715,6 @@ ________________________________________Common Base 5 (Do Not Use):
 
     light: &fluent-common-light
       <<: *common-light
-      primary-background-color: "rgb(255,255,255)"
       rgb-primary-background-color: "255,255,255"
 
       ha-card-border-radius: "4px"
@@ -758,29 +739,6 @@ ________________________________________Common Base 5 (Do Not Use):
 Metro Red:
   <<: *common-card-mods
   card-mod-theme: "Metro Red"
-  card-mod-root-yaml: |
-    .: |
-      .toolbar > ha-tab-group {
-        pointer-events: none;
-        opacity: 0;
-      }
-      /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
-      @media (min-width: 768px) {
-        :not(.edit-mode) > #view {
-          padding-left: 100px !important;
-        }
-      }
-
-      /* Add bottom padding for mobile screens to prevent cards from overlapping with the navbar */
-      @media (max-width: 767px) {
-        :not(.edit-mode) > hui-view:after {
-          content: "";
-          display: block;
-          height: 80px;
-          width: 100%;
-          background-color: transparent; 
-        }
-      }
   custom-button-gradient-1: "linear-gradient(135deg, #00cb6a, #00f17d)"
   custom-button-infobox: "rgba(0, 0, 0, 0.5)"
   icon-farve: "#ffffff"
@@ -804,28 +762,6 @@ Metro Red:
 MyTheme:
   <<: *common-card-mods
   card-mod-theme: "MyTheme"
-  card-mod-root-yaml: |
-    .: |
-      .toolbar > ha-tab-group {
-        pointer-events: none;
-        opacity: 0;
-      }
-      /* Padding for navbar on desktop */
-      @media (min-width: 768px) {
-        :not(.edit-mode) > #view {
-          padding-left: 100px !important;
-        }
-      }
-      /* Bottom padding for navbar on mobile */
-      @media (max-width: 767px) {
-        :not(.edit-mode) > hui-view:after {
-          content: "";
-          display: block;
-          height: 80px;
-          width: 100%;
-          background-color: transparent;
-        }
-      }
 
   # Base accent color (cold blue)
   primary-color: "#a9d8ff"
@@ -860,8 +796,10 @@ MyTheme:
       # 🔹 Icon/text colors
       icon-farve: "#ffffff" # icon on bright gradient
       icon-farve-2: "#e9f4f8" # icon on dark cards
-      border-radius-1: "10px"
-      box-shadow-on: "0px 2px 5px rgba(0, 0, 0, 0.9)"
+      border-radius-1: "16px"
+      box-shadow-on: "0 6px 18px rgba(0, 0, 0, 0.35)"
+      ha-card-border-radius: "16px"
+      mush-control-border-radius: "12px"
 
       # 🔹 Bright green CTA button (Start rengøring)
       cta-button-gradient: "linear-gradient(135deg, rgba(0,95,1,1), rgba(0,162,0,1))"
@@ -884,7 +822,11 @@ MyTheme:
 
       icon-farve: "#000000"
       icon-farve-2: "#1d2936"
-      border-radius-1: "10px"
+      border-radius-1: "16px"
+      box-shadow-on: "0 6px 18px rgba(0, 0, 0, 0.12)"
+      custom-button-gradient-2: "linear-gradient(135deg, rgba(255,220,220,0.98), rgba(233,103,103,0.9))"
+      ha-card-border-radius: "16px"
+      mush-control-border-radius: "12px"
 
       cta-button-gradient: "linear-gradient(135deg, #00b521, #2fe84a)"
       cta-button-text-color: "#ffffff"
@@ -892,29 +834,6 @@ MyTheme:
 Fluent Red:
   <<: *common-card-mods
   card-mod-theme: "Fluent Red"
-  card-mod-root-yaml: |
-    .: |
-      .toolbar > ha-tab-group {
-        pointer-events: none;
-        opacity: 0;
-      }
-      /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
-      @media (min-width: 768px) {
-        :not(.edit-mode) > #view {
-          padding-left: 100px !important;
-        }
-      }
-
-      /* Add bottom padding for mobile screens to prevent cards from overlapping with the navbar */
-      @media (max-width: 767px) {
-        :not(.edit-mode) > hui-view:after {
-          content: "";
-          display: block;
-          height: 80px;
-          width: 100%;
-          background-color: transparent; 
-        }
-      }
 
   primary-color: "#C30052"
   rgb-primary-color: "195,0,82"
@@ -945,29 +864,6 @@ Fluent Red:
 Metro Blue:
   <<: *common-card-mods
   card-mod-theme: "Metro Blue"
-  card-mod-root-yaml: |
-    .: |
-      .toolbar > ha-tab-group {
-        pointer-events: none;
-        opacity: 0;
-      }
-      /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
-      @media (min-width: 768px) {
-        :not(.edit-mode) > #view {
-          padding-left: 100px !important;
-        }
-      }
-
-      /* Add bottom padding for mobile screens to prevent cards from overlapping with the navbar */
-      @media (max-width: 767px) {
-        :not(.edit-mode) > hui-view:after {
-          content: "";
-          display: block;
-          height: 80px;
-          width: 100%;
-          background-color: transparent; 
-        }
-      }
   primary-color: "#0078d7"
   rgb-primary-color: "0,120,215"
   rgb-primary-color-darker: "0,91,163"
@@ -986,29 +882,6 @@ Metro Blue:
 Fluent Blue:
   <<: *common-card-mods
   card-mod-theme: "Fluent Blue"
-  card-mod-root-yaml: |
-    .: |
-      .toolbar > ha-tab-group {
-        pointer-events: none;
-        opacity: 0;
-      }
-      /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
-      @media (min-width: 768px) {
-        :not(.edit-mode) > #view {
-          padding-left: 100px !important;
-        }
-      }
-
-      /* Add bottom padding for mobile screens to prevent cards from overlapping with the navbar */
-      @media (max-width: 767px) {
-        :not(.edit-mode) > hui-view:after {
-          content: "";
-          display: block;
-          height: 80px;
-          width: 100%;
-          background-color: transparent; 
-        }
-      }
   primary-color: "#0078d7"
   rgb-primary-color: "0,120,215"
   rgb-primary-color-darker: "0,91,163"
@@ -1038,29 +911,6 @@ Fluent Blue:
 Metro Green:
   <<: *common-card-mods
   card-mod-theme: "Metro Green"
-  card-mod-root-yaml: |
-    .: |
-      .toolbar > ha-tab-group {
-        pointer-events: none;
-        opacity: 0;
-      }
-      /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
-      @media (min-width: 768px) {
-        :not(.edit-mode) > #view {
-          padding-left: 100px !important;
-        }
-      }
-
-      /* Add bottom padding for mobile screens to prevent cards from overlapping with the navbar */
-      @media (max-width: 767px) {
-        :not(.edit-mode) > hui-view:after {
-          content: "";
-          display: block;
-          height: 80px;
-          width: 100%;
-          background-color: transparent; 
-        }
-      }
   primary-color: "#00cb6a"
   rgb-primary-color: "0, 203, 106"
   rgb-primary-color-darker: "0, 151, 79"
@@ -1079,29 +929,6 @@ Metro Green:
 Fluent Green:
   <<: *common-card-mods
   card-mod-theme: "Fluent Green"
-  card-mod-root-yaml: |
-    .: |
-      .toolbar > ha-tab-group {
-        pointer-events: none;
-        opacity: 0;
-      }
-      /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
-      @media (min-width: 768px) {
-        :not(.edit-mode) > #view {
-          padding-left: 100px !important;
-        }
-      }
-
-      /* Add bottom padding for mobile screens to prevent cards from overlapping with the navbar */
-      @media (max-width: 767px) {
-        :not(.edit-mode) > hui-view:after {
-          content: "";
-          display: block;
-          height: 80px;
-          width: 100%;
-          background-color: transparent; 
-        }
-      }
   primary-color: "#00cb6a"
   rgb-primary-color: "0, 203, 106"
   rgb-primary-color-darker: "0, 151, 79"
@@ -1131,29 +958,6 @@ Fluent Green:
 Metro Orange:
   <<: *common-card-mods
   card-mod-theme: "Metro Orange"
-  card-mod-root-yaml: |
-    .: |
-      .toolbar > ha-tab-group {
-        pointer-events: none;
-        opacity: 0;
-      }
-      /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
-      @media (min-width: 768px) {
-        :not(.edit-mode) > #view {
-          padding-left: 100px !important;
-        }
-      }
-
-      /* Add bottom padding for mobile screens to prevent cards from overlapping with the navbar */
-      @media (max-width: 767px) {
-        :not(.edit-mode) > hui-view:after {
-          content: "";
-          display: block;
-          height: 80px;
-          width: 100%;
-          background-color: transparent; 
-        }
-      }
   primary-color: "#ff8c00"
   rgb-primary-color: "255, 140, 0"
   rgb-primary-color-darker: "204, 112, 0"
@@ -1172,29 +976,6 @@ Metro Orange:
 Fluent Orange:
   <<: *common-card-mods
   card-mod-theme: "Fluent Orange"
-  card-mod-root-yaml: |
-    .: |
-      .toolbar > ha-tab-group {
-        pointer-events: none;
-        opacity: 0;
-      }
-      /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
-      @media (min-width: 768px) {
-        :not(.edit-mode) > #view {
-          padding-left: 100px !important;
-        }
-      }
-
-      /* Add bottom padding for mobile screens to prevent cards from overlapping with the navbar */
-      @media (max-width: 767px) {
-        :not(.edit-mode) > hui-view:after {
-          content: "";
-          display: block;
-          height: 80px;
-          width: 100%;
-          background-color: transparent; 
-        }
-      }
   primary-color: "#ff8c00"
   rgb-primary-color: "255, 140, 0"
   rgb-primary-color-darker: "204, 112, 0"
@@ -1224,29 +1005,6 @@ Fluent Orange:
 Metro Purple:
   <<: *common-card-mods
   card-mod-theme: "Metro Purple"
-  card-mod-root-yaml: |
-    .: |
-      .toolbar > ha-tab-group {
-        pointer-events: none;
-        opacity: 0;
-      }
-      /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
-      @media (min-width: 768px) {
-        :not(.edit-mode) > #view {
-          padding-left: 100px !important;
-        }
-      }
-
-      /* Add bottom padding for mobile screens to prevent cards from overlapping with the navbar */
-      @media (max-width: 767px) {
-        :not(.edit-mode) > hui-view:after {
-          content: "";
-          display: block;
-          height: 80px;
-          width: 100%;
-          background-color: transparent; 
-        }
-      }
   primary-color: "#6a00cb"
   rgb-primary-color: "106, 0, 203" # hsl(hue,100,42)
   rgb-primary-color-darker: "105, 0, 204" # hsl(hue,100,32)
@@ -1265,29 +1023,6 @@ Metro Purple:
 Fluent Purple:
   <<: *common-card-mods
   card-mod-theme: "Fluent Purple"
-  card-mod-root-yaml: |
-    .: |
-      .toolbar > ha-tab-group {
-        pointer-events: none;
-        opacity: 0;
-      }
-      /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
-      @media (min-width: 768px) {
-        :not(.edit-mode) > #view {
-          padding-left: 100px !important;
-        }
-      }
-
-      /* Add bottom padding for mobile screens to prevent cards from overlapping with the navbar */
-      @media (max-width: 767px) {
-        :not(.edit-mode) > hui-view:after {
-          content: "";
-          display: block;
-          height: 80px;
-          width: 100%;
-          background-color: transparent; 
-        }
-      }
   primary-color: "#6a00cb"
   rgb-primary-color: "106, 0, 203" # hsl(hue,100,42)
   rgb-primary-color-darker: "105, 0, 204" # hsl(hue,100,32)
@@ -1319,29 +1054,6 @@ Fluent Purple:
 Metro Slate:
   <<: *common-card-mods
   card-mod-theme: "Metro Slate"
-  card-mod-root-yaml: |
-    .: |
-      .toolbar > ha-tab-group {
-        pointer-events: none;
-        opacity: 0;
-      }
-      /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
-      @media (min-width: 768px) {
-        :not(.edit-mode) > #view {
-          padding-left: 100px !important;
-        }
-      }
-
-      /* Add bottom padding for mobile screens to prevent cards from overlapping with the navbar */
-      @media (max-width: 767px) {
-        :not(.edit-mode) > hui-view:after {
-          content: "";
-          display: block;
-          height: 80px;
-          width: 100%;
-          background-color: transparent; 
-        }
-      }
   primary-color: "#4f5a68"
   rgb-primary-color: "79,90,104"
   rgb-primary-color-darker: "57,65,76"
@@ -1360,29 +1072,6 @@ Metro Slate:
 Fluent Slate:
   <<: *common-card-mods
   card-mod-theme: "Fluent Slate"
-  card-mod-root-yaml: |
-    .: |
-      .toolbar > ha-tab-group {
-        pointer-events: none;
-        opacity: 0;
-      }
-      /* Add padding to the left (or other sides, depending on your navbar position) for desktop screens */
-      @media (min-width: 768px) {
-        :not(.edit-mode) > #view {
-          padding-left: 100px !important;
-        }
-      }
-
-      /* Add bottom padding for mobile screens to prevent cards from overlapping with the navbar */
-      @media (max-width: 767px) {
-        :not(.edit-mode) > hui-view:after {
-          content: "";
-          display: block;
-          height: 80px;
-          width: 100%;
-          background-color: transparent; 
-        }
-      }
   primary-color: "#4f5a68"
   rgb-primary-color: "79,90,104"
   rgb-primary-color-darker: "57,65,76"

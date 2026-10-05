@@ -1,539 +1,87 @@
-l50_ultra_global_set_times_index:
-  alias: L50 – Global set repeats index
-  mode: parallel
-  sequence:
-  - variables:
-      index: '{{ (index | default(0)) | int(0) }}'
-      selected_text: '{{ states(''input_text.l50_ultra_selected_segments'') | string
-        }}'
-      ids: '{{ selected_text | regex_findall(''[0-9]+'') }}'
-      opts: '{{ state_attr(''select.l50_ultra_room_1_cleaning_times'',''options'')
-        or [] }}
-
-        '
-      n: '{{ (opts|length) if (opts|length) > 0 else 1 }}'
-      idx: '{{ index if index < n else (n - 1) }}'
-      choice: '{{ opts[idx] if (opts|length) > 0 else '''' }}'
-  - target:
-      entity_id: input_number.l50_ultra_global_idx_times
-    data:
-      value: '{{ idx | int }}'
-    action: input_number.set_value
-  - repeat:
-      for_each: '{{ ids }}'
-      sequence:
-      - choose:
-        - conditions: '{{ repeat.item == ''1'' and choice|length > 0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_1_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''2'' and choice|length > 0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_2_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''3'' and choice|length > 0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_3_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''4'' and choice|length > 0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_4_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''5'' and choice|length > 0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_5_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''6'' and choice|length > 0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_6_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''7'' and choice|length > 0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_7_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''8'' and choice|length > 0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_8_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''9'' and choice|length > 0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_9_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''10'' and choice|length > 0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_10_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''11'' and choice|length > 0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_11_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-l50_ultra_global_mode:
-  alias: L50 – Global cleaning mode
-  mode: parallel
-  sequence:
-  - variables:
-      mode: '{{ mode | default(''sweeping'') | lower }}'
-      selected_text: '{{ states(''input_text.l50_ultra_selected_segments'') | string
-        }}'
-      ids: '{{ selected_text | regex_findall(''[0-9]+'') }}'
-  - target:
-      entity_id: select.l50_ultra_room_1_cleaning_mode
-    data:
-      option: '{{ mode }}'
-    action: select.select_option
-  - repeat:
-      for_each: '{{ ids }}'
-      sequence:
-      - choose:
-        - conditions:
-          - condition: template
-            value_template: '{{ repeat.item == ''1'' }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_1_cleaning_mode
-            data:
-              option: '{{ mode }}'
-            action: select.select_option
-        - conditions:
-          - condition: template
-            value_template: '{{ repeat.item == ''2'' }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_2_cleaning_mode
-            data:
-              option: '{{ mode }}'
-            action: select.select_option
-        - conditions:
-          - condition: template
-            value_template: '{{ repeat.item == ''3'' }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_3_cleaning_mode
-            data:
-              option: '{{ mode }}'
-            action: select.select_option
-        - conditions:
-          - condition: template
-            value_template: '{{ repeat.item == ''4'' }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_4_cleaning_mode
-            data:
-              option: '{{ mode }}'
-            action: select.select_option
-        - conditions:
-          - condition: template
-            value_template: '{{ repeat.item == ''6'' }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_6_cleaning_mode
-            data:
-              option: '{{ mode }}'
-            action: select.select_option
-        - conditions:
-          - condition: template
-            value_template: '{{ repeat.item == ''7'' }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_7_cleaning_mode
-            data:
-              option: '{{ mode }}'
-            action: select.select_option
-        - conditions:
-          - condition: template
-            value_template: '{{ repeat.item == ''8'' }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_8_cleaning_mode
-            data:
-              option: '{{ mode }}'
-            action: select.select_option
-        - conditions:
-          - condition: template
-            value_template: '{{ repeat.item == ''9'' }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_9_cleaning_mode
-            data:
-              option: '{{ mode }}'
-            action: select.select_option
-        - conditions:
-          - condition: template
-            value_template: '{{ repeat.item == ''10'' }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_10_cleaning_mode
-            data:
-              option: '{{ mode }}'
-            action: select.select_option
-        - conditions:
-          - condition: template
-            value_template: '{{ repeat.item == ''11'' }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_11_cleaning_mode
-            data:
-              option: '{{ mode }}'
-            action: select.select_option
 l50_ultra_global_adjust:
-  alias: L50 – Global adjust & apply (no-template-entity_id)
-  mode: parallel
+  alias: L50 Ultra – Global adjust
+  mode: restart
+  fields:
+    kind:
+      name: Type
+      selector:
+        select:
+          options:
+            - suction
+            - mop
+            - mode
+            - times
+            - reset
+    index:
+      name: Index
+      required: false
+      selector:
+        number:
+          min: 0
+          max: 3
+          mode: box
   sequence:
-  - variables:
-      kind: '{{ (kind | default(''suction'')) | lower }}'
-      step_i: '{{ (step | default(1)) | int }}'
-      selected_text: '{{ states(''input_text.l50_ultra_selected_segments'') | string
-        }}'
-      ids: '{{ selected_text | regex_findall(''[0-9]+'') }}'
-      cur: "{% if kind == 'suction' %}\n  {{ states('input_number.l50_ultra_global_idx_suction')
-        | int(0) }}\n{% elif kind == 'mop' %}\n  {{ states('input_number.l50_ultra_global_idx_mop')
-        | int(0) }}\n{% else %}\n  {{ states('input_number.l50_ultra_global_idx_times')
-        | int(0) }}\n{% endif %}\n"
-      opts: "{% if kind == 'suction' %}\n  {{ state_attr('select.l50_ultra_room_1_suction_level','options')
-        or [] }}\n{% elif kind == 'mop' %}\n  {{ state_attr('select.l50_ultra_room_1_mop_pad_humidity','options')
-        or [] }}\n{% else %}\n  {{ state_attr('select.l50_ultra_room_1_cleaning_times','options')
-        or [] }}\n{% endif %}\n"
-      n: '{{ (opts|length) if (opts|length) > 0 else 1 }}'
-      new_index: '{{ (cur + step_i) % n }}'
-      choice: '{{ opts[new_index] if (opts|length) > 0 else '''' }}'
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ kind == ''suction'' }}'
-      sequence:
-      - entity_id: input_number.l50_ultra_global_idx_suction
-        data:
-          value: '{{ new_index | int }}'
-        action: input_number.set_value
-    - conditions:
-      - condition: template
-        value_template: '{{ kind == ''mop'' }}'
-      sequence:
-      - entity_id: input_number.l50_ultra_global_idx_mop
-        data:
-          value: '{{ new_index | int }}'
-        action: input_number.set_value
-    default:
-    - entity_id: input_number.l50_ultra_global_idx_times
-      data:
-        value: '{{ new_index | int }}'
-      action: input_number.set_value
-  - repeat:
-      for_each: '{{ ids }}'
-      sequence:
-      - choose:
-        - conditions: '{{ kind == ''suction'' and repeat.item == ''1'' and choice|length
-            > 0 }}
-
-            '
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ kind == 'suction' }}"
           sequence:
-          - entity_id: select.l50_ultra_room_1_suction_level
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''suction'' and repeat.item == ''2'' and choice|length
-            > 0 }}
-
-            '
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.l50_ultra_global_idx_suction
+              data:
+                value: "{{ index | int }}"
+        - conditions:
+            - condition: template
+              value_template: "{{ kind == 'mop' }}"
           sequence:
-          - entity_id: select.l50_ultra_room_2_suction_level
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''suction'' and repeat.item == ''3'' and choice|length
-            > 0 }}
-
-            '
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.l50_ultra_global_idx_mop
+              data:
+                value: "{{ index | int }}"
+        - conditions:
+            - condition: template
+              value_template: "{{ kind == 'mode' }}"
           sequence:
-          - entity_id: select.l50_ultra_room_3_suction_level
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''suction'' and repeat.item == ''4'' and choice|length
-            > 0 }}
-
-            '
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.l50_ultra_global_idx_mode
+              data:
+                value: "{{ index | int }}"
+        - conditions:
+            - condition: template
+              value_template: "{{ kind == 'times' }}"
           sequence:
-          - entity_id: select.l50_ultra_room_4_suction_level
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''suction'' and repeat.item == ''5'' and choice|length
-            > 0 }}
-
-            '
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.l50_ultra_global_idx_times
+              data:
+                value: "{{ index | int }}"
+        - conditions:
+            - condition: template
+              value_template: "{{ kind == 'reset' }}"
           sequence:
-          - entity_id: select.l50_ultra_room_5_suction_level
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''suction'' and repeat.item == ''6'' and choice|length
-            > 0 }}
-
-            '
-          sequence:
-          - entity_id: select.l50_ultra_room_6_suction_level
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''suction'' and repeat.item == ''7'' and choice|length
-            > 0 }}
-
-            '
-          sequence:
-          - entity_id: select.l50_ultra_room_7_suction_level
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''suction'' and repeat.item == ''8'' and choice|length
-            > 0 }}
-
-            '
-          sequence:
-          - entity_id: select.l50_ultra_room_8_suction_level
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''suction'' and repeat.item == ''9'' and choice|length
-            > 0 }}
-
-            '
-          sequence:
-          - entity_id: select.l50_ultra_room_9_suction_level
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''suction'' and repeat.item == ''10'' and choice|length
-            > 0 }}
-
-            '
-          sequence:
-          - entity_id: select.l50_ultra_room_10_suction_level
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''suction'' and repeat.item == ''11'' and choice|length
-            > 0 }}
-
-            '
-          sequence:
-          - entity_id: select.l50_ultra_room_11_suction_level
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''mop'' and repeat.item == ''1'' and choice|length
-            > 0 }}'
-          sequence:
-          - entity_id: select.l50_ultra_room_1_mop_pad_humidity
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''mop'' and repeat.item == ''2'' and choice|length
-            > 0 }}'
-          sequence:
-          - entity_id: select.l50_ultra_room_2_mop_pad_humidity
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''mop'' and repeat.item == ''3'' and choice|length
-            > 0 }}'
-          sequence:
-          - entity_id: select.l50_ultra_room_3_mop_pad_humidity
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''mop'' and repeat.item == ''4'' and choice|length
-            > 0 }}'
-          sequence:
-          - entity_id: select.l50_ultra_room_4_mop_pad_humidity
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''mop'' and repeat.item == ''5'' and choice|length
-            > 0 }}'
-          sequence:
-          - entity_id: select.l50_ultra_room_5_mop_pad_humidity
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''mop'' and repeat.item == ''6'' and choice|length
-            > 0 }}'
-          sequence:
-          - entity_id: select.l50_ultra_room_6_mop_pad_humidity
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''mop'' and repeat.item == ''7'' and choice|length
-            > 0 }}'
-          sequence:
-          - entity_id: select.l50_ultra_room_7_mop_pad_humidity
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''mop'' and repeat.item == ''8'' and choice|length
-            > 0 }}'
-          sequence:
-          - entity_id: select.l50_ultra_room_8_mop_pad_humidity
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''mop'' and repeat.item == ''9'' and choice|length
-            > 0 }}'
-          sequence:
-          - entity_id: select.l50_ultra_room_9_mop_pad_humidity
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''mop'' and repeat.item == ''10'' and choice|length
-            > 0 }}
-
-            '
-          sequence:
-          - entity_id: select.l50_ultra_room_10_mop_pad_humidity
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''mop'' and repeat.item == ''11'' and choice|length
-            > 0 }}
-
-            '
-          sequence:
-          - entity_id: select.l50_ultra_room_11_mop_pad_humidity
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''times'' and repeat.item == ''1'' and choice|length
-            > 0 }}
-
-            '
-          sequence:
-          - entity_id: select.l50_ultra_room_1_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''times'' and repeat.item == ''2'' and choice|length
-            > 0 }}
-
-            '
-          sequence:
-          - entity_id: select.l50_ultra_room_2_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''times'' and repeat.item == ''3'' and choice|length
-            > 0 }}
-
-            '
-          sequence:
-          - entity_id: select.l50_ultra_room_3_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''times'' and repeat.item == ''4'' and choice|length
-            > 0 }}
-
-            '
-          sequence:
-          - entity_id: select.l50_ultra_room_4_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''times'' and repeat.item == ''5'' and choice|length
-            > 0 }}
-
-            '
-          sequence:
-          - entity_id: select.l50_ultra_room_5_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''times'' and repeat.item == ''6'' and choice|length
-            > 0 }}
-
-            '
-          sequence:
-          - entity_id: select.l50_ultra_room_6_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''times'' and repeat.item == ''7'' and choice|length
-            > 0 }}
-
-            '
-          sequence:
-          - entity_id: select.l50_ultra_room_7_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''times'' and repeat.item == ''8'' and choice|length
-            > 0 }}
-
-            '
-          sequence:
-          - entity_id: select.l50_ultra_room_8_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''times'' and repeat.item == ''9'' and choice|length
-            > 0 }}
-
-            '
-          sequence:
-          - entity_id: select.l50_ultra_room_9_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''times'' and repeat.item == ''10'' and choice|length
-            > 0 }}
-
-            '
-          sequence:
-          - entity_id: select.l50_ultra_room_10_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
-        - conditions: '{{ kind == ''times'' and repeat.item == ''11'' and choice|length
-            > 0 }}
-
-            '
-          sequence:
-          - entity_id: select.l50_ultra_room_11_cleaning_times
-            data:
-              option: '{{ choice }}'
-            action: select.select_option
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.l50_ultra_global_idx_suction
+              data:
+                value: 0
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.l50_ultra_global_idx_mop
+              data:
+                value: 0
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.l50_ultra_global_idx_mode
+              data:
+                value: 0
+            - action: input_number.set_value
+              target:
+                entity_id: input_number.l50_ultra_global_idx_times
+              data:
+                value: 0
 plot_energy_usage:
   alias: 00 - Plot energy usage
   icon: mdi:brightness-percent
@@ -577,173 +125,183 @@ plot_energy_usage:
         entity:
     stop_state:
       description: State the entity should have to stop the plot
-      example: 'off'
+      example: "off"
       required: true
       selector:
         text:
   sequence:
-  - variables:
-      not_defined: "{{ [\n      'energy sensor' if sensor is not defined or not sensor
-        else none,\n      'stop entity' if stop_entity is not defined or not stop_entity
-        else none,\n      'stop state' if stop_state is not defined else none\n    ]
-        | reject('none') | list\n}}\n"
-  - if: '{{ not_defined | count > 0 }}'
-    then:
-    - stop: '{{ not_defined | join('', '') }} {{ ''is'' if not_defined | count ==
-        1 else ''are''}} not defined, script has stopped
+    - variables:
+        not_defined:
+          "{{ [\n      'energy sensor' if sensor is not defined or not sensor
+          else none,\n      'stop entity' if stop_entity is not defined or not stop_entity
+          else none,\n      'stop state' if stop_state is not defined else none\n    ]
+          | reject('none') | list\n}}\n"
+    - if: "{{ not_defined | count > 0 }}"
+      then:
+        - stop:
+            "{{ not_defined | join(', ') }} {{ 'is' if not_defined | count ==
+            1 else 'are'}} not defined, script has stopped
 
-        '
-      error: true
-  - variables:
-      description: '{{ description | default(''unknown'') }}'
-      no_weight_points: '{{ no_weight_points | default(4) | int(4) }}'
-  - repeat:
-      until:
-      - condition: template
-        value_template: '{{ is_state(stop_entity, stop_state) }}'
-      sequence:
-      - variables:
-          sensor_state: '{{ states(sensor) | float(''na'') }}'
-      - if: '{{ not sensor_state | is_number }}'
-        then:
-        - stop: Received non numeric state, script has stopped
+            "
           error: true
-      - event: update_energy_plot
-        event_data:
-          description: '{{ description }}'
-          status: '{{ ''first'' if repeat.first else ''ongoing'' }}'
-          state: '{{ sensor_state }}'
-          no_weight_points: '{{ no_weight_points }}'
-      - delay:
-          minutes: '{{ 60 / no_weight_points }}'
-  - event: update_energy_plot
-    event_data:
-      description: '{{ description }}'
-      no_weight_points: '{{ no_weight_points }}'
-      status: complete
+    - variables:
+        description: "{{ description | default('unknown') }}"
+        no_weight_points: "{{ no_weight_points | default(4) | int(4) }}"
+    - repeat:
+        until:
+          - condition: template
+            value_template: "{{ is_state(stop_entity, stop_state) }}"
+        sequence:
+          - variables:
+              sensor_state: "{{ states(sensor) | float('na') }}"
+          - if: "{{ not sensor_state | is_number }}"
+            then:
+              - stop: Received non numeric state, script has stopped
+                error: true
+          - event: update_energy_plot
+            event_data:
+              description: "{{ description }}"
+              status: "{{ 'first' if repeat.first else 'ongoing' }}"
+              state: "{{ sensor_state }}"
+              no_weight_points: "{{ no_weight_points }}"
+          - delay:
+              minutes: "{{ 60 / no_weight_points }}"
+    - event: update_energy_plot
+      event_data:
+        description: "{{ description }}"
+        no_weight_points: "{{ no_weight_points }}"
+        status: complete
 opvaskemaskinestartscript:
   alias: OpvaskemaskineStartScript
   sequence:
-  - variables:
-      selected_time: "{% if is_state('input_boolean.wash_today', 'on') %}\n  {{ states('sensor.elpris_lavest_4t_idag')
-        }}\n{% else %}\n  {{ states('sensor.elpris_lavest_4t') }}\n{% endif %}"
-      start_seconds: '{% set tid = as_timestamp(selected_time) %} {% set startSeconds
-        = (tid - now().timestamp()) | int %} {{ startSeconds }}         '
-  - data:
-      validate: true
-      device_id: eba0e0d1c71ffe0db50d16907e42c5f4
-      program_key: '{{ states(''select.011010524691008792_programs'') }}'
-      options:
-      - key: BSH.Common.Option.StartInRelative
-        value: '{{ start_seconds }}'
-    action: home_connect_alt.start_program
+    - variables:
+        selected_time:
+          "{% if is_state('input_boolean.wash_today', 'on') %}\n  {{ states('sensor.elpris_lavest_4t_idag')
+          }}\n{% else %}\n  {{ states('sensor.elpris_lavest_4t') }}\n{% endif %}"
+        start_seconds:
+          "{% set tid = as_timestamp(selected_time) %} {% set startSeconds
+          = (tid - now().timestamp()) | int %} {{ startSeconds }}         "
+    - data:
+        validate: true
+        device_id: eba0e0d1c71ffe0db50d16907e42c5f4
+        program_key: "{{ states('select.011010524691008792_programs') }}"
+        options:
+          - key: BSH.Common.Option.StartInRelative
+            value: "{{ start_seconds }}"
+      action: home_connect_alt.start_program
 vaskemaskinestartscript:
   alias: VaskemaskineStartScript
   sequence:
-  - action: home_connect_alt.select_program
-    metadata: {}
-    data:
-      validate: true
-      device_id: 5c6a73b87eb6cb1c23a6838140d06a65
-      program_key: '{{ states(''select.484090540289002643_programs'') }}'
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ states(''select.484090540289002643_laundrycare_washer_option_temperature'')
-          != ''unavailable'' }}
+    - action: home_connect_alt.select_program
+      metadata: {}
+      data:
+        validate: true
+        device_id: 5c6a73b87eb6cb1c23a6838140d06a65
+        program_key: "{{ states('select.484090540289002643_programs') }}"
+    - choose:
+        - conditions:
+            - condition: template
+              value_template:
+                "{{ states('select.484090540289002643_laundrycare_washer_option_temperature')
+                != 'unavailable' }}
 
-          '
-      sequence:
-      - action: home_connect_alt.set_program_option
-        data:
-          device_id: 5c6a73b87eb6cb1c23a6838140d06a65
-          key: LaundryCare.Washer.Option.Temperature
-          value: '{{ states(''select.484090540289002643_laundrycare_washer_option_temperature'')
-            }}
+                "
+          sequence:
+            - action: home_connect_alt.set_program_option
+              data:
+                device_id: 5c6a73b87eb6cb1c23a6838140d06a65
+                key: LaundryCare.Washer.Option.Temperature
+                value:
+                  "{{ states('select.484090540289002643_laundrycare_washer_option_temperature')
+                  }}
 
-            '
-  - action: home_connect_alt.set_program_option
-    metadata: {}
-    data:
-      device_id: 5c6a73b87eb6cb1c23a6838140d06a65
-      key: LaundryCare.Washer.Option.SpinSpeed
-      value: '{{ states(''select.484090540289002643_laundrycare_washer_option_spinspeed'')
-        }}'
-  - action: home_connect_alt.set_program_option
-    metadata: {}
-    data:
-      device_id: 5c6a73b87eb6cb1c23a6838140d06a65
-      key: LaundryCare.Washer.Option.IDos1Active
-      value: '{{ true if states(''binary_sensor.484090540289002643_laundrycare_washer_option_idos1active'')
-        == ''on'' else false }}'
-  - action: home_connect_alt.set_program_option
-    metadata: {}
-    data:
-      device_id: 5c6a73b87eb6cb1c23a6838140d06a65
-      key: LaundryCare.Washer.Option.IDos2Active
-      value: '{{ true if states(''binary_sensor.484090540289002643_laundrycare_washer_option_idos2active'')
-        == ''on'' else false }}'
-  - variables:
-      finish_in_relative: '{{ states(''sensor.finish_in_relative'') | int }}'
-  - action: home_connect_alt.start_program
-    metadata: {}
-    data:
-      validate: true
-      options:
-      - key: BSH.Common.Option.FinishInRelative
-        value: '{{ finish_in_relative }}'
-      device_id: 5c6a73b87eb6cb1c23a6838140d06a65
-  description: ''
+                  "
+    - action: home_connect_alt.set_program_option
+      metadata: {}
+      data:
+        device_id: 5c6a73b87eb6cb1c23a6838140d06a65
+        key: LaundryCare.Washer.Option.SpinSpeed
+        value:
+          "{{ states('select.484090540289002643_laundrycare_washer_option_spinspeed')
+          }}"
+    - action: home_connect_alt.set_program_option
+      metadata: {}
+      data:
+        device_id: 5c6a73b87eb6cb1c23a6838140d06a65
+        key: LaundryCare.Washer.Option.IDos1Active
+        value:
+          "{{ true if states('binary_sensor.484090540289002643_laundrycare_washer_option_idos1active')
+          == 'on' else false }}"
+    - action: home_connect_alt.set_program_option
+      metadata: {}
+      data:
+        device_id: 5c6a73b87eb6cb1c23a6838140d06a65
+        key: LaundryCare.Washer.Option.IDos2Active
+        value:
+          "{{ true if states('binary_sensor.484090540289002643_laundrycare_washer_option_idos2active')
+          == 'on' else false }}"
+    - variables:
+        finish_in_relative: "{{ states('sensor.finish_in_relative') | int }}"
+    - action: home_connect_alt.start_program
+      metadata: {}
+      data:
+        validate: true
+        options:
+          - key: BSH.Common.Option.FinishInRelative
+            value: "{{ finish_in_relative }}"
+        device_id: 5c6a73b87eb6cb1c23a6838140d06a65
+  description: ""
   icon: mdi:washing-machine
 skoda_start_afriming:
   sequence:
-  - action: switch.turn_on
-    metadata: {}
-    data: {}
-    target:
-      entity_id: switch.skoda_enyaq_window_heating
+    # The Public API has no window heating command; start the climate instead.
+    - action: climate.turn_on
+      metadata: {}
+      data: {}
+      target:
+        entity_id: climate.enyaq_air_conditioning
   alias: skoda_start_afriming
-  description: ''
+  description: ""
 skoda_stop_afriming:
   sequence:
-  - action: switch.turn_off
-    metadata: {}
-    data: {}
-    target:
-      entity_id: switch.skoda_enyaq_window_heating
+    - action: climate.turn_off
+      metadata: {}
+      data: {}
+      target:
+        entity_id: climate.enyaq_air_conditioning
   alias: skoda_stop_afriming
-  description: ''
+  description: ""
 monta_start_lader:
   sequence:
-  - action: switch.turn_on
-    metadata: {}
-    data: {}
-    target:
-      entity_id: switch.monta_thomas_ladestander_start_stop
+    - action: switch.turn_on
+      metadata: {}
+      data: {}
+      target:
+        entity_id: switch.monta_thomas_ladestander_start_stop
   alias: monta_start_lader
-  description: ''
+  description: ""
 monta_stop_lader:
   sequence:
-  - action: switch.turn_off
-    metadata: {}
-    data: {}
-    target:
-      entity_id: switch.monta_thomas_ladestander_start_stop
+    - action: switch.turn_off
+      metadata: {}
+      data: {}
+      target:
+        entity_id: switch.monta_thomas_ladestander_start_stop
   alias: monta_stop_lader
-  description: ''
+  description: ""
 change_theme:
   sequence:
-  - action: frontend.set_theme
-    metadata: {}
-    data:
-      name: '{{ states(''input_select.theme_selector'') }}'
-  - action: input_select.select_next
-    target:
-      entity_id: input_select.theme_selector
-    data:
-      cycle: true
+    - action: frontend.set_theme
+      metadata: {}
+      data:
+        name: "{{ states('input_select.theme_selector') }}"
+    - action: input_select.select_next
+      target:
+        entity_id: input_select.theme_selector
+      data:
+        cycle: true
   alias: Change Theme
-  description: ''
+  description: ""
 l50_ultra_toggle_room_selection:
   alias: L50 Ultra – Toggle room selection
   mode: queued
@@ -757,428 +315,112 @@ l50_ultra_toggle_room_selection:
           max: 99
           mode: box
   sequence:
-  - variables:
-      rid: '{{ room_id | int }}'
-      text: '{{ states(''input_text.l50_ultra_selected_segments'') | string }}'
-      list_str: '{{ text | regex_findall(''[0-9]+'') | list }}'
-      list_int: '{{ list_str | map(''int'') | list }}'
-      has: '{{ rid in list_int }}'
-      new_list_str: '{% if has %} {{ list_str | reject(''equalto'', rid|string) |
-        list }} {% else %} {{ (list_str + [rid|string]) | unique | list }} {% endif
-        %}
+    - variables:
+        rid: "{{ room_id | int }}"
+        text: "{{ states('input_text.l50_ultra_selected_segments') | string }}"
+        list_str: "{{ text | regex_findall('[0-9]+') | list }}"
+        list_int: "{{ list_str | map('int') | list }}"
+        has: "{{ rid in list_int }}"
+        new_list_str:
+          "{% if has %} {{ list_str | reject('equalto', rid|string) |
+          list }} {% else %} {{ (list_str + [rid|string]) | unique | list }} {% endif
+          %}
 
-        '
-      joined: '{{ new_list_str | join('','') }}'
-  - target:
-      entity_id: input_text.l50_ultra_selected_segments
-    data:
-      value: '{{ joined }}'
-    action: input_text.set_value
+          "
+        joined: "{{ new_list_str | join(',') }}"
+    - target:
+        entity_id: input_text.l50_ultra_selected_segments
+      data:
+        value: "{{ joined }}"
+      action: input_text.set_value
 l50_ultra_clean_selected_rooms:
   alias: L50 Ultra – Clean selected rooms
   mode: single
   sequence:
-  - variables:
-      text: '{{ states(''input_text.l50_ultra_selected_segments'') | string }}'
-      segs: '{{ text | regex_findall(''[0-9]+'') | map(''int'') | list }}'
-  - choose:
-    - conditions: '{{ segs | count > 0 }}'
-      sequence:
-      - target:
-          entity_id: vacuum.l50_ultra
-        data:
-          segments: '{{ segs }}'
-        action: dreame_vacuum.vacuum_clean_segment
-    default:
-    - target:
-        entity_id: vacuum.l50_ultra
-      action: vacuum.start
-l50_ultra_global_reset_presets:
-  alias: L50 – Global reset presets
-  mode: parallel
+    - variables:
+        text: "{{ states('input_text.l50_ultra_selected_segments') | string }}"
+        segs: "{{ text\n   | regex_findall('[0-9]+')\n   | map('int')\n   | list }}"
+        suction:
+          "{{ states('input_number.l50_ultra_global_idx_suction') | int(0)
+          }}"
+        cleaning_mode:
+          "{{ states('input_number.l50_ultra_global_idx_mode') | int(0)
+          }}"
+        repeats:
+          "{{ (states('input_number.l50_ultra_global_idx_times') | int(0))
+          + 1 }}"
+        water_volume:
+          "{{ (states('input_number.l50_ultra_global_idx_mop') | int(0))
+          + 1 }}"
+        wetness:
+          "{% set levels = [1, 16, 32] %} {% set i = states('input_number.l50_ultra_global_idx_mop')
+          | int(0) %} {{ levels[i] }}"
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ segs | count > 0 }}"
+          sequence:
+            - if:
+                - condition: template
+                  value_template:
+                    "{{ states('switch.l50_ultra_customized_cleaning') ==
+                    'off' }}"
+              then:
+                - action: switch.turn_on
+                  target:
+                    entity_id: switch.l50_ultra_customized_cleaning
+                - delay:
+                    milliseconds: 1000
+            - variables:
+                suction_list: "{{ [suction] * (segs | count) }}"
+                water_list: "{{ [water_volume] * (segs | count) }}"
+                wetness_list: "{{ [wetness] * (segs | count) }}"
+                mode_list: "{{ [cleaning_mode] * (segs | count) }}"
+                repeats_list: "{{ [repeats] * (segs | count) }}"
+            - action: dreame_vacuum.vacuum_set_custom_cleaning
+              target:
+                entity_id: vacuum.l50_ultra
+              data:
+                segment_id: "{{ segs }}"
+                suction_level: "{{ suction_list }}"
+                water_volume: "{{ water_list }}"
+                wetness_level: "{{ wetness_list }}"
+                cleaning_mode: "{{ mode_list }}"
+                repeats: "{{ repeats_list }}"
+            - delay:
+                milliseconds: 1000
+            - action: dreame_vacuum.vacuum_clean_segment
+              target:
+                entity_id: vacuum.l50_ultra
+              data:
+                segments: "{{ segs }}"
+      default:
+        - action: vacuum.start
+          target:
+            entity_id: vacuum.l50_ultra
+system_genstart_zigbee_koordinator:
+  alias: System – Genstart Zigbee
+  icon: mdi:zigbee
+  mode: single
   sequence:
-  - variables:
-      suction: '{{ suction | default(''quiet'') }}'
-      moist: '{{ moist | default(''slightly_dry'') }}'
-      times: '{{ times | default(''1'') }}'
-      mode: '{{ mode | default(''sweeping_and_mopping'') }}'
-      selected_text: '{{ states(''input_text.l50_ultra_selected_segments'') | string
-        }}'
-      ids: '{{ selected_text | regex_findall(''[0-9]+'') }}'
-      opts_suction: '{{ state_attr(''select.l50_ultra_room_1_suction_level'',''options'')
-        or [] }}
-
-        '
-      opts_moist: '{{ state_attr(''select.l50_ultra_room_1_mop_pad_humidity'',''options'')
-        or [] }}
-
-        '
-      opts_times: '{{ state_attr(''select.l50_ultra_room_1_cleaning_times'',''options'')
-        or [] }}
-
-        '
-      opts_mode: '{{ state_attr(''select.l50_ultra_room_1_cleaning_mode'',''options'')
-        or [] }}
-
-        '
-      chosen_suction: "{% set opts = opts_suction %} {% set pref = (suction|string)
-        %} {% set found = (opts | select('search', '(?i)^' ~ pref ~ '$') | list) %}
-        {% if found|length > 0 %}\n  {{ found[0] }}\n{% else %}\n  {% set syn = (opts
-        | select('search', '(?i)^(auto|balanced|medium|standard|quiet)$') | list)
-        %}\n  {{ syn[0] if syn|length>0 else (opts[0] if (opts|length)>0 else '')
-        }}\n{% endif %}\n"
-      chosen_moist: "{% set opts = opts_moist %} {% set pref = (moist|string) %} {%
-        set exact = (opts | select('search', '(?i)^' ~ pref ~ '$') | list) %} {% if
-        exact|length > 0 %}\n  {{ exact[0] }}\n{% else %}\n  {% set mid = (opts |
-        select('search', '(?i)^moist$') | list) %}\n  {% if mid|length > 0 %}\n    {{
-        mid[0] }}\n  {% else %}\n    {% set known = (opts | select('search', '(?i)^(slightly[_
-        ]?dry|moist|wet)$') | list) %}\n    {{ known[0] if known|length>0 else (opts[0]
-        if (opts|length)>0 else '') }}\n  {% endif %}\n{% endif %}\n"
-      chosen_times: "{% set opts = opts_times %} {% set pref = (times|string) %} {%
-        set found = (opts\n  | select('search', '(?i)^(' ~ pref ~ '|1x|1 time|1 times|once)$')\n
-        \ | list) %}\n{{ found[0] if found|length>0 else (opts[0] if (opts|length)>0
-        else '') }}\n"
-      chosen_mode: '{% set opts = opts_mode %} {% set pref = (mode|string) %} {% set
-        found = (opts | select(''search'', ''(?i)^'' ~ pref ~ ''$'') | list) %} {{
-        found[0] if found|length>0 else (opts[0] if (opts|length)>0 else '''') }}
-
-        '
-      idx_suction: "{% set ns = namespace(i=0) %}\n{% for o in opts_suction %}\n  {%
-        if o == chosen_suction %}{% set ns.i = loop.index0 %}{% endif %}\n{% endfor
-        %}\n{{ ns.i }}\n"
-      idx_moist: "{% set ns = namespace(i=0) %}\n{% for o in opts_moist %}\n  {% if
-        o == chosen_moist %}{% set ns.i = loop.index0 %}{% endif %}\n{% endfor %}\n{{
-        ns.i }}\n"
-      idx_times: "{% set ns = namespace(i=0) %}\n{% for o in opts_times %}\n  {% if
-        o == chosen_times %}{% set ns.i = loop.index0 %}{% endif %}\n{% endfor %}\n{{
-        ns.i }}\n"
-  - target:
-      entity_id: input_number.l50_ultra_global_idx_suction
-    data:
-      value: '{{ idx_suction }}'
-    action: input_number.set_value
-  - target:
-      entity_id: input_number.l50_ultra_global_idx_mop
-    data:
-      value: '{{ idx_moist }}'
-    action: input_number.set_value
-  - target:
-      entity_id: input_number.l50_ultra_global_idx_times
-    data:
-      value: '{{ idx_times }}'
-    action: input_number.set_value
-  - repeat:
-      for_each: '{{ ids }}'
-      sequence:
-      - choose:
-        - conditions: '{{ repeat.item == ''1'' and chosen_suction|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_1_suction_level
-            data:
-              option: '{{ chosen_suction }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''2'' and chosen_suction|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_2_suction_level
-            data:
-              option: '{{ chosen_suction }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''3'' and chosen_suction|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_3_suction_level
-            data:
-              option: '{{ chosen_suction }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''4'' and chosen_suction|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_4_suction_level
-            data:
-              option: '{{ chosen_suction }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''5'' and chosen_suction|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_5_suction_level
-            data:
-              option: '{{ chosen_suction }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''6'' and chosen_suction|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_6_suction_level
-            data:
-              option: '{{ chosen_suction }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''7'' and chosen_suction|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_7_suction_level
-            data:
-              option: '{{ chosen_suction }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''8'' and chosen_suction|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_8_suction_level
-            data:
-              option: '{{ chosen_suction }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''9'' and chosen_suction|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_9_suction_level
-            data:
-              option: '{{ chosen_suction }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''10'' and chosen_suction|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_10_suction_level
-            data:
-              option: '{{ chosen_suction }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''11'' and chosen_suction|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_11_suction_level
-            data:
-              option: '{{ chosen_suction }}'
-            action: select.select_option
-      - choose:
-        - conditions: '{{ repeat.item == ''1'' and chosen_moist|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_1_mop_pad_humidity
-            data:
-              option: '{{ chosen_moist }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''2'' and chosen_moist|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_2_mop_pad_humidity
-            data:
-              option: '{{ chosen_moist }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''3'' and chosen_moist|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_3_mop_pad_humidity
-            data:
-              option: '{{ chosen_moist }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''4'' and chosen_moist|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_4_mop_pad_humidity
-            data:
-              option: '{{ chosen_moist }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''5'' and chosen_moist|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_5_mop_pad_humidity
-            data:
-              option: '{{ chosen_moist }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''6'' and chosen_moist|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_6_mop_pad_humidity
-            data:
-              option: '{{ chosen_moist }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''7'' and chosen_moist|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_7_mop_pad_humidity
-            data:
-              option: '{{ chosen_moist }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''8'' and chosen_moist|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_8_mop_pad_humidity
-            data:
-              option: '{{ chosen_moist }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''9'' and chosen_moist|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_9_mop_pad_humidity
-            data:
-              option: '{{ chosen_moist }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''10'' and chosen_moist|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_10_mop_pad_humidity
-            data:
-              option: '{{ chosen_moist }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''11'' and chosen_moist|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_11_mop_pad_humidity
-            data:
-              option: '{{ chosen_moist }}'
-            action: select.select_option
-      - choose:
-        - conditions: '{{ repeat.item == ''1'' and chosen_times|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_1_cleaning_times
-            data:
-              option: '{{ chosen_times }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''2'' and chosen_times|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_2_cleaning_times
-            data:
-              option: '{{ chosen_times }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''3'' and chosen_times|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_3_cleaning_times
-            data:
-              option: '{{ chosen_times }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''4'' and chosen_times|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_4_cleaning_times
-            data:
-              option: '{{ chosen_times }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''5'' and chosen_times|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_5_cleaning_times
-            data:
-              option: '{{ chosen_times }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''6'' and chosen_times|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_6_cleaning_times
-            data:
-              option: '{{ chosen_times }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''7'' and chosen_times|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_7_cleaning_times
-            data:
-              option: '{{ chosen_times }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''8'' and chosen_times|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_8_cleaning_times
-            data:
-              option: '{{ chosen_times }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''9'' and chosen_times|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_9_cleaning_times
-            data:
-              option: '{{ chosen_times }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''10'' and chosen_times|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_10_cleaning_times
-            data:
-              option: '{{ chosen_times }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''11'' and chosen_times|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_11_cleaning_times
-            data:
-              option: '{{ chosen_times }}'
-            action: select.select_option
-      - choose:
-        - conditions: '{{ repeat.item == ''1'' and chosen_mode|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_1_cleaning_mode
-            data:
-              option: '{{ chosen_mode }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''2'' and chosen_mode|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_2_cleaning_mode
-            data:
-              option: '{{ chosen_mode }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''3'' and chosen_mode|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_3_cleaning_mode
-            data:
-              option: '{{ chosen_mode }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''4'' and chosen_mode|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_4_cleaning_mode
-            data:
-              option: '{{ chosen_mode }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''5'' and chosen_mode|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_5_cleaning_mode
-            data:
-              option: '{{ chosen_mode }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''6'' and chosen_mode|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_6_cleaning_mode
-            data:
-              option: '{{ chosen_mode }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''7'' and chosen_mode|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_7_cleaning_mode
-            data:
-              option: '{{ chosen_mode }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''8'' and chosen_mode|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_8_cleaning_mode
-            data:
-              option: '{{ chosen_mode }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''9'' and chosen_mode|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_9_cleaning_mode
-            data:
-              option: '{{ chosen_mode }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''10'' and chosen_mode|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_10_cleaning_mode
-            data:
-              option: '{{ chosen_mode }}'
-            action: select.select_option
-        - conditions: '{{ repeat.item == ''11'' and chosen_mode|length>0 }}'
-          sequence:
-          - target:
-              entity_id: select.l50_ultra_room_11_cleaning_mode
-            data:
-              option: '{{ chosen_mode }}'
-            action: select.select_option
+    - action: hassio.addon_restart
+      data:
+        addon: 45df7312_zigbee2mqtt
+system_genstart_home_assistant:
+  alias: System – Genstart Home Assistant
+  icon: mdi:reload
+  mode: single
+  sequence:
+    - action: homeassistant.restart
+system_genstart_server:
+  alias: System – Genstart server
+  icon: mdi:power-cycle
+  mode: single
+  sequence:
+    - action: hassio.host_reboot
+system_luk_server:
+  alias: System – Luk server
+  icon: mdi:power
+  mode: single
+  sequence:
+    - action: hassio.host_shutdown

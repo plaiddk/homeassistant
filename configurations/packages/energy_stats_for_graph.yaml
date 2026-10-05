@@ -1,26 +1,19 @@
 pack_energy_stats_for_graph:
   sensor:
+    # 30 days of 15-minute prices = 2880 samples
     - platform: statistics
       name: Average energy price last 30d mean
-      entity_id: sensor.energi_data_service_west_of_the_great_belt
+      entity_id: sensor.energi_data_service
       state_characteristic: mean
-      sampling_size: 760
+      sampling_size: 2880
       max_age:
         days: 30
 
     - platform: statistics
       name: Energy price last 30d (std)
-      entity_id: sensor.energi_data_service_west_of_the_great_belt
+      entity_id: sensor.energi_data_service
       state_characteristic: standard_deviation
-      sampling_size: 512
-      max_age:
-        days: 30
-
-    - platform: statistics
-      name: Energy price last 30d (mean)
-      entity_id: sensor.energi_data_service_west_of_the_great_belt
-      state_characteristic: mean
-      sampling_size: 512
+      sampling_size: 2880
       max_age:
         days: 30
 

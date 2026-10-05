@@ -1,0 +1,12 @@
+{
+  "domain": "skoda_api",
+  "name": "Škoda Public API",
+  "codeowners": [],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://public.api.connect.skoda-auto.cz/docs",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "requirements": [],
+  "version": "0.2.0"
+}

@@ -1,0 +1,123 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Škoda Public API",
+        "description": "Opret en API-nøgle i MyŠkoda-appen og vælg den bil, den skal gælde for.",
+        "data": {
+          "api_key": "API-nøgle",
+          "vin": "Stelnummer (VIN)"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Forny API-nøgle",
+        "description": "API-nøglen til {vin} er udløbet eller tilbagekaldt. Opret eller opdater en nøgle i MyŠkoda-appen og indsæt den her.",
+        "data": {
+          "api_key": "API-nøgle"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "API-nøglen er ugyldig, udløbet eller gælder ikke for denne bil.",
+      "vehicle_not_found": "Ingen bil fundet med dette stelnummer.",
+      "rate_limited": "Grænsen for antal kald er nået. Prøv igen senere.",
+      "cannot_connect": "Kunne ikke forbinde til Škoda API."
+    },
+    "abort": {
+      "already_configured": "Denne bil er allerede konfigureret.",
+      "reauth_successful": "API-nøglen er opdateret."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opdatering",
+        "description": "API'et tillader ca. 20 kald i timen pr. bil, inklusive kommandoer.",
+        "data": {
+          "scan_interval_minutes": "Opdateringsinterval (minutter)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "locked": { "name": "Lås" },
+      "doors": { "name": "Døre" },
+      "windows": { "name": "Vinduer" },
+      "lights": { "name": "Lys" },
+      "trunk": { "name": "Bagagerum" },
+      "bonnet": { "name": "Motorhjelm" },
+      "sunroof": { "name": "Soltag" },
+      "charger_connected": { "name": "Ladekabel" },
+      "charger_locked": { "name": "Ladestik lås" },
+      "charging": { "name": "Oplader" },
+      "in_saved_location": { "name": "På gemt ladested" },
+      "moving": { "name": "Kører" },
+      "window_heating": { "name": "Rudeopvarmning" },
+      "window_heating_with_ac": { "name": "Rudeopvarmning med klima" },
+      "ac_at_unlock": { "name": "Klima ved oplåsning" },
+      "battery_care_mode": { "name": "Batteribeskyttelse" },
+      "reduced_charge_current": { "name": "Reduceret strømstyrke" },
+      "auto_unlock_plug": { "name": "Lås stik op efter opladning" }
+    },
+    "climate": {
+      "air_conditioning": { "name": "Klimaanlæg" }
+    },
+    "device_tracker": {
+      "location": { "name": "Position" }
+    },
+    "number": {
+      "charge_limit": { "name": "Ladegrænse" }
+    },
+    "select": {
+      "charge_mode": { "name": "Ladetilstand" }
+    },
+    "sensor": {
+      "battery_level": { "name": "Batteriprocent" },
+      "electric_range": { "name": "Rækkevidde" },
+      "charging_state": {
+        "name": "Ladestatus",
+        "state": {
+          "connect_cable": "Tilslut kabel",
+          "charging": "Oplader",
+          "conserving": "Vedligeholder",
+          "ready_for_charging": "Klar til opladning",
+          "discharging": "Aflader",
+          "charging_interrupted": "Opladning afbrudt"
+        }
+      },
+      "charge_type": {
+        "name": "Ladetype",
+        "state": { "ac": "AC", "dc": "DC", "off": "Fra" }
+      },
+      "charging_power": { "name": "Ladeeffekt" },
+      "charging_rate": { "name": "Ladehastighed" },
+      "remaining_charging_time": { "name": "Resterende ladetid" },
+      "fully_charged_at": { "name": "Fuldt opladet" },
+      "target_battery_level": { "name": "Ladegrænse i procent" },
+      "mileage": { "name": "Kilometerstand" },
+      "total_range": { "name": "Samlet rækkevidde" },
+      "fuel_level": { "name": "Brændstofniveau" },
+      "air_conditioning_state": {
+        "name": "Klimaanlæg status",
+        "state": {
+          "off": "Slukket",
+          "cooling": "Køler",
+          "heating": "Varmer",
+          "heating_auxiliary": "Varmer (ekstra varmer)",
+          "ventilation": "Ventilerer",
+          "completed": "Færdig"
+        }
+      },
+      "target_temperature_reached_at": { "name": "Måltemperatur nået" },
+      "parking_address": { "name": "Parkeringsadresse" },
+      "last_updated": { "name": "Sidst opdateret af bilen" },
+      "api_key_expires": { "name": "API-nøgle udløber" },
+      "rate_limit_remaining": { "name": "API-kald tilbage" }
+    },
+    "switch": {
+      "charging_switch": { "name": "Opladning" },
+      "active_ventilation": { "name": "Aktiv ventilation" }
+    }
+  }
+}

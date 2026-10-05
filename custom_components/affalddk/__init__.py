@@ -26,8 +26,11 @@ from .const import (
     CONF_ADDRESS_ID,
     CONF_MUNICIPALITY,
     CONF_DYNAMIC_NEXT_EVENT_ICON,
+    CONF_UNIT_LANGUAGE,
+    DEFAULT_UNIT_LANGUAGE,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
+    TRANSLATIONS,
 )
 
 PLATFORMS = [Platform.SENSOR, Platform.CALENDAR]
@@ -43,6 +46,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
         await coordinator.async_config_entry_first_refresh()
     else:
         await coordinator.async_refresh()
+
+    language = config_entry.options.get(CONF_UNIT_LANGUAGE, DEFAULT_UNIT_LANGUAGE)
+    coordinator.translations = TRANSLATIONS[language]
 
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][config_entry.entry_id] = coordinator

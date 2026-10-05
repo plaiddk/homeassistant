@@ -1,0 +1,123 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Škoda Public API",
+        "description": "Create an API key in the MyŠkoda app and select the vehicle it should cover.",
+        "data": {
+          "api_key": "API key",
+          "vin": "VIN"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Renew API key",
+        "description": "The API key for {vin} has expired or was revoked. Create or update a key in the MyŠkoda app and paste it here.",
+        "data": {
+          "api_key": "API key"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "API key is invalid, expired or does not cover this vehicle.",
+      "vehicle_not_found": "No vehicle found for this VIN.",
+      "rate_limited": "Rate limit reached. Try again later.",
+      "cannot_connect": "Failed to connect to the Škoda API."
+    },
+    "abort": {
+      "already_configured": "This vehicle is already configured.",
+      "reauth_successful": "API key updated."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Polling",
+        "description": "The API allows about 20 requests per hour per vehicle, including commands.",
+        "data": {
+          "scan_interval_minutes": "Update interval (minutes)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "locked": { "name": "Lock" },
+      "doors": { "name": "Doors" },
+      "windows": { "name": "Windows" },
+      "lights": { "name": "Lights" },
+      "trunk": { "name": "Trunk" },
+      "bonnet": { "name": "Bonnet" },
+      "sunroof": { "name": "Sunroof" },
+      "charger_connected": { "name": "Charger connected" },
+      "charger_locked": { "name": "Charger lock" },
+      "charging": { "name": "Charging" },
+      "in_saved_location": { "name": "In saved charging location" },
+      "moving": { "name": "Moving" },
+      "window_heating": { "name": "Window heating" },
+      "window_heating_with_ac": { "name": "Window heating with AC" },
+      "ac_at_unlock": { "name": "AC when unlocked" },
+      "battery_care_mode": { "name": "Battery care mode" },
+      "reduced_charge_current": { "name": "Reduced charging current" },
+      "auto_unlock_plug": { "name": "Unlock plug when charged" }
+    },
+    "climate": {
+      "air_conditioning": { "name": "Air conditioning" }
+    },
+    "device_tracker": {
+      "location": { "name": "Location" }
+    },
+    "number": {
+      "charge_limit": { "name": "Charge limit" }
+    },
+    "select": {
+      "charge_mode": { "name": "Charge mode" }
+    },
+    "sensor": {
+      "battery_level": { "name": "Battery level" },
+      "electric_range": { "name": "Electric range" },
+      "charging_state": {
+        "name": "Charging state",
+        "state": {
+          "connect_cable": "Connect cable",
+          "charging": "Charging",
+          "conserving": "Conserving",
+          "ready_for_charging": "Ready for charging",
+          "discharging": "Discharging",
+          "charging_interrupted": "Charging interrupted"
+        }
+      },
+      "charge_type": {
+        "name": "Charge type",
+        "state": { "ac": "AC", "dc": "DC", "off": "Off" }
+      },
+      "charging_power": { "name": "Charging power" },
+      "charging_rate": { "name": "Charging rate" },
+      "remaining_charging_time": { "name": "Remaining charging time" },
+      "fully_charged_at": { "name": "Fully charged at" },
+      "target_battery_level": { "name": "Target battery level" },
+      "mileage": { "name": "Mileage" },
+      "total_range": { "name": "Total range" },
+      "fuel_level": { "name": "Fuel level" },
+      "air_conditioning_state": {
+        "name": "Air conditioning state",
+        "state": {
+          "off": "Off",
+          "cooling": "Cooling",
+          "heating": "Heating",
+          "heating_auxiliary": "Auxiliary heating",
+          "ventilation": "Ventilation",
+          "completed": "Completed"
+        }
+      },
+      "target_temperature_reached_at": { "name": "Target temperature reached at" },
+      "parking_address": { "name": "Parking address" },
+      "last_updated": { "name": "Last updated by car" },
+      "api_key_expires": { "name": "API key expires" },
+      "rate_limit_remaining": { "name": "API requests remaining" }
+    },
+    "switch": {
+      "charging_switch": { "name": "Charging" },
+      "active_ventilation": { "name": "Active ventilation" }
+    }
+  }
+}

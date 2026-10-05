@@ -1,11 +1,11 @@
 - number:
     - name: "Car Climate Temperature"
       unique_id: car_climate_temperature
-      state: "{{ state_attr('climate.skoda_enyaq_klimaanlaeg', 'temperature') | float(22.5) }}"
+      state: "{{ state_attr('climate.enyaq_air_conditioning', 'temperature') | float(22.5) }}"
       set_value:
         - action: climate.set_temperature
           target:
-            entity_id: climate.skoda_enyaq_klimaanlaeg
+            entity_id: climate.enyaq_air_conditioning
           data:
             temperature: "{{ value }}"
       min: 15.5

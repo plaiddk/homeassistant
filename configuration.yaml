@@ -1,60 +1,54 @@
 # Loads default set of integrations. Do not remove.
 default_config:
-  #bluetooth:
-######################################
 
 homeassistant:
   internal_url: http://192.168.1.159:8123
   external_url: https://hacs.kaffeogkage.cc
-
-  #customize: !include customize.yaml
   packages: !include_dir_merge_named configurations/packages/
-  #allowlist_external_dirs:
-  #- /config/www/rest
-  #- /config
 
-######################################
-# Frontend setup
+#───────────────────────────────────────────────────────────────────────────────
+# Frontend
+#───────────────────────────────────────────────────────────────────────────────
 frontend:
   themes: !include_dir_merge_named themes
 
-######################################
-# Default includes
+#───────────────────────────────────────────────────────────────────────────────
+# UI-managed files
+#───────────────────────────────────────────────────────────────────────────────
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
 
-######################################
-# Integrations without configuration
+#───────────────────────────────────────────────────────────────────────────────
+# Integrations / split config
+#───────────────────────────────────────────────────────────────────────────────
 wake_on_lan:
-
-######################################
-
-# Configurations
-binary_sensor: !include_dir_merge_list configurations/binary_sensor
-#conversation: !include configurations/conversation.yaml
-#fuelprices_dk: !include configurations/fuelprices.yaml
-#group: !include_dir_merge_named configurations/groups
-#intent_script: !include_dir_merge_named configurations/intent_script
-#media_player: !include_dir_merge_list configurations/media_player
-#powercalc: !include configurations/powercalc.yaml
-#pyscript: !include configurations/pyscript.yaml
 python_script:
-#recorder: !include configurations/recorder.yaml
-#rest: !include_dir_merge_list configurations/rest
-#rest_command: !include configurations/rest_command.yaml
+binary_sensor: !include_dir_merge_list configurations/binary_sensor
 sensor: !include_dir_merge_list configurations/sensor
 template: !include_dir_merge_list configurations/template
-#shell_command: !include configurations/shell_commands.yaml
-#switch: !include_dir_merge_list configurations/switch
 
-#tts: !include configurations/tts.yaml
-#zha: !include configurations/zha.yaml
+#───────────────────────────────────────────────────────────────────────────────
+# Recorder – keep high-frequency / no-value entities out of the database
+#───────────────────────────────────────────────────────────────────────────────
+recorder:
+  purge_keep_days: 10
+  exclude:
+    event_types:
+      - call_service
+    entities:
+      - automation.cctv_loop
+      - input_text.random_video_filename
+      - sensor.time
+      - sensor.date_time
+      - sensor.system_monitor_memory_free
+      - sensor.system_monitor_memory_use
+    entity_globs:
+      - sensor.santa_*
 
-logger:
-  logs:
-    homeassistant.components.rest: debug
-
+#───────────────────────────────────────────────────────────────────────────────
+# Helpers
+#───────────────────────────────────────────────────────────────────────────────
 input_text:
   huskeliste_herman:
     name: Huskeliste Herman
@@ -101,7 +95,13 @@ input_number:
     max: 30
     step: 0.5
     mode: slider
-
+  l50_ultra_global_idx_mode:
+    name: L50 Ultra Global Idx Mode
+    min: 0
+    max: 2
+    step: 1
+    mode: box
+    initial: 0
   l50_ultra_global_idx_suction:
     name: L50 Global Suction Index
     min: 0
@@ -154,25 +154,17 @@ input_select:
     initial: Fluent Blue
 
 #───────────────────────────────────────────────────────────────────────────────
-# Pollen prognose og seneste pollental
+# REST sensors
 #───────────────────────────────────────────────────────────────────────────────
-pollen_dk:
-  regions: # Possible values: øst, vest
-    - vest
-  pollen_types: # Possible values: alternaria, birk, bynke, cladosporium, el, elm, græs, hassel
-    - alternaria
-    - birk
-    - bynke
-    - cladosporium
-    - el
-    - elm
-    - græs
-    - hassel
-#───────────────────────────────────────────────────────────────────────────────
-# Eloverblik
-#───────────────────────────────────────────────────────────────────────────────
-# Santa Tracker ADD THIS TO YOUR CONFIG
+rest_command:
+  runplanner_routes:
+    url: http://192.168.1.211:8089/api/routes
+    method: GET
+    headers:
+      accept: application/json
+
 rest:
+  # Santa Tracker
   - resource: "https://santa-api.appspot.com/info?client=web&language=en&fingerprint=&routeOffset=0&streamOffset=0"
     scan_interval: 60
     sensor:

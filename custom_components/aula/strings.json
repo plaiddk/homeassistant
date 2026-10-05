@@ -58,6 +58,14 @@
         },
         "description": "",
         "title": "Options"
+      },
+      "schoolschedule_display": {
+        "data": {
+          "teacher_name_display": "How should teacher names be displayed?",
+          "schoolschedule_emoji": "Show emoji icons on schoolschedule events?"
+        },
+        "description": "",
+        "title": "Schoolschedule Display"
       }
     }
   },
@@ -77,10 +85,19 @@
       "options": {
         "data": {
           "schoolschedule": "Add school schedules as calendar entities?",
-          "ugeplan": "Add ugeplaner as sensor attributes?"
+          "ugeplan": "Add ugeplaner as sensor attributes?",
+          "mu_opgaver": "Enable assignments from Min Uddannelse"
         },
         "description": "",
         "title": "Options"
+      },
+      "schoolschedule_display": {
+        "data": {
+          "teacher_name_display": "How should teacher names be displayed?",
+          "schoolschedule_emoji": "Show emoji icons on schoolschedule events?"
+        },
+        "description": "",
+        "title": "Schoolschedule Display"
       }
     }
   }

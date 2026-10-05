@@ -1,29 +1,39 @@
-# Ignore the database
+# Database
 home-assistant_v2.db
 home-assistant_v2.db-shm
 home-assistant_v2.db-wal
 
-# Ignore backup snapshots
+# Backups
 *.tar
 *.tar.gz
+backups/
 
-# Ignore log files
+# Logs
 *.log
-skoleskema.json
+*.log.*
 *.lock
 
+# Runtime caches / generated data
+.cache/
+tts/
+image/
+deps/
+__pycache__/
+zigbee2mqtt/log/
+zigbee2mqtt/database.db*
+zigbee2mqtt/state.json
+skoleskema.json
 
-# Ignore media
+# Media
 /media/*
 www/*.mp4
-www/*.jpghome-assistant_v2.db
-home-assistant_v2.db-shm
-home-assistant_v2.db-wal
-
+www/*.jpg
 
 # Sensitive files & folders
 secrets.yaml
 .storage/
 .cloud/
+nest/
+zigbee2mqtt/coordinator_backup.json
 
 custom_components/nordnet_multi/

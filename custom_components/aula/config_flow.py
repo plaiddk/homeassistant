@@ -5,19 +5,22 @@ from typing import Any, Dict, Optional
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_PASSWORD
+from homeassistant.core import callback
 from homeassistant.data_entry_flow import AbortFlow
+from homeassistant.helpers import network
 import homeassistant.helpers.config_validation as cv
-from homeassistant.helpers.entity_registry import (
-    async_entries_for_config_entry,
-    async_get,
-)
 import voluptuous as vol
 
 from .const import (
     CONF_SCHOOLSCHEDULE,
     CONF_UGEPLAN,
     CONF_MU_OPGAVER,
-    CONF_TEACHER_FULL_NAME,
+    CONF_TEACHER_NAME_DISPLAY,
+    TEACHER_NAME_INITIALS,
+    TEACHER_NAME_FULL,
+    TEACHER_NAME_FIRST_NAME_INITIALS,
+    resolve_teacher_name_display,
+    CONF_SCHOOLSCHEDULE_EMOJI,
     CONF_MITID_USERNAME,
     CONF_MITID_PASSWORD,
     CONF_MITID_TOKEN,
@@ -44,7 +47,6 @@ USER_SCHEMA = vol.Schema(
         vol.Optional(CONF_SCHOOLSCHEDULE, default=True): cv.boolean,
         vol.Optional(CONF_UGEPLAN, default=True): cv.boolean,
         vol.Optional(CONF_MU_OPGAVER, default=True): cv.boolean,
-        vol.Optional(CONF_TEACHER_FULL_NAME, default=False): cv.boolean,
     }
 )
 
@@ -52,6 +54,21 @@ TOKEN_CREDENTIALS_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_MITID_PASSWORD): cv.string,
         vol.Required(CONF_MITID_TOKEN): cv.string,
+    }
+)
+
+TEACHER_NAME_DISPLAY_OPTIONS = {
+    TEACHER_NAME_INITIALS: "Teacher initials",
+    TEACHER_NAME_FULL: "Teacher full name",
+    TEACHER_NAME_FIRST_NAME_INITIALS: "Teacher first name (initials)",
+}
+
+SCHOOLSCHEDULE_DISPLAY_SCHEMA = vol.Schema(
+    {
+        vol.Optional(
+            CONF_TEACHER_NAME_DISPLAY, default=TEACHER_NAME_INITIALS
+        ): vol.In(TEACHER_NAME_DISPLAY_OPTIONS),
+        vol.Optional(CONF_SCHOOLSCHEDULE_EMOJI, default=False): cv.boolean,
     }
 )
 
@@ -73,6 +90,12 @@ class AulaCustomConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._auth_error = None
         self._reauth_entry = None
 
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry):
+        """Get the options flow for this handler."""
+        return OptionsFlowHandler()
+
     async def async_step_user(self, user_input: Optional[Dict[str, Any]] = None):
         """Handle initial user input."""
         errors: Dict[str, str] = {}
@@ -86,15 +109,35 @@ class AulaCustomConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 CONF_UGEPLAN: user_input.get(CONF_UGEPLAN, True),
                 CONF_MU_OPGAVER: user_input.get(CONF_MU_OPGAVER, True),
                 CONF_MITID_USE_TOKEN: use_token,
-                CONF_TEACHER_FULL_NAME: user_input.get(CONF_TEACHER_FULL_NAME, False),
             }
 
+            if self._feature_flags[CONF_SCHOOLSCHEDULE]:
+                return await self.async_step_schoolschedule_display()
             if use_token:
                 return await self.async_step_token_credentials()
             return await self.async_step_authenticate()
 
         return self.async_show_form(
             step_id="user", data_schema=USER_SCHEMA, errors=errors
+        )
+
+    async def async_step_schoolschedule_display(
+        self, user_input: Optional[Dict[str, Any]] = None
+    ):
+        """Ask how the schoolschedule should look (only shown when schoolschedule is enabled)."""
+        if user_input is not None:
+            self._feature_flags[CONF_TEACHER_NAME_DISPLAY] = user_input[
+                CONF_TEACHER_NAME_DISPLAY
+            ]
+            self._feature_flags[CONF_SCHOOLSCHEDULE_EMOJI] = user_input[
+                CONF_SCHOOLSCHEDULE_EMOJI
+            ]
+            if self._auth_method == AUTH_METHOD_TOKEN:
+                return await self.async_step_token_credentials()
+            return await self.async_step_authenticate()
+
+        return self.async_show_form(
+            step_id="schoolschedule_display", data_schema=SCHOOLSCHEDULE_DISPLAY_SCHEMA
         )
 
     async def async_step_token_credentials(self, user_input: Optional[Dict[str, Any]] = None):
@@ -185,10 +228,17 @@ class AulaCustomConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             # Start authentication task
             self.hass.async_create_task(self._authenticate_async(session_data))
+            try:
+                base_url = network.get_url(
+                    self.hass,
+                    require_current_request=True,
+                )
+            except network.NoURLAvailableError:
+                base_url = network.get_url(self.hass)
 
             return self.async_external_step(
                 step_id="authenticate",
-                url=f"/api/aula/auth/{self.flow_id}",
+                url=f"{base_url.rstrip('/')}/api/aula/auth/{self.flow_id}",
             )
 
         if session_data.get("completed"):
@@ -235,11 +285,11 @@ class AulaCustomConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if self._reauth_entry:
             # Update existing entry with new tokens
             _LOGGER.info("Updating existing entry with new tokens")
+            # Updating the entry triggers options_update_listener (__init__.py),
+            # which reloads it - an explicit reload here would race that reload.
             self.hass.config_entries.async_update_entry(
                 self._reauth_entry, data=data
             )
-            # Reload the entry to apply new tokens
-            await self.hass.config_entries.async_reload(self._reauth_entry.entry_id)
             return self.async_abort(reason="reauth_successful")
         else:
             # Create new entry
@@ -345,7 +395,10 @@ class AulaCustomConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             CONF_SCHOOLSCHEDULE: self._reauth_entry.data.get(CONF_SCHOOLSCHEDULE, True),
             CONF_UGEPLAN: self._reauth_entry.data.get(CONF_UGEPLAN, True),
             CONF_MU_OPGAVER: self._reauth_entry.data.get(CONF_MU_OPGAVER, True),
-            CONF_TEACHER_FULL_NAME: self._reauth_entry.data.get(CONF_TEACHER_FULL_NAME, False),
+            CONF_TEACHER_NAME_DISPLAY: resolve_teacher_name_display(self._reauth_entry.data),
+            CONF_SCHOOLSCHEDULE_EMOJI: self._reauth_entry.data.get(
+                CONF_SCHOOLSCHEDULE_EMOJI, False
+            ),
         }
 
         # Start authentication process
@@ -388,13 +441,16 @@ class AulaCustomConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         self._mitid_username = self._reauth_entry.data.get(CONF_MITID_USERNAME)
         self._auth_method = auth_method
-        self._mitid_password = user_input.password
-        self._mitid_token = user_input.token
+        self._mitid_password = None
+        self._mitid_token = None
         self._feature_flags = {
             CONF_SCHOOLSCHEDULE: self._reauth_entry.data.get(CONF_SCHOOLSCHEDULE, True),
             CONF_UGEPLAN: self._reauth_entry.data.get(CONF_UGEPLAN, True),
             CONF_MU_OPGAVER: self._reauth_entry.data.get(CONF_MU_OPGAVER, True),
-            CONF_TEACHER_FULL_NAME: self._reauth_entry.data.get(CONF_TEACHER_FULL_NAME, False),
+            CONF_TEACHER_NAME_DISPLAY: resolve_teacher_name_display(self._reauth_entry.data),
+            CONF_SCHOOLSCHEDULE_EMOJI: self._reauth_entry.data.get(
+                CONF_SCHOOLSCHEDULE_EMOJI, False
+            ),
         }
 
         # Start authentication process
@@ -402,37 +458,72 @@ class AulaCustomConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 
 class OptionsFlowHandler(config_entries.OptionsFlow):
-    """Handle options flow for Aula integration."""
+    """Handle options flow for Aula integration (feature toggles)."""
 
-    def __init__(self, config_entry):
+    def __init__(self):
         """Initialize options flow."""
-        self.config_entry = config_entry
-        self.options = dict(config_entry.options)
+        self._pending_updates = {}
 
     async def async_step_init(self, user_input=None):
         """Manage the options."""
-        _LOGGER.debug("Options flow started")
-        _LOGGER.debug(self.config_entry)
-        entity_registry = await async_get(self.hass)
-        entries = async_entries_for_config_entry(
-            entity_registry, self.config_entry.entry_id
-        )
-        repo_map = {e.entity_id: e for e in entries}
-        for entity_id in repo_map.keys():
-            _LOGGER.debug(entity_id)
-        return await self.async_step_user()
+        return await self.async_step_options()
 
-    async def async_step_user(self, user_input=None):
-        """Handle a flow initialized by the user."""
+    async def async_step_options(self, user_input=None):
+        """Show and handle the feature-toggle options form."""
         if user_input is not None:
-            self.options.update(user_input)
-            return await self._update_options()
+            self._pending_updates = dict(user_input)
+            if self._pending_updates.get(CONF_SCHOOLSCHEDULE):
+                return await self.async_step_schoolschedule_display()
+            return self._save_options()
 
-        return self.async_show_form(
-            step_id="user",
-            data_schema=AUTH_SCHEMA,
+        current = self.config_entry.data
+        options_schema = vol.Schema(
+            {
+                vol.Optional(
+                    CONF_SCHOOLSCHEDULE,
+                    default=current.get(CONF_SCHOOLSCHEDULE, True),
+                ): cv.boolean,
+                vol.Optional(
+                    CONF_UGEPLAN, default=current.get(CONF_UGEPLAN, True)
+                ): cv.boolean,
+                vol.Optional(
+                    CONF_MU_OPGAVER, default=current.get(CONF_MU_OPGAVER, True)
+                ): cv.boolean,
+            }
         )
+        return self.async_show_form(step_id="options", data_schema=options_schema)
 
-    async def _update_options(self):
-        """Update config entry options."""
-        return self.async_create_entry(title="Aula", data=self.options)
+    async def async_step_schoolschedule_display(self, user_input=None):
+        """Show and handle the schoolschedule display options (only when schoolschedule is on)."""
+        if user_input is not None:
+            self._pending_updates[CONF_TEACHER_NAME_DISPLAY] = user_input[
+                CONF_TEACHER_NAME_DISPLAY
+            ]
+            self._pending_updates[CONF_SCHOOLSCHEDULE_EMOJI] = user_input[
+                CONF_SCHOOLSCHEDULE_EMOJI
+            ]
+            return self._save_options()
+
+        current = self.config_entry.data
+        schema = vol.Schema(
+            {
+                vol.Optional(
+                    CONF_TEACHER_NAME_DISPLAY,
+                    default=resolve_teacher_name_display(current),
+                ): vol.In(TEACHER_NAME_DISPLAY_OPTIONS),
+                vol.Optional(
+                    CONF_SCHOOLSCHEDULE_EMOJI,
+                    default=current.get(CONF_SCHOOLSCHEDULE_EMOJI, False),
+                ): cv.boolean,
+            }
+        )
+        return self.async_show_form(step_id="schoolschedule_display", data_schema=schema)
+
+    def _save_options(self):
+        # Updating the entry triggers options_update_listener (__init__.py),
+        # which reloads it - an explicit reload here would race that reload.
+        self.hass.config_entries.async_update_entry(
+            self.config_entry,
+            data={**self.config_entry.data, **self._pending_updates},
+        )
+        return self.async_create_entry(title="", data={})

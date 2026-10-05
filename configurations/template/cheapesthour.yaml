@@ -1,14 +1,19 @@
+# Nord Pool delivers 15-minute slots, so N hours = the N*4 cheapest slots of today.
 - sensor:
     - name: "Cheapest 3 Hours"
       unique_id: sensor_cheapest_3_hours
+      availability: "{{ state_attr('sensor.nordpool_kwh_dk1_dkk_3_10_025', 'raw_today') is not none }}"
       state: >-
-        {% set l = state_attr('sensor.nordpool_kwh_dk1_dkk_3_10_025', 'raw_today') | sort(attribute='value') %}
-        {{ (now() >= l[0].start and now() <= l[0].end) or
-           (now() >= l[1].start and now() <= l[1].end) or
-           (now() >= l[2].start and now() <= l[2].end) }}
+        {% set slots = state_attr('sensor.nordpool_kwh_dk1_dkk_3_10_025', 'raw_today') | sort(attribute='value') %}
+        {% set ns = namespace(on=false) %}
+        {% for p in slots[:12] if as_datetime(p.start) <= now() < as_datetime(p.end) %}{% set ns.on = true %}{% endfor %}
+        {{ ns.on }}
 
     - name: "Cheapest 1 Hour"
       unique_id: sensor_cheapest_1_hour
+      availability: "{{ state_attr('sensor.nordpool_kwh_dk1_dkk_3_10_025', 'raw_today') is not none }}"
       state: >-
-        {% set l = state_attr('sensor.nordpool_kwh_dk1_dkk_3_10_025', 'raw_today') | sort(attribute='value') %}
-        {{ (now() >= l[0].start and now() <= l[0].end) }}
+        {% set slots = state_attr('sensor.nordpool_kwh_dk1_dkk_3_10_025', 'raw_today') | sort(attribute='value') %}
+        {% set ns = namespace(on=false) %}
+        {% for p in slots[:4] if as_datetime(p.start) <= now() < as_datetime(p.end) %}{% set ns.on = true %}{% endfor %}
+        {{ ns.on }}
