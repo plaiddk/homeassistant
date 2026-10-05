@@ -1,18 +1,18 @@
 {
     "1": {
-        "state": "ON",
+        "state": "OFF",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 263
     },
     "2": {
-        "state": "ON",
+        "state": "OFF",
         "brightness": 193,
         "color_mode": "color_temp",
         "color_temp": 326
     },
     "3": {
-        "state": "ON",
+        "state": "OFF",
         "brightness": 203,
         "color_mode": "color_temp",
         "color_temp": 304
@@ -28,7 +28,7 @@
         }
     },
     "5": {
-        "state": "ON",
+        "state": "OFF",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 324,
@@ -38,7 +38,7 @@
         }
     },
     "6": {
-        "state": "ON",
+        "state": "OFF",
         "brightness": 76,
         "color_temp": 366,
         "color_mode": "color_temp"
@@ -66,7 +66,7 @@
         }
     },
     "10": {
-        "state": "ON",
+        "state": "OFF",
         "brightness": 162,
         "color_temp": 366,
         "color_mode": "color_temp"
@@ -76,13 +76,13 @@
         "brightness": 218
     },
     "12": {
-        "state": "ON",
+        "state": "OFF",
         "color_mode": "color_temp",
         "color_temp": 424,
-        "brightness": 122
+        "brightness": 195
     },
     "0x00178801062cae78": {
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 244,
         "brightness": 162,
         "color_temp": 366,
@@ -98,7 +98,7 @@
     },
     "0x00178801061f9830": {
         "linkquality": 144,
-        "state": "ON",
+        "state": "OFF",
         "brightness": 76,
         "color_mode": "color_temp",
         "color_temp": 366,
@@ -113,7 +113,7 @@
     },
     "0x0017880106a22f02": {
         "linkquality": 156,
-        "state": "ON",
+        "state": "OFF",
         "brightness": 76,
         "color_temp": 366,
         "color_mode": "color_temp",
@@ -129,7 +129,7 @@
     "0x001788010e4fc541": {
         "battery": 100,
         "occupancy": false,
-        "illuminance": 3,
+        "illuminance": 0,
         "temperature": 22.06,
         "occupancy_timeout": 0,
         "linkquality": 172,
@@ -229,7 +229,7 @@
         "philips_raw": "070001fe6e01"
     },
     "0x0017880106b9510e": {
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 124,
         "brightness": 203,
         "color_mode": "color_temp",
@@ -244,7 +244,7 @@
         "philips_raw": "070000cb3001"
     },
     "0x0017880106b96957": {
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 112,
         "brightness": 203,
         "color_mode": "color_temp",
@@ -259,7 +259,7 @@
         "philips_raw": "070001cb3001"
     },
     "0x00178801068d4351": {
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 124,
         "brightness": 203,
         "color_mode": "color_temp",
@@ -271,10 +271,10 @@
             "latest_source": "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/images/Hue/100B-0114-01002A00-ConfLightBLE-Lamps-EFR32MG21.zigbee",
             "latest_release_notes": "Version: 42.0"
         },
-        "philips_raw": "070001cb3001"
+        "philips_raw": "070000cb3001"
     },
     "0x0017880106b9598c": {
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 160,
         "brightness": 203,
         "color_mode": "color_temp",
@@ -289,7 +289,7 @@
         "philips_raw": "070000cb3001"
     },
     "0x001788010e5e0616": {
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 132,
         "brightness": 203,
         "color_mode": "color_temp",
@@ -308,7 +308,7 @@
         "occupancy_timeout": 0,
         "occupancy": false,
         "temperature": 19.81,
-        "illuminance": 11,
+        "illuminance": 0,
         "linkquality": 172,
         "update": {
             "state": "idle",
@@ -320,7 +320,7 @@
         "motion_sensitivity": "high"
     },
     "0x001788010e608621": {
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 192,
         "brightness": 254,
         "color_mode": "color_temp",
@@ -335,7 +335,7 @@
         "philips_raw": "070001fe0701"
     },
     "0x001788010e5d0bdd": {
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 192,
         "brightness": 254,
         "color_mode": "color_temp",
@@ -350,7 +350,7 @@
         "philips_raw": "070001fe0701"
     },
     "0x001788010e608783": {
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 136,
         "brightness": 254,
         "color_mode": "color_temp",
@@ -365,7 +365,7 @@
         "philips_raw": "070000a40701"
     },
     "0x001788010e5d03e8": {
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 104,
         "brightness": 254,
         "color_mode": "color_temp",
@@ -381,8 +381,8 @@
     },
     "0x001788010e4fc5ac": {
         "occupancy": false,
-        "illuminance": 30,
-        "temperature": 20.41,
+        "illuminance": 0,
+        "temperature": 20.63,
         "battery": 100,
         "occupancy_timeout": 0,
         "linkquality": 136,
@@ -396,8 +396,8 @@
     },
     "0x001788010e4facad": {
         "battery": 100,
-        "illuminance": 18,
-        "temperature": 20.95,
+        "illuminance": 0,
+        "temperature": 20.57,
         "occupancy": false,
         "occupancy_timeout": 0,
         "linkquality": 132,
@@ -410,7 +410,7 @@
         }
     },
     "0x001788010e61914a": {
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 180,
         "brightness": 193,
         "color_mode": "color_temp",
@@ -425,7 +425,7 @@
         "philips_raw": "070001c14601"
     },
     "0x001788010e6184ea": {
-        "state": "ON",
+        "state": "OFF",
         "linkquality": 112,
         "brightness": 193,
         "color_mode": "color_temp",
@@ -469,7 +469,7 @@
         "battery": 100,
         "occupancy": false,
         "illuminance": 0,
-        "temperature": 19.21,
+        "temperature": 18.91,
         "occupancy_timeout": 0,
         "linkquality": 140,
         "update": {
@@ -587,10 +587,10 @@
     },
     "0x001788010dbda59d": {
         "linkquality": 132,
-        "state": "ON",
+        "state": "OFF",
         "color_mode": "color_temp",
         "color_temp": 424,
-        "brightness": 122,
+        "brightness": 195,
         "update": {
             "state": "idle",
             "installed_version": 16787968,
@@ -602,10 +602,10 @@
     },
     "0x001788010dbda447": {
         "linkquality": 124,
-        "state": "ON",
+        "state": "OFF",
         "color_mode": "color_temp",
         "color_temp": 424,
-        "brightness": 122,
+        "brightness": 195,
         "update": {
             "state": "idle",
             "installed_version": 16787968,
@@ -728,7 +728,7 @@
         }
     },
     "0x001788010d4ac542": {
-        "state": "ON",
+        "state": "OFF",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 366,
@@ -743,7 +743,7 @@
         "philips_raw": "070000fe6e01"
     },
     "0x0017880109dbe5cc": {
-        "state": "ON",
+        "state": "OFF",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 366,
@@ -762,7 +762,7 @@
         "philips_raw": "070000fe6e01"
     },
     "0x001788010e6160bb": {
-        "state": "ON",
+        "state": "OFF",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 324,
@@ -777,7 +777,7 @@
         "philips_raw": "070001bc1801"
     },
     "0x001788010d9a6602": {
-        "state": "ON",
+        "state": "OFF",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 366,
@@ -792,7 +792,7 @@
         "philips_raw": "070000fe6e01"
     },
     "0x001788010e619360": {
-        "state": "ON",
+        "state": "OFF",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 324,
@@ -807,7 +807,7 @@
         "philips_raw": "070001bc1801"
     },
     "0x0017880109e3f695": {
-        "state": "ON",
+        "state": "OFF",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 366,
@@ -826,7 +826,7 @@
         "philips_raw": "070000fe6e01"
     },
     "0x0017880108497a94": {
-        "state": "ON",
+        "state": "OFF",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 366,
@@ -845,7 +845,7 @@
         "philips_raw": "070000fe6e01"
     },
     "0x0017880109e3f715": {
-        "state": "ON",
+        "state": "OFF",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 366,
@@ -864,7 +864,7 @@
         "philips_raw": "070000fe6e01"
     },
     "0x001788010e616180": {
-        "state": "ON",
+        "state": "OFF",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 324,
@@ -879,7 +879,7 @@
         "philips_raw": "070001ce4401"
     },
     "0x001788010e5dd675": {
-        "state": "ON",
+        "state": "OFF",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 324,

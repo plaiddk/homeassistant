@@ -82,54 +82,6 @@
     - data:
         current_time: "{{ now().timestamp() }}"
       action: python_script.set_finish_in_relative
-- id: "1734302153700"
-  alias: Ulæste beskeder Aula (v2)
-  description: Henter ulæste Aula-beskeder, laver kort, ren tekst-opsummering.
-  triggers: []
-  conditions: []
-  actions:
-    - variables:
-        aula_messages: ""
-        summary_response: ""
-    - action: aula.api_call
-      data:
-        uri: ?method=messaging.getThreads&sortOn=date&orderDirection=desc&page=0&filterOn=unread
-      response_variable: aula_messages
-    - action: conversation.process
-      data:
-        agent_id: conversation.chatgpt
-        text:
-          "Herunder er ulæste beskeder (tråde) fra Aula. Giv en kort, præcis opsummering
-          **kun for de sidste 30 dage**. Medtag kun det, der er værd at huske/handle
-          på (aftaler, forfaldsdage, afleveringer/lektier, udstyr, tests, tidspunkter,
-          links, mødested, ændringer). Angiv hvilket barn beskeden handler om: (Kamma),
-          (Herman), eller (Generelt), baseret på indhold/afsender/emne.
-
-          Returnér KUN én linje pr. relevant besked i præcis dette format (ingen overskrift,
-          ingen kodefence, ingen tomme linjer): - **YYYY-MM-DD** (Kamma|Herman|Generelt):
-          kort besked i én linje
-
-          Regler: - Brug datoen for beskeden eller tydeligt angivet forfaldsdato. -
-          Ingen linjeskift i én linje; brug ; som separator. - Ingen personfølsomme
-          detaljer udover navnene Kamma/Herman. - Maksimer klarhed, minimer fyld.
-
-          Rå data: {{ aula_messages }}
-
-          "
-      response_variable: summary_response
-    - variables:
-        beskeder_text:
-          "{{ summary_response.response.speech.plain.speech\n   | string\n
-          \  | regex_replace(find='^\\\\s*```(?:json|yaml)?\\\\s*', replace='')\n   |
-          regex_replace(find='\\\\s*```\\\\s*$', replace='')\n   | trim }}"
-    - event: aula_beskeder_updated
-      event_data:
-        beskeder_text: "{{ beskeder_text }}"
-    - action: input_text.set_value
-      data:
-        entity_id: input_text.beskedliste_alle
-        value: "{{ beskeder_text[:250] }}"
-  mode: single
 - id: "1734942363531"
   alias: Badeværelse stor Dag og Nat
   description: ""
@@ -568,42 +520,6 @@
       action: input_boolean.turn_off
       data: {}
   mode: single
-- id: "1757957483629"
-  alias: "Kamma Aula "
-  description: ""
-  use_blueprint:
-    path: thomas/aula.yaml
-    input:
-      ugeplan_sensor: sensor.finderuphoj_skole_kamma
-      output_helper: input_text.huskeliste_kamma
-      event_name: kamma_huskeliste_updated
-- id: "1757967411947"
-  alias: Herman Aula Huskeliste
-  description: ""
-  use_blueprint:
-    path: thomas/aula.yaml
-    input:
-      ugeplan_sensor: sensor.finderuphoj_skole_herman
-      output_helper: input_text.huskeliste_herman
-      event_name: herman_huskeliste_updated
-- id: "1758479016009"
-  alias: Herman ugeplan next
-  description: ""
-  use_blueprint:
-    path: thomas/aulaugeplan2.yaml
-    input:
-      ugeplan_sensor: sensor.finderuphoj_skole_herman
-      output_helper: input_text.huskeliste_herman_next
-      event_name: herman_huskeliste_next_updated
-- id: "1758479048045"
-  alias: Kamma ugeplan next
-  description: ""
-  use_blueprint:
-    path: thomas/aulaugeplan2.yaml
-    input:
-      ugeplan_sensor: sensor.finderuphoj_skole_kamma
-      output_helper: input_text.huskeliste_kamma_next
-      event_name: kamma_huskeliste_next_updated
 - id: ev_smart_charging_follow_connection
   alias: EV Smart Charging – Follow Monta Connection
   triggers:

@@ -1,0 +1,741 @@
+pack_aula_skole:
+  input_boolean:
+    aula_notifikationer:
+      name: Aula notifikationer
+      icon: mdi:bell-badge-outline
+
+  input_select:
+    aula_ai_model:
+      name: Aula AI-model
+      icon: mdi:robot-outline
+      options:
+        - gpt-6-astra
+        - gpt-5.4-mini
+        - gpt-4o
+
+  rest_command:
+    aula_openai:
+      url: https://api.openai.com/v1/responses
+      method: POST
+      timeout: 240
+      headers:
+        Authorization: !secret openai_aula_authorization
+      content_type: application/json
+      payload: "{{ body | to_json }}"
+
+  # ───────────────────────────── Sensorer (fodres af scripts via events) ─────────────────────────────
+  template:
+    - trigger:
+        - trigger: event
+          event_type: aula_ugeplan_opdateret
+          event_data:
+            barn: Kamma
+      sensor:
+        - name: Aula Kamma skole
+          unique_id: aula_kamma_skole
+          icon: mdi:school-outline
+          device_class: timestamp
+          state: "{{ now().isoformat() }}"
+          attributes:
+            barn: Kamma
+            resume: "{{ trigger.event.data.resume }}"
+            dage: "{{ trigger.event.data.dage }}"
+            kilde: "{{ trigger.event.data.kilde }}"
+
+    - trigger:
+        - trigger: event
+          event_type: aula_ugeplan_opdateret
+          event_data:
+            barn: Herman
+      sensor:
+        - name: Aula Herman skole
+          unique_id: aula_herman_skole
+          icon: mdi:school-outline
+          device_class: timestamp
+          state: "{{ now().isoformat() }}"
+          attributes:
+            barn: Herman
+            resume: "{{ trigger.event.data.resume }}"
+            dage: "{{ trigger.event.data.dage }}"
+            kilde: "{{ trigger.event.data.kilde }}"
+
+    - trigger:
+        - trigger: event
+          event_type: aula_beskeder_opdateret
+      sensor:
+        - name: Aula beskeder
+          unique_id: aula_beskeder_ai
+          icon: mdi:email-outline
+          state: "{{ trigger.event.data.beskeder | rejectattr('laest') | list | count }}"
+          attributes:
+            samlet: "{{ trigger.event.data.samlet }}"
+            beskeder: "{{ trigger.event.data.beskeder }}"
+            fingeraftryk: "{{ trigger.event.data.fingeraftryk }}"
+            notificeret: "{{ trigger.event.data.notificeret }}"
+            opdateret: "{{ now().isoformat() }}"
+
+  # ───────────────────────────── Scripts ─────────────────────────────
+  script:
+    aula_opdater_ugeplan:
+      alias: Aula · Opdater ugeplan (AI)
+      icon: mdi:school
+      mode: queued
+      max: 6
+      fields:
+        barn:
+          name: Barn
+          required: true
+          example: Kamma
+          selector:
+            text:
+        skole_sensor:
+          name: Aula-sensor
+          required: true
+          selector:
+            entity:
+              domain: sensor
+        skema_kalender:
+          name: Skoleskema-kalender
+          required: true
+          selector:
+            entity:
+              domain: calendar
+        tving:
+          name: Tving opdatering
+          description: Kør AI selv om ugeplanen er uændret.
+          default: false
+          selector:
+            boolean:
+      sequence:
+        - action: calendar.get_events
+          target:
+            entity_id:
+              - "{{ skema_kalender }}"
+              - calendar.helligdage_i_danmark
+          data:
+            start_date_time: "{{ (today_at() - timedelta(days=now().weekday())).isoformat() }}"
+            duration:
+              days: 14
+          response_variable: kalendere
+          continue_on_error: true
+
+        # Ugeplanen er struktureret HTML (én <h3> pr. dag), så dage og datoer udledes uden AI.
+        - variables:
+            sensor_id: "sensor.aula_{{ barn | lower }}_skole"
+            kilde: >-
+              {%- set kal = kalendere if kalendere is defined and kalendere is mapping else {} -%}
+              {%- set events = kal.get(skema_kalender, {}).get('events', []) -%}
+              {%- set helligdage = kal.get('calendar.helligdage_i_danmark', {}).get('events', []) -%}
+              {%- set ev = namespace(l=[]) -%}
+              {%- for e in events if 'T' in e.start -%}
+                {%- set s = as_local(as_datetime(e.start)) -%}
+                {%- set ev.l = ev.l + [{
+                    'dato': s.date().isoformat(),
+                    'start': s.strftime('%H:%M'),
+                    'slut': as_local(as_datetime(e.end)).strftime('%H:%M'),
+                    'tekst': s.strftime('%H:%M') ~ ' ' ~ (e.summary.split(',')[0] | trim) ~ (' @' ~ e.location if e.location else '')
+                  }] -%}
+              {%- endfor -%}
+              {%- set mandag = today_at() - timedelta(days=now().weekday()) -%}
+              {%- set ugedage = ['mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag'] -%}
+              {%- set ns = namespace(dage=[]) -%}
+              {%- for uge in [0, 1] -%}
+                {%- set html = (state_attr(skole_sensor, 'ugeplan_next' if uge else 'ugeplan') or '') | string -%}
+                {%- set blokke = html.split('<h3>')[1:] -%}
+                {%- for i in range(5) -%}
+                  {%- set d = (mandag + timedelta(days=7 * uge + i)).date() -%}
+                  {%- set iso = d.isoformat() -%}
+                  {%- set t = namespace(v='') -%}
+                  {%- for b in blokke -%}
+                    {%- set dele = b.split('</h3>') -%}
+                    {%- if (dele[0] | regex_findall('(\\d+)\\.') | first | default(0) | int(0)) == d.day -%}
+                      {%- set t.v = dele[1:] | join(' ') -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                  {%- set tekst = t.v
+                      | regex_replace('<b>', ' • ')
+                      | regex_replace('</b>', ':')
+                      | regex_replace('<br\\s*/?>|</p>|</li>|</div>', ' / ')
+                      | striptags
+                      | regex_replace('(\\s*/\\s*)+', ' / ')
+                      | regex_replace(':\\s*/\\s*', ': ')
+                      | regex_replace('^[\\s/\\-•]+|[\\s/\\-]+$', '')
+                      | trim -%}
+                  {%- set lektioner = ev.l | selectattr('dato', 'eq', iso) | sort(attribute='start') | list -%}
+                  {%- set ns.dage = ns.dage + [{
+                      'dato': iso,
+                      'ugedag': ugedage[i],
+                      'uge': 'denne' if uge == 0 else 'naeste',
+                      'ugeplan': tekst,
+                      'skema': lektioner | map(attribute='tekst') | list,
+                      'start': lektioner | map(attribute='start') | min if lektioner else '',
+                      'slut': lektioner | map(attribute='slut') | max if lektioner else '',
+                      'helligdag': helligdage | selectattr('start', 'search', '^' ~ iso) | map(attribute='summary') | join(', ')
+                    }] -%}
+                {%- endfor -%}
+              {%- endfor -%}
+              {{ ns.dage }}
+
+        - condition: template
+          value_template: "{{ tving | default(false) or state_attr(sensor_id, 'kilde') != kilde }}"
+
+        - action: script.aula_ai
+          data:
+            navn: ugeplan
+            instruktioner: |-
+              Du er en omhyggelig assistent for en dansk familie. Du læser skolens ugeplan og skoleskema for {{ barn }} og laver en praktisk huskeliste til forældrene.
+              I dag er {{ ['mandag','tirsdag','onsdag','torsdag','fredag','lørdag','søndag'][now().weekday()] }} {{ now().date().isoformat() }} (uge {{ now().isocalendar()[1] }}).
+
+              INPUT – en JSON-liste med præcis {{ kilde | count }} skoledage. Felter pr. dag:
+              - dato: YYYY-MM-DD. Brug KUN disse datoer.
+              - ugedag, uge ("denne" eller "naeste").
+              - ugeplan: lærernes tekst for dagen. "• Fag: tekst" angiver hvilket fag teksten hører til. Kan være tom.
+              - skema: dagens lektioner som "HH:MM FAG @lokale". Kan være tom (fx for næste uge).
+              - helligdag: navnet hvis dagen er en helligdag, ellers tom.
+
+              Fagkoder: DAN=Dansk, MAT=Matematik, ENG=Engelsk, TYS=Tysk, N/T=Natur/teknologi, HIS=Historie, KRI=Kristendom, MUS=Musik, BIL=Billedkunst, HDS=Håndværk og design, MAD=Madkundskab, IDR=Idræt, BIB=Bibliotek, UUV/UU2=Understøttende undervisning. Lokale HAL=idrætshal.
+
+              UDFYLD FOR HVER DAG
+              - dato: kopiér præcis fra input.
+              - overskrift: max 5 ord med dagens vigtigste for forældre (fx "Idræt + læselektie", "Motionsdag", "Efterårsferie"). Ingen særlige ting: "Almindelig skoledag". Tom ugeplan OG tomt skema: "Ingen ugeplan endnu".
+              - fri: true KUN hvis ugeplanen eller helligdag udtrykkeligt siger ferie, fridag, helligdag eller lukket. Tom ugeplan betyder "ingen information" – ikke fri.
+              - lektier: KUN hjemmearbejde som ugeplanen udtrykkeligt nævner (lektie, læs, opgave, aflevering, øv, skriv, stav), der skal være LAVET til denne dag. Format "Fag: konkret opgave" (fx "Dansk: læs s. 12-15"). Står der "til torsdag" eller "afleveres fredag", hører lektien til den dag – ikke dagen hvor den blev nævnt. Det klassen laver i timen er IKKE lektier. Emneord som "EMNEUGE" er ikke lektier. Ingen nævnt = tom liste.
+              - husk: konkrete ting der skal pakkes. Kun fra disse kilder: (a) skemaet: IDR → "Idrætstøj og indendørssko"; svømning → "Badetøj, håndklæde, svømmebriller"; BIB → "Biblioteksbøger"; (b) ugeplanen: tur/udflugt → "Turtaske og drikkedunk", motionsdag → "Løbesko og sportstøj", samt alt der udtrykkeligt nævnes (iPad, underskrift, penge, madpakke osv.). Opfind aldrig ting.
+              - i_timen: hvad klassen arbejder med, KUN hvis ugeplanen beskriver et konkret indhold ("Matematik: brøker"). Udled aldrig fra skemaet alene. Skriv aldrig generiske punkter som "undervisning", "emne" eller "aktiviteter". Max 4 punkter.
+              - begivenheder: særlige ting forældre bør vide: tur, test (fx nationale test), emneuge (med fag), motionsdag, arrangement, ændret mødetid, tidlig fri.
+              - Er fri=true: lektier, husk og i_timen er tomme lister.
+
+              REGLER
+              - Kort, konkret dansk. Ingen fyldord, ingen emojis, ingen gentagelser mellem felter.
+              - Brug kun information fra input. Gæt aldrig – en tom liste er bedre end et gæt.
+              - Præcis én post pr. dag i input, samme rækkefølge.
+              - resume: 1-2 sætninger om de to uger set fra forældrenes perspektiv, med ugedage (fx "Emneuge med motionsdag fredag. Næste uge er efterårsferie.").
+
+              INPUT:
+              {{ kilde | to_json }}
+            skema:
+              type: object
+              additionalProperties: false
+              required: [resume, dage]
+              properties:
+                resume:
+                  type: string
+                dage:
+                  type: array
+                  items:
+                    type: object
+                    additionalProperties: false
+                    required:
+                      [
+                        dato,
+                        overskrift,
+                        fri,
+                        lektier,
+                        husk,
+                        i_timen,
+                        begivenheder,
+                      ]
+                    properties:
+                      dato:
+                        type: string
+                      overskrift:
+                        type: string
+                      fri:
+                        type: boolean
+                      lektier:
+                        type: array
+                        items:
+                          type: string
+                      husk:
+                        type: array
+                        items:
+                          type: string
+                      i_timen:
+                        type: array
+                        items:
+                          type: string
+                      begivenheder:
+                        type: array
+                        items:
+                          type: string
+          response_variable: ai
+
+        # Datoer og skema kommer altid fra input; AI'en leverer kun indholdet.
+        - variables:
+            dage: >-
+              {%- set svar = ai.data.dage if ai.data is mapping and ai.data.dage is defined else [] -%}
+              {%- set ns = namespace(ud=[]) -%}
+              {%- for k in kilde -%}
+                {%- set a = svar | selectattr('dato', 'eq', k.dato) | first | default({}, true) -%}
+                {%- set ns.ud = ns.ud + [{
+                    'dato': k.dato,
+                    'ugedag': k.ugedag,
+                    'uge': k.uge,
+                    'start': k.start,
+                    'slut': k.slut,
+                    'skema': k.skema,
+                    'overskrift': a.overskrift | default(''),
+                    'fri': a.fri | default(false) or k.helligdag != '',
+                    'lektier': a.lektier | default([]),
+                    'husk': a.husk | default([]),
+                    'i_timen': a.i_timen | default([]),
+                    'begivenheder': a.begivenheder | default([])
+                  }] -%}
+              {%- endfor -%}
+              {{ ns.ud }}
+
+        - event: aula_ugeplan_opdateret
+          event_data:
+            barn: "{{ barn }}"
+            resume: "{{ ai.data.resume | default('') }}"
+            dage: "{{ dage }}"
+            kilde: "{{ kilde }}"
+
+    aula_opdater_beskeder:
+      alias: Aula · Opdater beskeder (AI)
+      icon: mdi:email-fast-outline
+      mode: queued
+      max: 2
+      fields:
+        tving:
+          name: Tving AI
+          description: Kør AI selv om der ikke er nye beskeder.
+          default: false
+          selector:
+            boolean:
+      sequence:
+        - action: aula.api_call
+          data:
+            uri: "?method=messaging.getThreads&sortOn=date&orderDirection=desc&page=0"
+          response_variable: oversigt
+
+        - variables:
+            sensor_id: sensor.aula_beskeder
+            graense: "{{ (now() - timedelta(days=14)).date().isoformat() }}"
+            traade: >-
+              {%- set alle = oversigt.data.threads if oversigt.data is defined and oversigt.data.threads is defined else [] -%}
+              {%- set ns = namespace(l=[]) -%}
+              {%- for t in alle -%}
+                {%- set sendt = t.latestMessage.sendDateTime | default('') -%}
+                {%- if sendt[:10] >= graense and not t.sensitive | default(false) -%}
+                  {%- set ns.l = ns.l + [{
+                      'id': t.id | string,
+                      'dato': sendt[:10],
+                      'tid': sendt[11:16],
+                      'emne': t.subject | default(''),
+                      'fra': t.creator.fullName | default(''),
+                      'boern': t.regardingChildren | default([]) | map(attribute='displayName') | map('regex_replace', ' .*', '') | list,
+                      'laest': t.read | default(true),
+                      'tekst': (t.latestMessage.text.html | default('') | regex_replace('<br\\s*/?>|</p>|</li>|</div>', ' ') | striptags | trim)[:600]
+                    }] -%}
+                {%- endif -%}
+              {%- endfor -%}
+              {{ ns.l[:10] }}
+            fingeraftryk: "{% for t in traade %}{{ t.id }}@{{ t.dato }}T{{ t.tid }};{% endfor %}"
+            forrige: "{{ state_attr('sensor.aula_beskeder', 'beskeder') or [] }}"
+            tidligere_notificeret: "{{ state_attr('sensor.aula_beskeder', 'notificeret') or [] }}"
+            resultat: "{{ forrige }}"
+            samlet: "{{ state_attr('sensor.aula_beskeder', 'samlet') or '' }}"
+            fuld: {}
+            traad: null
+
+        - if:
+            - condition: template
+              value_template: "{{ traade | count == 0 }}"
+          then:
+            - variables:
+                resultat: []
+                samlet: Ingen beskeder fra skolen de sidste 14 dage.
+          else:
+            - if:
+                - condition: template
+                  value_template: >-
+                    {{ tving | default(false) or fingeraftryk != state_attr('sensor.aula_beskeder', 'fingeraftryk')
+                       or forrige | count != traade | count }}
+              then:
+                # Kun læste tråde hentes i fuld længde, så ulæste ikke markeres som læst i Aula.
+                - repeat:
+                    for_each: "{{ traade | selectattr('laest') | map(attribute='id') | list }}"
+                    sequence:
+                      - variables:
+                          traad: null
+                      - action: aula.api_call
+                        data:
+                          uri: "?method=messaging.getMessagesForThread&threadId={{ repeat.item }}&page=0"
+                        response_variable: traad
+                        continue_on_error: true
+                      - variables:
+                          fuld: >-
+                            {%- set data = traad.data if traad is mapping and traad.data is defined else {} -%}
+                            {%- set msgs = data.get('messages', []) | sort(attribute='sendDateTime') -%}
+                            {%- set valgt = (msgs[:1] + msgs[-3:]) if msgs | count > 4 else msgs -%}
+                            {%- set ns = namespace(t='') -%}
+                            {%- for m in valgt -%}
+                              {%- set ns.t = ns.t ~ ' [' ~ m.sendDateTime[:10] ~ '] '
+                                  ~ ((m.text or {}).html | default('') | regex_replace('<br\\s*/?>|</p>|</li>|</div>', ' ') | striptags | trim) -%}
+                            {%- endfor -%}
+                            {%- set filer = (data.get('firstMessage') or {}).get('attachments') or [] -%}
+                            {%- if filer -%}
+                              {%- set ns.t = ns.t ~ ' Vedhæftet: ' ~ (filer | map(attribute='name') | join(', ')) -%}
+                            {%- endif -%}
+                            {{ (dict(fuld.items() | list + [(repeat.item, ns.t[:3000] | trim)]) if ns.t else fuld) }}
+
+                - variables:
+                    ai_input: >-
+                      {%- set ns = namespace(l=[]) -%}
+                      {%- for t in traade -%}
+                        {%- set ns.l = ns.l + [{
+                            'id': t.id,
+                            'dato': t.dato,
+                            'emne': t.emne,
+                            'boern': t.boern,
+                            'laest': t.laest,
+                            'forhaandsvisning': t.id not in fuld,
+                            'tekst': fuld.get(t.id, t.tekst)
+                          }] -%}
+                      {%- endfor -%}
+                      {{ ns.l }}
+
+                - action: script.aula_ai
+                  data:
+                    navn: beskeder
+                    instruktioner: |-
+                      Du hjælper forældrene til Kamma og Herman med at holde styr på beskeder fra skolen i Aula.
+                      I dag er {{ ['mandag','tirsdag','onsdag','torsdag','fredag','lørdag','søndag'][now().weekday()] }} {{ now().date().isoformat() }}.
+
+                      INPUT – JSON-liste med beskedtråde, nyeste først. Felter: id, dato (seneste besked), emne, boern (hvilke børn tråden vedrører), laest, forhaandsvisning (true = teksten er kun de første ~250 tegn), tekst.
+
+                      FOR HVER TRÅD:
+                      - id: kopiér præcis.
+                      - barn: "Kamma", "Herman", "Begge" eller "Generelt". Brug feltet boern; kun hvis det er tomt, ud fra indholdet.
+                      - titel: max 7 ord om hvad det reelt handler om (ikke bare emnefeltet kopieret).
+                      - resume: 1-2 korte sætninger med det vigtigste for forældre.
+                      - handlinger: konkrete ting forældrene skal gøre: svare, tilmelde, betale, underskrive, medbringe, hente tidligt osv. Tom liste hvis ingen.
+                      - frist: YYYY-MM-DD for hvornår handlingen skal være gjort eller begivenheden finder sted. Omregn "på fredag", "i morgen" osv. ud fra trådens dato. Tom streng hvis ingen dato.
+                      - type: "handling" hvis forældrene skal gøre noget, "begivenhed" hvis der er en dato/arrangement at kende, ellers "info".
+
+                      samlet: max 3 korte sætninger om det forældrene skal huske FREMOVER (i dag {{ now().date().isoformat() }} og frem), sorteret efter dato, med ugedag og dato (fx "torsdag 8/10"). Medtag ALDRIG noget med frist før i dag, noget der er udløbet eller overstået. Er der intet kommende, skriv "Intet der kræver handling lige nu."
+
+                      REGLER
+                      - Kort, konkret dansk. Ingen emojis. Gæt aldrig – er teksten en forhåndsvisning, så beskriv kun det der står.
+                      - Nævn ikke andre børn eller voksne ved navn end Kamma og Herman. Skriv "læreren", "klassen", "SFO", "skolen" osv.
+                      - Præcis én post pr. tråd i input.
+
+                      INPUT:
+                      {{ ai_input | to_json }}
+                    skema:
+                      type: object
+                      additionalProperties: false
+                      required: [samlet, beskeder]
+                      properties:
+                        samlet:
+                          type: string
+                        beskeder:
+                          type: array
+                          items:
+                            type: object
+                            additionalProperties: false
+                            required:
+                              [id, barn, titel, resume, handlinger, frist, type]
+                            properties:
+                              id:
+                                type: string
+                              barn:
+                                type: string
+                                enum: [Kamma, Herman, Begge, Generelt]
+                              titel:
+                                type: string
+                              resume:
+                                type: string
+                              handlinger:
+                                type: array
+                                items:
+                                  type: string
+                              frist:
+                                type: string
+                              type:
+                                type: string
+                                enum: [handling, begivenhed, info]
+                  response_variable: ai
+
+                - variables:
+                    samlet: "{{ ai.data.samlet | default('') }}"
+                    resultat: "{{ ai.data.beskeder if ai.data is mapping and ai.data.beskeder is defined else [] }}"
+
+            # Metadata (dato, afsender, læst, barn) kommer fra Aula – ikke fra AI'en.
+            - variables:
+                resultat: >-
+                  {%- set ns = namespace(l=[]) -%}
+                  {%- for t in traade -%}
+                    {%- set a = resultat | selectattr('id', 'eq', t.id) | first | default({}, true) -%}
+                    {%- set b = t.boern -%}
+                    {%- set barn = 'Begge' if ('Kamma' in b and 'Herman' in b)
+                        else 'Kamma' if 'Kamma' in b
+                        else 'Herman' if 'Herman' in b
+                        else a.barn | default('Generelt') -%}
+                    {%- set ns.l = ns.l + [{
+                        'id': t.id,
+                        'dato': t.dato,
+                        'tid': t.tid,
+                        'emne': t.emne,
+                        'fra': t.fra,
+                        'laest': t.laest,
+                        'barn': barn,
+                        'titel': a.titel | default(t.emne, true),
+                        'resume': a.resume | default(t.tekst[:160]),
+                        'handlinger': a.handlinger | default([]),
+                        'frist': a.frist | default(''),
+                        'type': a.type | default('info')
+                      }] -%}
+                  {%- endfor -%}
+                  {{ ns.l }}
+
+        - variables:
+            nye: >-
+              {{ resultat | rejectattr('laest') | selectattr('type', 'in', ['handling', 'begivenhed'])
+                 | rejectattr('id', 'in', tidligere_notificeret) | list }}
+            notificeret: >-
+              {{ ((tidligere_notificeret + (resultat | rejectattr('laest') | map(attribute='id') | list)) | unique | list)[-60:] }}
+
+        - event: aula_beskeder_opdateret
+          event_data:
+            samlet: "{{ samlet }}"
+            beskeder: "{{ resultat }}"
+            fingeraftryk: "{{ fingeraftryk }}"
+            notificeret: "{{ notificeret }}"
+
+        - repeat:
+            for_each: "{{ nye[:3] }}"
+            sequence:
+              - action: script.aula_notifikation
+                data:
+                  titel: "Aula · {{ repeat.item.barn }}: {{ repeat.item.titel }}"
+                  besked: >-
+                    {{ repeat.item.resume }}
+                    {%- if repeat.item.handlinger %} Husk: {{ repeat.item.handlinger | join('; ') }}.{% endif %}
+                    {%- if repeat.item.frist is match('\\d{4}-\\d{2}-\\d{2}') %} Frist: {{ repeat.item.frist[8:10] | int }}/{{ repeat.item.frist[5:7] | int }}.{% endif %}
+                  tag: aula_{{ repeat.item.id }}
+
+    aula_ai:
+      alias: Aula · AI-kald (OpenAI)
+      icon: mdi:creation
+      mode: parallel
+      fields:
+        navn:
+          required: true
+          selector:
+            text:
+        instruktioner:
+          required: true
+          selector:
+            text:
+              multiline: true
+        skema:
+          required: true
+          selector:
+            object:
+      sequence:
+        - variables:
+            model: "{{ states('input_select.aula_ai_model') }}"
+            # Kun parametre som modellen understøtter: ældre gpt-4* får lav temperatur, gpt-5* får reasoning.
+            body: >-
+              {%- set b = {
+                  'model': model,
+                  'input': instruktioner,
+                  'store': false,
+                  'text': {'format': {'type': 'json_schema', 'name': navn, 'schema': skema, 'strict': true}}
+                } -%}
+              {%- if model.startswith('gpt-4') -%}
+                {%- set b = dict(b, temperature=0.2) -%}
+              {%- elif model.startswith('gpt-5') -%}
+                {%- set b = dict(b, reasoning={'effort': 'medium'}) -%}
+              {%- endif -%}
+              {{ b }}
+        - action: rest_command.aula_openai
+          data:
+            body: "{{ body }}"
+          response_variable: svar
+        - if:
+            - condition: template
+              value_template: "{{ svar.status != 200 }}"
+          then:
+            - stop: "OpenAI ({{ model }}) svarede {{ svar.status }}: {{ (svar.content.error.message if svar.content is mapping and svar.content.error is defined else svar.content) | string | truncate(300) }}"
+              error: true
+        - variables:
+            resultat: >-
+              {%- set tekst = namespace(v='') -%}
+              {%- for o in svar.content.output if o.type == 'message' -%}
+                {%- for c in o.content if c.type == 'output_text' -%}
+                  {%- set tekst.v = tekst.v ~ c.text -%}
+                {%- endfor -%}
+              {%- endfor -%}
+              {{ {'data': tekst.v | from_json, 'model': model} }}
+        - stop: OK
+          response_variable: resultat
+
+    aula_opdater_alt:
+      alias: Aula · Opdater alt nu
+      icon: mdi:refresh
+      mode: single
+      sequence:
+        - parallel:
+            - action: script.aula_opdater_ugeplan
+              data:
+                barn: Kamma
+                skole_sensor: sensor.finderuphoj_skole_kamma
+                skema_kalender: calendar.skoleskema_kamma_rytter_jensen
+                tving: true
+            - action: script.aula_opdater_ugeplan
+              data:
+                barn: Herman
+                skole_sensor: sensor.finderuphoj_skole_herman
+                skema_kalender: calendar.skoleskema_herman_rytter_jensen
+                tving: true
+            - action: script.aula_opdater_beskeder
+              data:
+                tving: true
+
+    aula_notifikation:
+      alias: Aula · Send notifikation
+      icon: mdi:cellphone-message
+      mode: parallel
+      fields:
+        titel:
+          required: true
+          selector:
+            text:
+        besked:
+          required: true
+          selector:
+            text:
+              multiline: true
+        tag:
+          selector:
+            text:
+      sequence:
+        - condition: state
+          entity_id: input_boolean.aula_notifikationer
+          state: "on"
+        - variables:
+            # Tilføj din kones telefon her, når Home Assistant-appen er sat op på den.
+            modtagere:
+              - notify.mobile_app_plaids_iphone
+        - repeat:
+            for_each: "{{ modtagere }}"
+            sequence:
+              - action: "{{ repeat.item }}"
+                continue_on_error: true
+                data:
+                  title: "{{ titel }}"
+                  message: "{{ besked }}"
+                  data:
+                    tag: "{{ tag | default('aula') }}"
+                    group: aula
+                    url: /lovelace/skole
+                    clickAction: /lovelace/skole
+
+  # ───────────────────────────── Automatiseringer ─────────────────────────────
+  automation:
+    - id: aula_ugeplan_ai
+      alias: Aula · Ugeplaner med AI
+      description: Opdaterer huskelister for Kamma og Herman når ugeplanen ændres (og hver morgen).
+      mode: queued
+      max: 4
+      triggers:
+        - trigger: state
+          entity_id:
+            - sensor.finderuphoj_skole_kamma
+            - sensor.finderuphoj_skole_herman
+          attribute: ugeplan
+          for: "00:02:00"
+        - trigger: state
+          entity_id:
+            - sensor.finderuphoj_skole_kamma
+            - sensor.finderuphoj_skole_herman
+          attribute: ugeplan_next
+          for: "00:02:00"
+        - trigger: time
+          at: "05:30:00"
+      actions:
+        - repeat:
+            for_each:
+              - barn: Kamma
+                sensor: sensor.finderuphoj_skole_kamma
+                kalender: calendar.skoleskema_kamma_rytter_jensen
+              - barn: Herman
+                sensor: sensor.finderuphoj_skole_herman
+                kalender: calendar.skoleskema_herman_rytter_jensen
+            sequence:
+              - if:
+                  - condition: template
+                    value_template: "{{ trigger.platform != 'state' or trigger.entity_id == repeat.item.sensor }}"
+                then:
+                  - action: script.aula_opdater_ugeplan
+                    continue_on_error: true
+                    data:
+                      barn: "{{ repeat.item.barn }}"
+                      skole_sensor: "{{ repeat.item.sensor }}"
+                      skema_kalender: "{{ repeat.item.kalender }}"
+
+    - id: aula_beskeder_ai
+      alias: Aula · Beskeder med AI
+      description: Opsummerer de seneste 14 dages Aula-beskeder og giver besked om nye ting der kræver handling.
+      mode: queued
+      max: 2
+      triggers:
+        - trigger: state
+          entity_id: binary_sensor.aula_aulamessage
+          to: "on"
+        - trigger: state
+          entity_id: binary_sensor.aula_aulamessage
+          attribute: subject
+        - trigger: time
+          at:
+            - "06:30:00"
+            - "12:00:00"
+            - "15:30:00"
+            - "20:00:00"
+      actions:
+        - action: script.aula_opdater_beskeder
+
+    - id: aula_huskeliste_aften
+      alias: Aula · Huskeliste til i morgen
+      description: Sender aftenen før en samlet huskeliste for begge børn.
+      mode: single
+      triggers:
+        - trigger: time
+          at: "19:00:00"
+      conditions:
+        - condition: state
+          entity_id: input_boolean.aula_notifikationer
+          state: "on"
+      actions:
+        - variables:
+            imorgen: "{{ (now() + timedelta(days=1)).date().isoformat() }}"
+            linjer: >-
+              {%- set ns = namespace(l=[]) -%}
+              {%- for barn in ['Kamma', 'Herman'] -%}
+                {%- set dage = state_attr('sensor.aula_' ~ barn | lower ~ '_skole', 'dage') or [] -%}
+                {%- set dag = dage | selectattr('dato', 'eq', imorgen) | first | default(none) -%}
+                {%- if dag and not dag.fri -%}
+                  {%- set dele = [] -%}
+                  {%- if dag.husk -%}{%- set dele = dele + ['Husk: ' ~ dag.husk | join(', ')] -%}{%- endif -%}
+                  {%- if dag.lektier -%}{%- set dele = dele + ['Lektier: ' ~ dag.lektier | join('; ')] -%}{%- endif -%}
+                  {%- if dag.begivenheder -%}{%- set dele = dele + [dag.begivenheder | join('; ')] -%}{%- endif -%}
+                  {%- if dele -%}
+                    {%- set ns.l = ns.l + [barn ~ (' (' ~ dag.start ~ '–' ~ dag.slut ~ ')' if dag.start else '') ~ ': ' ~ dele | join('. ')] -%}
+                  {%- endif -%}
+                {%- endif -%}
+              {%- endfor -%}
+              {%- for b in (state_attr('sensor.aula_beskeder', 'beskeder') or [])
+                  | selectattr('frist', 'eq', imorgen) | selectattr('type', 'in', ['handling', 'begivenhed']) -%}
+                {%- set ns.l = ns.l + ['Aula (' ~ b.barn ~ '): ' ~ b.titel ~ ((' – ' ~ b.handlinger | join('; ')) if b.handlinger else '')] -%}
+              {%- endfor -%}
+              {{ ns.l }}
+        - condition: template
+          value_template: "{{ linjer | count > 0 }}"
+        - action: script.aula_notifikation
+          data:
+            titel: I morgen i skolen
+            besked: "{{ linjer | join('\n') }}"
+            tag: aula_imorgen
