@@ -12,4 +12,4 @@
     - name: "Finish In Relative"
       unique_id: sensor_finish_in_relative
       unit_of_measurement: "seconds"
-      state: "{{ states('sensor.finish_in_relative') | int }}"
+      state: "{{ states('sensor.finish_in_relative') | int(-1) }}"

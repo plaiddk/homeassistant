@@ -71,7 +71,9 @@
     - entity_id:
         - sensor.elpris_lavest_4t_vaskemaskine
       trigger: state
-      from: unavailable
+      from:
+        - unavailable
+        - unknown
       to:
       enabled: true
   conditions:
