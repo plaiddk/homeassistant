@@ -1,0 +1,78 @@
+pack_bil_forvarmning_kalender:
+  automation:
+    - id: enyaq_forvarm_efter_kalender_maja
+      alias: Enyaq - forvarm før Majas aftale slutter
+      description: >-
+        Starter klima på Enyaq 30 min før en matchende aftale i Majas kalender slutter,
+        hvis Maja er ude og bilen holder samme sted som hende.
+      mode: parallel
+      triggers:
+        - trigger: calendar
+          event: end
+          offset: "-0:30:0"
+          entity_id: calendar.majachristensen82_gmail_com
+          id: start
+        - trigger: event
+          event_type: mobile_app_notification_action
+          event_data:
+            action: ENYAQ_KLIMA_STOP
+          id: stop
+      variables:
+        noegleord: "padel|fitness|spinning|crossfit|yoga"
+        max_afstand_km: 1
+      actions:
+        - choose:
+            - conditions:
+                - condition: trigger
+                  id: stop
+              sequence:
+                - action: climate.turn_off
+                  target:
+                    entity_id: climate.enyaq_air_conditioning
+          default:
+            - condition: template
+              value_template: >-
+                {{ trigger.calendar_event.summary is search(noegleord, ignorecase=True)
+                   and not trigger.calendar_event.all_day }}
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.maja
+                  state: home
+            - condition: template
+              value_template: >-
+                {{ distance('device_tracker.enyaq_location', 'device_tracker.maja_iphone') | float(999) <= max_afstand_km }}
+            - condition: numeric_state
+              entity_id: sensor.enyaq_battery_level
+              above: 20
+            # Only worth it when it's cold (heating) or warm (cooling)
+            - condition: template
+              value_template: >-
+                {% set t = state_attr('weather.openweathermap', 'temperature') | float(0) %}
+                {{ t < 12 or t > 24 }}
+            - action: climate.turn_on
+              target:
+                entity_id: climate.enyaq_air_conditioning
+            - action: notify.mobile_app_maja_iphone
+              data:
+                title: Bilen varmes op
+                message: >-
+                  Enyaq starter klima ({{ state_attr('climate.enyaq_air_conditioning', 'temperature') }}°C),
+                  da "{{ trigger.calendar_event.summary }}" slutter kl. {{ as_timestamp(trigger.calendar_event.end) | timestamp_custom('%H:%M') }}.
+                data:
+                  actions:
+                    - action: ENYAQ_KLIMA_STOP
+                      title: Stop klima
+            # Safety stop if the car hasn't moved within 45 min
+            - wait_for_trigger:
+                - trigger: state
+                  entity_id: binary_sensor.enyaq_moving
+                  to: "on"
+              timeout: "00:45:00"
+            - if:
+                - condition: template
+                  value_template: "{{ not wait.trigger and is_state('binary_sensor.enyaq_moving', 'off') }}"
+              then:
+                - action: climate.turn_off
+                  target:
+                    entity_id: climate.enyaq_air_conditioning

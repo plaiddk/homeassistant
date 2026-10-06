@@ -617,9 +617,9 @@ pack_aula_skole:
           entity_id: input_boolean.aula_notifikationer
           state: "on"
         - variables:
-            # Tilføj din kones telefon her, når Home Assistant-appen er sat op på den.
             modtagere:
               - notify.mobile_app_plaids_iphone
+              - notify.mobile_app_maja_iphone
         - repeat:
             for_each: "{{ modtagere }}"
             sequence:
